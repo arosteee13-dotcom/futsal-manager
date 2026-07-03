@@ -24,23 +24,37 @@ const MENTALITIES = {
   attacking: { label: 'Atacante', attackMod: 1.3, defenseMod: 0.7 },
 }
 
-const MAX_SQUAD = 14
+const MAX_SQUAD = 16
+const MAX_CONVOCADOS = 14
+const MAX_TITULARES = 5
+const MAX_BENCH = 9
+
+const INJURIES = [
+  { type: 'sprain',    description: 'Esguince de tobillo',     duration: 2, recoveryEnergy: 20 },
+  { type: 'strain',    description: 'Rotura fibrilar',          duration: 4, recoveryEnergy: 10 },
+  { type: 'contusion', description: 'Contusión muscular',       duration: 1, recoveryEnergy: 30 },
+  { type: 'fracture',  description: 'Fractura de dedo',         duration: 3, recoveryEnergy: 15 },
+  { type: 'meniscus',  description: 'Lesión de menisco',        duration: 5, recoveryEnergy: 10 },
+  { type: 'hamstring', description: 'Lesión en el isquiotibial',duration: 3, recoveryEnergy: 15 },
+  { type: 'ankle',     description: 'Torcedura de tobillo',     duration: 2, recoveryEnergy: 25 },
+]
 
 /* FC Barcelona — plantilla real */
+const CDN = 'https://cdn.resfu.com/img_data/players/medium'
 const FCB_SQUAD = [
-  { id: 'fcb-1', name: 'Dídac Plana', position: 'portero', skill: 83, energy: 95, number: 21, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-2', name: 'Miquel Feixas', position: 'portero', skill: 72, energy: 100, number: 26, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-3', name: 'Joao Alves', position: 'cierre', skill: 85, energy: 90, number: 5, nationality: '🇵🇹 Portugal', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-4', name: 'Antonio Pérez Ortega', position: 'cierre', skill: 78, energy: 88, number: 6, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-5', name: 'Matheus Rodrigues', position: 'ala', skill: 86, energy: 85, number: 3, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-6', name: 'Adolfo Fernández', position: 'ala', skill: 80, energy: 82, number: 8, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-7', name: 'Mamadou Touré', position: 'ala', skill: 82, energy: 78, number: 11, nationality: '🇸🇳 Senegal', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-8', name: 'Catela', position: 'ala', skill: 88, energy: 80, number: 13, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-9', name: 'Eric Martel', position: 'ala', skill: 76, energy: 92, number: 14, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-10', name: 'Sergio González Pérez', position: 'ala', skill: 79, energy: 86, number: 16, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-11', name: 'Luciano Gauna', position: 'ala', skill: 84, energy: 75, number: 25, nationality: '🇦🇷 Argentina', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-12', name: 'Pito', position: 'pivot', skill: 92, energy: 83, number: 10, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
-  { id: 'fcb-13', name: 'Fits', position: 'pivot', skill: 87, energy: 79, number: 19, nationality: '🇦🇴 Angola', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0 },
+  { id: 'fcb-1', name: 'Dídac Plana', position: 'portero', skill: 83, energy: 95, number: 21, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622208.jpg?size=120x&lossy=1` },
+  { id: 'fcb-2', name: 'Miquel Feixas', position: 'portero', skill: 72, energy: 100, number: 26, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622210.jpg?size=120x&lossy=1` },
+  { id: 'fcb-3', name: 'Joao Alves', position: 'cierre', skill: 85, energy: 90, number: 5, nationality: '🇵🇹 Portugal', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622190.jpg?size=120x&lossy=1` },
+  { id: 'fcb-4', name: 'Antonio Pérez Ortega', position: 'cierre', skill: 78, energy: 88, number: 6, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622212.jpg?size=120x&lossy=1` },
+  { id: 'fcb-5', name: 'Matheus Rodrigues', position: 'ala', skill: 86, energy: 85, number: 3, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622216.jpg?size=120x&lossy=1` },
+  { id: 'fcb-6', name: 'Adolfo Fernández', position: 'ala', skill: 80, energy: 82, number: 8, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622219.jpg?size=120x&lossy=1` },
+  { id: 'fcb-7', name: 'Mamadou Touré', position: 'ala', skill: 82, energy: 78, number: 11, nationality: '🇸🇳 Senegal', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622228.jpg?size=120x&lossy=1` },
+  { id: 'fcb-8', name: 'Catela', position: 'ala', skill: 88, energy: 80, number: 13, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622223.jpg?size=120x&lossy=1` },
+  { id: 'fcb-9', name: 'Eric Martel', position: 'ala', skill: 76, energy: 92, number: 14, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622226.jpg?size=120x&lossy=1` },
+  { id: 'fcb-10', name: 'Sergio González Pérez', position: 'ala', skill: 79, energy: 86, number: 16, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622227.jpg?size=120x&lossy=1` },
+  { id: 'fcb-11', name: 'Luciano Gauna', position: 'ala', skill: 84, energy: 75, number: 25, nationality: '🇦🇷 Argentina', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622351.jpg?size=120x&lossy=1` },
+  { id: 'fcb-12', name: 'Pito', position: 'pivot', skill: 92, energy: 83, number: 10, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622231.jpg?size=120x&lossy=1` },
+  { id: 'fcb-13', name: 'Fits', position: 'pivot', skill: 87, energy: 79, number: 19, nationality: '🇦🇴 Angola', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622234.jpg?size=120x&lossy=1` },
 ]
 
 /* Pool de nombres españoles para CPU */
@@ -78,14 +92,12 @@ function generateCpuSquad(teamId) {
       const value = calcValue(skill)
       players.push({
         id: `${teamId}-cpu-${pid++}`,
-        name,
-        position: pos,
-        skill,
-        energy: randInt(70, 100),
-        number: pid,
+        name, position: pos, skill,
+        energy: randInt(70, 100), number: pid,
         nationality: '🇪🇸 España',
         goals: 0, matches: 0,
         value, listed: false, salePrice: 0,
+        enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null,
       })
     }
   }
@@ -97,12 +109,22 @@ const COUNTRIES = [
     leagues: [
       { id: 'lnfs1', name: 'LNFS Primera División',
         teams: [
-          { id: 'fcb', name: 'FC Barcelona' },
-          { id: 'elp', name: 'ElPozo Murcia' },
-          { id: 'mov', name: 'Movistar Inter' },
-          { id: 'pal', name: 'PALMA Futsal' },
-          { id: 'val', name: 'Levante UD' },
-          { id: 'jae', name: 'Jaén Paraíso Interior' },
+          { id: '1041', name: 'Barça', logo: 'https://cdn.resfu.com/img_data/equipos/1041.png?size=120x&lossy=1' },
+          { id: '4146', name: 'ElPozo Murcia Costa Calida', logo: 'https://cdn.resfu.com/img_data/equipos/4146.png?size=120x&lossy=1' },
+          { id: '3093', name: 'Inter FS', logo: 'https://cdn.resfu.com/img_data/equipos/3093.png?size=120x&lossy=1' },
+          { id: '3092', name: 'Palma Futsal', logo: 'https://cdn.resfu.com/img_data/equipos/3092.png?size=120x&lossy=1' },
+          { id: '3219', name: 'Jaén FS', logo: 'https://cdn.resfu.com/img_data/equipos/3219.png?size=120x&lossy=1' },
+          { id: '83478', name: 'Cordoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1' },
+          { id: '69694', name: 'Inagroup El Ejido', logo: 'https://cdn.resfu.com/img_data/equipos/69694.png?size=120x&lossy=1' },
+          { id: '3082', name: 'Industrias Santa Coloma', logo: 'https://cdn.resfu.com/img_data/equipos/3082.png?size=120x&lossy=1' },
+          { id: '14228', name: 'Jimbee Cartagena', logo: 'https://cdn.resfu.com/img_data/equipos/14228.png?size=120x&lossy=1' },
+          { id: '5203', name: 'Manzanares FS', logo: 'https://cdn.resfu.com/img_data/equipos/5203.png?size=120x&lossy=1' },
+          { id: '7970', name: 'Noia Portus Apostoli', logo: 'https://cdn.resfu.com/img_data/equipos/7970.png?size=120x&lossy=1' },
+          { id: '3193', name: 'O Parrulo Ferrol', logo: 'https://cdn.resfu.com/img_data/equipos/3193.png?size=120x&lossy=1' },
+          { id: '2603', name: 'Osasuna Magna', logo: 'https://cdn.resfu.com/img_data/equipos/2603.png?size=120x&lossy=1' },
+          { id: '5208', name: 'Peñícola FS', logo: 'https://cdn.resfu.com/img_data/equipos/5208.png?size=120x&lossy=1' },
+          { id: '22225', name: 'Viña Albali Valdepeñas', logo: 'https://cdn.resfu.com/img_data/equipos/22225.png?size=120x&lossy=1' },
+          { id: '3096', name: 'Wanapix Sala 10', logo: 'https://cdn.resfu.com/img_data/equipos/3096.png?size=120x&lossy=1' },
         ] },
       { id: 'lnfs2', name: 'LNFS Segunda División',
         teams: [
@@ -203,8 +225,7 @@ class MatchEngine {
     this._timer = null
     this.onEvent = null
     this.onFinish = null
-    this.homeSkill = avgSkill(homePlayers) * calcTacticMultiplier(tactic.formation, tactic.mentality)
-    this.homeEnergy = avgEnergy(homePlayers) / 100
+    this.tacticMult = calcTacticMultiplier(tactic.formation, tactic.mentality)
     this.homeName = homeName || 'Tu Equipo'
     this.awayName = awayName || 'Rival'
   }
@@ -213,6 +234,24 @@ class MatchEngine {
     if (this.finished) return
     this.minute++
     if (this.minute > 40) { this._finish(); return }
+
+    /* Desgaste y lesiones */
+    const enPista = state.players.filter(p => p.enPista)
+    enPista.forEach(p => aplicarDesgaste(p))
+
+    const lesionado = simularLesion()
+    if (lesionado) {
+      lesionado.enPista = false
+      if (this.onEvent) this.onEvent({ text: `🚑 Lesión: ${lesionado.name} no puede continuar`, type: 'injury' }, this.homeScore, this.awayScore, this.minute)
+    }
+
+    /* Cambios automáticos */
+    const cambios = gestionarCambios()
+    for (const c of cambios) {
+      if (this.onEvent) this.onEvent({ text: `🔄 Sale: ${c.sale.name} (ENE:${c.sale.energy}) → Entra: ${c.entra.name} (ENE:${c.entra.energy})`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
+    }
+
+    /* Simular minuto */
     const event = this._simulateMinute()
     if (event) {
       this.events.push(event)
@@ -220,17 +259,23 @@ class MatchEngine {
       else if (event.type === 'awayGoal') this.awayScore++
       if (this.onEvent) this.onEvent(event, this.homeScore, this.awayScore, this.minute)
     }
+
     this._timer = setTimeout(() => this._tick(), 1400)
   }
   _simulateMinute() {
-    const homeChance = this.homeSkill * (0.5 + this.homeEnergy * 0.3)
+    const enPista = state.players.filter(p => p.enPista)
+    if (enPista.length === 0) return null
+    const homeSkill = enPista.reduce((s, p) => s + getHabilidadEfectiva(p), 0) / enPista.length * this.tacticMult
+    const homeEnergyAVG = enPista.reduce((s, p) => s + p.energy, 0) / enPista.length / 100
+
+    const homeChance = homeSkill * (0.5 + homeEnergyAVG * 0.3)
     const awayChance = this.awaySkill * 0.5
     const totalChance = homeChance + awayChance
     if (Math.random() > 0.42) return null
     const roll = Math.random() * totalChance
     const isHomeAttack = roll < homeChance
     const teamName = isHomeAttack ? this.homeName : this.awayName
-    const teamSkill = isHomeAttack ? this.homeSkill : this.awaySkill
+    const teamSkill = isHomeAttack ? homeSkill : this.awaySkill
     const goalProb = (teamSkill / 100) * 0.35
     if (Math.random() < goalProb) {
       const t = pickRandom(EVENTS_POOL.goal)
@@ -256,10 +301,12 @@ class MatchEngine {
 
 /* ============ STATE ============ */
 const STORAGE_KEY = 'futsal_saves'
+const TACTICS_KEY = 'futsal_tactics'
 
 const state = {
-  coach: '', team: '', teamId: '', countryId: '', leagueId: '',
+  coach: '', team: '', teamId: '', teamLogo: '', countryId: '', leagueId: '',
   gameId: null,
+  matchdaySquad: [], startingFive: [], subsBench: [], convocatoriaValidada: false,
   stats: { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 },
   players: [],
   tactic: { formation: '1-2-1', mentality: 'balanced' },
@@ -271,6 +318,9 @@ const state = {
   currentTab: 'club',
   clubSubTab: 'squad',
   marketTab: 'buy',
+  tacticsSlots: [],
+  benchIds: [],
+  reserveIds: [],
 }
 
 /* ============ HELPERS ============ */
@@ -307,17 +357,41 @@ function saveGame() {
   const idx = saves.findIndex(s => s.id === state.gameId)
   const matchday = state.stats.wins + state.stats.draws + state.stats.losses + 1
   const data = {
-    id: state.gameId, name: `${state.coach} - ${state.team}`, coach: state.coach, team: state.team, teamId: state.teamId,
+    id: state.gameId, name: `${state.coach} - ${state.team}`, coach: state.coach, team: state.team, teamId: state.teamId, teamLogo: state.teamLogo,
     countryId: state.countryId, leagueId: state.leagueId,
     date: new Date().toISOString(), matchday, players: state.players, tactic: state.tactic,
     finances: state.finances, stats: state.stats, leagueTeams: state.leagueTeams,
     currentMatchday: state.currentMatchday, totalMatchdays: state.totalMatchdays, fixtures: state.fixtures,
+    tacticsSlots: state.tacticsSlots,
+    benchIds: state.benchIds,
+    reserveIds: state.reserveIds,
   }
   if (idx >= 0) saves[idx] = data; else saves.unshift(data)
   setSaves(saves)
 }
 function autoSave() { saveGame() }
 function deleteSave(id) { let s = getSaves(); setSaves(s.filter(x => x.id !== id)) }
+
+function autoSaveTactics() {
+  if (!state.gameId) return
+  const data = { formation: state.tactic.formation, mentality: state.tactic.mentality, tacticsSlots: state.tacticsSlots, benchIds: state.benchIds, reserveIds: state.reserveIds }
+  try { const all = JSON.parse(localStorage.getItem(TACTICS_KEY)) || {}; all[state.gameId] = data; localStorage.setItem(TACTICS_KEY, JSON.stringify(all)) } catch {}
+}
+
+function loadTactics() {
+  if (!state.gameId) return
+  try {
+    const all = JSON.parse(localStorage.getItem(TACTICS_KEY)) || {}
+    const data = all[state.gameId]
+    if (data) {
+      state.tactic.formation = data.formation || state.tactic.formation
+      state.tactic.mentality = data.mentality || state.tactic.mentality
+      state.tacticsSlots = data.tacticsSlots || []
+      state.benchIds = data.benchIds || []
+      state.reserveIds = data.reserveIds || []
+    }
+  } catch {}
+}
 
 /* ============ LEAGUE / FIXTURES ============ */
 function generateFixtures(teamIds) {
@@ -348,6 +422,17 @@ function getTeamName(id) {
   if (id === state.teamId) return state.team
   const t = state.leagueTeams.find(x => x.teamId === id)
   return t ? t.name : id
+}
+
+function getTeamLogo(id) {
+  if (id === state.teamId) return state.teamLogo
+  for (const c of COUNTRIES) {
+    for (const l of c.leagues) {
+      const t = l.teams.find(x => x.id === id)
+      if (t && t.logo) return t.logo
+    }
+  }
+  return ''
 }
 
 function getTeamObj(id) {
@@ -410,9 +495,10 @@ function renderSquad(players) {
   container.innerHTML = ordered.map(p => {
     const pos = POSITIONS[p.position]
     const initials = getInitials(p.name)
+    const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
     return `
       <div class="player-card" data-player-id="${p.id}">
-        <div class="player-avatar" style="background:${pos.color}">${initials}</div>
+        <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
         <div class="player-info">
           <div class="player-name">${p.name}</div>
           <span class="player-position" style="background:${pos.color}">${pos.label}</span>
@@ -448,40 +534,475 @@ const formationRoles = {
   '1-1-2': [{ role: 'portero', label: '1' }, { role: 'cierre', label: '2' }, { role: 'ala', label: '3' }, { role: 'ala', label: '4' }],
 }
 
+function renderClub() {
+  const logoEl = document.getElementById('club-logo')
+  if (logoEl) {
+    logoEl.innerHTML = state.teamLogo ? `<img class="team-logo" src="${state.teamLogo}" alt="${state.team}">` : ''
+  }
+  document.getElementById('club-squad-content').classList.add('hidden')
+  document.getElementById('club-tactics-content').classList.add('hidden')
+  document.querySelectorAll('#view-club .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.subtab === state.clubSubTab))
+  if (state.clubSubTab === 'squad') {
+    document.getElementById('club-squad-content').classList.remove('hidden')
+    renderSquad(state.players)
+  } else {
+    document.getElementById('club-tactics-content').classList.remove('hidden')
+    renderTactics(state.tactic)
+  }
+}
+
+function renderBenchCard(player, extraClass) {
+  const pos = POSITIONS[player.position]
+  const avatarStyle = player.avatar
+    ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}`
+    : `background:${pos.color}`
+  return `<div class="bench-card ${extraClass}" data-player-id="${player.id}">
+    <div class="bc-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
+    <div class="bc-info">
+      <div class="bc-name-row">
+        <span class="bc-name">${player.name}</span>
+        <span class="bc-pos" style="background:${pos.color}">${pos.label}</span>
+      </div>
+      <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
+    </div>
+  </div>`
+}
+
+/* ============ TÁCTICA + CONVOCATORIA ============ */
+function getEneColor(energy) {
+  if (energy > 70) return '#10B981'
+  if (energy >= 50) return '#F59E0B'
+  return '#EF4444'
+}
+
+const POS_MULTIPLIER = {
+  portero: { portero: 1.0, cierre: 0.5, ala: 0.3, pivot: 0.2 },
+  cierre:  { portero: 0.3, cierre: 1.0, ala: 0.7, pivot: 0.5 },
+  ala:     { portero: 0.2, cierre: 0.6, ala: 1.0, pivot: 0.7 },
+  pivot:   { portero: 0.2, cierre: 0.5, ala: 0.7, pivot: 1.0 },
+}
+
+const SLOT_ROLES = {
+  '1-2-1': ['portero', 'cierre', 'ala', 'ala', 'pivot'],
+  '2-2':   ['portero', 'cierre', 'cierre', 'pivot', 'pivot'],
+  '1-1-2': ['portero', 'cierre', 'ala', 'pivot', 'pivot'],
+}
+
+function getPositionMultiplier(naturalPosition, assignedRole) {
+  const row = POS_MULTIPLIER[naturalPosition]
+  return row ? row[assignedRole] || 0.3 : 1
+}
+
 function renderTactics(tactic) {
-  renderFormations(tactic.formation)
-  renderMentality(tactic.mentality)
-  renderPitch(tactic.formation)
-  setupTacticsListeners(tactic)
-}
-function renderFormations(selected) {
-  const c = document.getElementById('formation-options')
-  if (!c) return
-  c.querySelectorAll('.tactics-btn').forEach(b => b.classList.toggle('active', b.dataset.formation === selected))
-}
-function renderMentality(selected) {
-  const c = document.getElementById('mentality-options')
-  if (!c) return
-  c.querySelectorAll('.tactics-btn').forEach(b => b.classList.toggle('active', b.dataset.mentality === selected))
-}
-function renderPitch(key) {
-  const pitch = document.getElementById('tactics-preview')
-  if (!pitch) return
-  const roles = formationRoles[key] || formationRoles['1-2-1']
-  pitch.innerHTML = `<div class="pitch">${roles.map(r => { const p = POSITIONS[r.role]; return `<div class="pitch-role" style="background:${p.color}">${r.label}</div>` }).join('')}</div>`
-}
-function setupTacticsListeners(tactic) {
+  const container = document.getElementById('club-tactics-content')
+  if (!container) return
+
+  /* Init slots if needed */
+  const roles = SLOT_ROLES[tactic.formation]
+  if (!state.tacticsSlots || state.tacticsSlots.length !== roles.length) {
+    state.tacticsSlots = roles.map(() => null)
+  } else {
+    /* On formation change, preserve players whose role still exists */
+    const oldRoles = SLOT_ROLES[tactic.formation] || roles
+    if (oldRoles.length !== roles.length) {
+      state.tacticsSlots = roles.map(r => {
+        const idx = oldRoles.indexOf(r)
+        return idx >= 0 ? state.tacticsSlots[idx] : null
+      })
+    }
+  }
+
+  const slots = state.tacticsSlots
+  const assignedIds = slots.filter(Boolean)
+  const assigned = assignedIds.map(id => state.players.find(p => p.id === id)).filter(Boolean)
+  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
+  const injured = state.players.filter(p => p.injury)
+
+  state.benchIds = state.benchIds.filter(id => available.find(p => p.id === id))
+  if (state.benchIds.length > MAX_BENCH) state.benchIds = state.benchIds.slice(0, MAX_BENCH)
+  const bench = state.benchIds.map(id => state.players.find(p => p.id === id)).filter(Boolean)
+  const rest = available.filter(p => !state.benchIds.includes(p.id))
+
+  const complete = slots.every(Boolean)
+  const hasGK = slots.some(id => {
+    if (!id) return false
+    const p = state.players.find(x => x.id === id)
+    return p && p.position === 'portero'
+  })
+  const enoughAvailable = available.length >= 5
+
+  /* Build HTML */
+  let html = `<div class="tactics-section">
+    <label class="tactics-label">Formación</label>
+    <div class="tactics-options" id="formation-options">
+      <button class="tactics-btn ${tactic.formation === '1-2-1' ? 'active' : ''}" data-formation="1-2-1">1-2-1</button>
+      <button class="tactics-btn ${tactic.formation === '2-2' ? 'active' : ''}" data-formation="2-2">2-2</button>
+      <button class="tactics-btn ${tactic.formation === '1-1-2' ? 'active' : ''}" data-formation="1-1-2">1-1-2</button>
+    </div>
+  </div>
+  <div class="tactics-section">
+    <label class="tactics-label">Mentalidad</label>
+    <div class="tactics-options" id="mentality-options">
+      <button class="tactics-btn ${tactic.mentality === 'defensive' ? 'active' : ''}" data-mentality="defensive">Defensiva</button>
+      <button class="tactics-btn ${tactic.mentality === 'balanced' ? 'active' : ''}" data-mentality="balanced">Balanceada</button>
+      <button class="tactics-btn ${tactic.mentality === 'attacking' ? 'active' : ''}" data-mentality="attacking">Atacante</button>
+    </div>
+  </div>`
+
+  /* Vertical pitch: attack top → goalkeeper bottom */
+  const PITCH_ROWS = {
+    '1-2-1': [[4], [2, 3], [1], [0]],
+    '2-2':   [[], [3, 4], [1, 2], [0]],
+    '1-1-2': [[3, 4], [2], [1], [0]],
+  }
+  const layout = PITCH_ROWS[tactic.formation] || PITCH_ROWS['1-2-1']
+
+  function renderPitchSlot(i) {
+    const role = roles[i]
+    const pid = slots[i]
+    const player = pid ? state.players.find(p => p.id === pid) : null
+    const pos = POSITIONS[role]
+    if (player) {
+      const mult = getPositionMultiplier(player.position, role)
+      const penalty = mult < 1 ? `${Math.round(mult * 100)}%` : ''
+      const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      return `<div class="pitch-slot-wrap">
+        <div class="pitch-slot filled" data-slot="${i}" style="border-color:${pos.color};background:${pos.color}">
+          <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
+        </div>
+        <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="⚠️ ${penalty}"` : ''}>${pos.label}</span>
+        <span class="pitch-slot-name">${player.name}</span>
+        <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
+      </div>`
+    }
+    return `<div class="pitch-slot-wrap">
+      <div class="pitch-slot empty" data-slot="${i}">+</div>
+      <span class="pitch-slot-role">${pos.label}</span>
+    </div>`
+  }
+
+  html += `<div class="pitch-tactics">`
+  layout.forEach(row => {
+    if (row.length === 0) { html += `<div style="flex:1"></div>`; return }
+    const wide = tactic.formation === '1-2-1' && row.length === 2
+    html += `<div class="pitch-row${wide ? ' wide' : ''}">${row.map(i => renderPitchSlot(i)).join('')}</div>`
+  })
+  html += `</div>`
+
+  /* Bench grid (9 circles: 5 + 4) */
+  html += `<div class="tactics-subsection-label">BANQUILLO (${bench.length}/${MAX_BENCH})</div>
+    <div class="bench-grid">`
+  for (let i = 0; i < MAX_BENCH; i++) {
+    const pid = state.benchIds[i]
+    const player = pid ? state.players.find(p => p.id === pid) : null
+    if (player) {
+      const pos = POSITIONS[player.position]
+      const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      html += `<div class="bench-slot-wrap">
+        <div class="bench-slot filled" data-bench="${i}">
+          <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
+        </div>
+        <span class="bench-slot-name">${player.name}</span>
+        <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
+      </div>`
+    } else {
+      html += `<div class="bench-slot-wrap">
+        <div class="bench-slot empty" data-bench="${i}">+</div>
+        <span class="bench-slot-name">—</span>
+      </div>`
+    }
+  }
+  html += `</div>`
+
+  /* Reserve slots (2) */
+  html += `<div class="tactics-subsection-label">RESERVAS</div>
+    <div class="bench-grid">`
+  for (let i = 0; i < 2; i++) {
+    const pid = state.reserveIds[i]
+    const player = pid ? state.players.find(p => p.id === pid) : null
+    if (player) {
+      const pos = POSITIONS[player.position]
+      const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      html += `<div class="bench-slot-wrap">
+        <div class="bench-slot filled" data-reserve="${i}">
+          <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
+        </div>
+        <span class="bench-slot-name">${player.name}</span>
+        <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
+      </div>`
+    } else {
+      html += `<div class="bench-slot-wrap">
+        <div class="bench-slot empty" data-reserve="${i}">+</div>
+        <span class="bench-slot-name">—</span>
+      </div>`
+    }
+  }
+  html += `</div>`
+
+  /* Injured */
+  if (injured.length > 0) {
+    html += `<div class="tactics-subsection-label" style="color:#EF4444">NO DISPONIBLES 🚑</div>
+      <div class="bench-row">${injured.map(p => {
+        const i = p.injury
+        const rt = i.remaining === 1 ? '🟡 falta 1 jornada' : `🔴 faltan ${i.remaining} jornadas`
+        return `<div class="bench-card unavailable">
+          <div class="bc-avatar" style="background:#EF4444;font-size:14px">🚑</div>
+          <div class="bc-info">
+            <div class="bc-name-row"><span class="bc-name">${p.name}</span></div>
+            <div class="bc-injury-text">${i.description} (${rt})</div>
+          </div>
+        </div>`
+      }).join('')}</div>`
+  }
+
+  container.innerHTML = html
+
+  /* Event listeners */
   document.querySelectorAll('#formation-options .tactics-btn').forEach(btn => {
     btn.onclick = () => { tactic.formation = btn.dataset.formation; renderTactics(tactic) }
   })
   document.querySelectorAll('#mentality-options .tactics-btn').forEach(btn => {
     btn.onclick = () => { tactic.mentality = btn.dataset.mentality; renderTactics(tactic) }
   })
+  document.querySelectorAll('.pitch-slot').forEach(el => {
+    el.onclick = () => {
+      const idx = parseInt(el.dataset.slot)
+      if (slots[idx]) { openSwapPicker(slots[idx], tactic) }
+      else { openSlotPicker(idx, roles[idx], tactic) }
+    }
+  })
+  document.querySelectorAll('.bench-slot').forEach(el => {
+    el.onclick = () => {
+      const benchIdx = el.dataset.bench
+      const reserveIdx = el.dataset.reserve
+      if (benchIdx !== undefined) {
+        const idx = parseInt(benchIdx)
+        if (el.classList.contains('filled')) {
+          const pid = state.benchIds[idx]
+          if (pid) openSwapPicker(pid, tactic)
+        } else {
+          openBenchPicker(idx, tactic)
+        }
+      } else if (reserveIdx !== undefined) {
+        const idx = parseInt(reserveIdx)
+        if (el.classList.contains('filled')) {
+          const pid = state.reserveIds[idx]
+          if (pid) openSwapPicker(pid, tactic)
+        } else {
+          openReservePicker(idx, tactic)
+        }
+      }
+    }
+  })
+  /* Auto-validate whenever formation is complete */
+  if (complete && hasGK && enoughAvailable) {
+    state.matchdaySquad = [...slots, ...state.benchIds, ...state.reserveIds]
+    state.startingFive = slots
+    state.subsBench = [...state.benchIds, ...state.reserveIds]
+    state.convocatoriaValidada = true
+  } else {
+    state.convocatoriaValidada = false
+  }
+  autoSaveTactics()
 }
 
-function renderClub() {
-  renderSquad(state.players)
-  renderTactics(state.tactic)
+function openSlotPicker(slotIndex, role, tactic) {
+  const assignedIds = state.tacticsSlots.filter(Boolean)
+  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
+  const pos = POSITIONS[role]
+  document.getElementById('slot-picker-title').textContent = `Elegir jugador para ${pos.label}`
+  const list = document.getElementById('slot-picker-list')
+  if (available.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted)">No hay jugadores disponibles</div>'
+  } else {
+    list.innerHTML = available.map(p => {
+      const mult = getPositionMultiplier(p.position, role)
+      const penalty = mult < 1 ? ` ⚠️ ${Math.round(mult * 100)}%` : ''
+      const col = POSITIONS[p.position].color
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
+      return `<div class="slot-picker-item" data-player-id="${p.id}">
+        <div class="sp-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
+        <div class="sp-info">
+          <div class="sp-name">${p.name}</div>
+          <div class="sp-detail">${POSITIONS[p.position].label} · HAB ${p.skill}</div>
+        </div>
+        <div class="sp-penalty">${penalty}</div>
+      </div>`
+    }).join('')
+    list.querySelectorAll('.slot-picker-item').forEach(el => {
+      el.onclick = () => {
+        state.tacticsSlots[slotIndex] = el.dataset.playerId
+        closeSlotPicker()
+        renderTactics(tactic)
+      }
+    })
+  }
+  document.getElementById('slot-picker-modal').classList.remove('hidden')
+  document.getElementById('slot-picker-close').onclick = closeSlotPicker
+}
+
+function closeSlotPicker() {
+  document.getElementById('slot-picker-modal').classList.add('hidden')
+}
+
+function openBenchPicker(slotIndex, tactic) {
+  const assignedIds = [...state.tacticsSlots.filter(Boolean), ...state.benchIds.filter(Boolean)]
+  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
+  document.getElementById('slot-picker-title').textContent = `Elegir suplente (slot ${slotIndex + 1})`
+  const list = document.getElementById('slot-picker-list')
+  if (available.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted)">No hay jugadores disponibles</div>'
+  } else {
+    list.innerHTML = available.map(p => {
+      const col = POSITIONS[p.position].color
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
+      return `<div class="slot-picker-item" data-player-id="${p.id}">
+        <div class="sp-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
+        <div class="sp-info">
+          <div class="sp-name">${p.name}</div>
+          <div class="sp-detail">${POSITIONS[p.position].label} · HAB ${p.skill}</div>
+        </div>
+      </div>`
+    }).join('')
+    list.querySelectorAll('.slot-picker-item').forEach(el => {
+      el.onclick = () => {
+        state.benchIds[slotIndex] = el.dataset.playerId
+        closeSlotPicker()
+        renderTactics(tactic)
+      }
+    })
+  }
+  document.getElementById('slot-picker-modal').classList.remove('hidden')
+  document.getElementById('slot-picker-close').onclick = closeSlotPicker
+}
+
+function openReservePicker(slotIndex, tactic) {
+  const assignedIds = [...state.tacticsSlots.filter(Boolean), ...state.benchIds.filter(Boolean), ...state.reserveIds.filter(Boolean)]
+  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
+  document.getElementById('slot-picker-title').textContent = `Elegir reserva (slot ${slotIndex + 1})`
+  const list = document.getElementById('slot-picker-list')
+  if (available.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted)">No hay jugadores disponibles</div>'
+  } else {
+    list.innerHTML = available.map(p => {
+      const col = POSITIONS[p.position].color
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
+      return `<div class="slot-picker-item" data-player-id="${p.id}">
+        <div class="sp-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
+        <div class="sp-info">
+          <div class="sp-name">${p.name}</div>
+          <div class="sp-detail">${POSITIONS[p.position].label} · HAB ${p.skill}</div>
+        </div>
+      </div>`
+    }).join('')
+    list.querySelectorAll('.slot-picker-item').forEach(el => {
+      el.onclick = () => {
+        state.reserveIds[slotIndex] = el.dataset.playerId
+        closeSlotPicker()
+        renderTactics(tactic)
+      }
+    })
+  }
+  document.getElementById('slot-picker-modal').classList.remove('hidden')
+  document.getElementById('slot-picker-close').onclick = closeSlotPicker
+}
+
+function openSwapPicker(playerId, tactic) {
+  const player = state.players.find(p => p.id === playerId)
+  if (!player) return
+  const slots = state.tacticsSlots
+  const formRoles = SLOT_ROLES[tactic.formation] || SLOT_ROLES['1-2-1']
+  document.getElementById('slot-picker-title').textContent = `Intercambiar a ${player.name}`
+  const list = document.getElementById('slot-picker-list')
+  list.innerHTML = formRoles.map((role, i) => {
+    const pid = slots[i]
+    const occupant = pid ? state.players.find(p => p.id === pid) : null
+    const pos = POSITIONS[role]
+    const avatarStyle = occupant
+      ? (occupant.avatar ? `background-image:url(${occupant.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`)
+      : `background:${pos.color}`
+    return `<div class="slot-picker-item" data-slot="${i}">
+      <div class="sp-avatar" style="${avatarStyle}">${occupant ? (occupant.avatar ? '' : getInitials(occupant.name)) : '—'}</div>
+      <div class="sp-info">
+        <div class="sp-name">${occupant ? occupant.name : '— Vacío —'}</div>
+        <div class="sp-detail" style="color:${pos.color}">${pos.label}</div>
+      </div>
+    </div>`
+  }).join('')
+  list.querySelectorAll('.slot-picker-item').forEach(el => {
+    el.onclick = () => {
+      const slotIdx = parseInt(el.dataset.slot)
+      const prevId = slots[slotIdx]
+      slots[slotIdx] = playerId
+      if (prevId && prevId !== playerId) {
+        state.benchIds = state.benchIds.filter(id => id !== playerId)
+        if (!state.benchIds.includes(prevId)) {
+          if (state.benchIds.length < MAX_BENCH) state.benchIds.push(prevId)
+        }
+      } else {
+        state.benchIds = state.benchIds.filter(id => id !== playerId)
+      }
+      closeSlotPicker()
+      renderTactics(tactic)
+    }
+  })
+  document.getElementById('slot-picker-modal').classList.remove('hidden')
+  document.getElementById('slot-picker-close').onclick = closeSlotPicker
+}
+
+/* ============ FATIGA & SUSTITUCIONES ============ */
+function getHabilidadEfectiva(player, assignedRole) {
+  const mult = assignedRole ? getPositionMultiplier(player.position, assignedRole) : 1
+  const base = player.energy < 50 ? Math.round(player.skill * 0.5) : player.skill
+  return Math.round(base * mult)
+}
+
+function aplicarDesgaste(player) {
+  const base = 3
+  const extraMap = { portero: -1, ala: 1 }
+  const extra = extraMap[player.position] || 0
+  player.energy = Math.max(0, player.energy - (base + extra + randInt(-1, 1)))
+  player.minutosEnPista = (player.minutosEnPista || 0) + 1
+}
+
+function findSustituto(banquillo, posicion, enPistaIds) {
+  const similares = { portero: ['portero'], cierre: ['cierre', 'ala'], ala: ['ala', 'cierre'], pivot: ['pivot', 'ala'] }
+  const validas = similares[posicion] || [posicion]
+  return banquillo
+    .filter(p => validas.includes(p.position) && p.energy >= 60 && !enPistaIds.includes(p.id))
+    .sort((a, b) => b.energy - a.energy)[0]
+}
+
+function gestionarCambios() {
+  const enPista = state.players.filter(p => p.enPista)
+  const banquillo = state.players.filter(p => p.convocado && !p.enPista)
+  const enPistaIds = enPista.map(p => p.id)
+  let cambios = []
+
+  for (const jugador of enPista) {
+    if (jugador.energy >= 60) continue
+    const sustituto = findSustituto(banquillo, jugador.position, enPistaIds)
+    if (!sustituto) continue
+    jugador.enPista = false
+    sustituto.enPista = true
+    enPistaIds[enPistaIds.indexOf(jugador.id)] = sustituto.id
+    cambios.push({ sale: jugador, entra: sustituto })
+    if (sustituto.energy < 60) break
+  }
+  return cambios
+}
+
+function simularLesion() {
+  for (const p of state.players) {
+    if (!p.enPista) continue
+    if (p.injury) continue
+    if (Math.random() > 0.025) continue
+    const inj = pickRandom(INJURIES)
+    p.injury = { type: inj.type, description: inj.description, duration: inj.duration, remaining: inj.duration, recoveryEnergy: inj.recoveryEnergy }
+    p.energy = 0
+    return p
+  }
+  return null
 }
 
 /* ============ LEAGUE VIEW ============ */
@@ -511,9 +1032,10 @@ function renderLeague() {
   let tableHtml = `<table class="league-table"><tr><th>#</th><th>Equipo</th><th>PJ</th><th>V</th><th>E</th><th>D</th><th>GF</th><th>GC</th><th>Pts</th></tr>`
   standings.forEach((s, i) => {
     const isUser = s.teamId === state.teamId
+    const logo = getTeamLogo(s.teamId)
     tableHtml += `<tr class="${isUser ? 'league-row-user' : ''}">
       <td><span class="league-pos ${i < 3 ? 'p' + (i+1) : ''}">${i + 1}</span></td>
-      <td>${getTeamName(s.teamId)}</td>
+      <td>${logo ? `<img class="team-logo" src="${logo}" style="width:18px;height:18px;vertical-align:middle;margin-right:6px">` : ''}${getTeamName(s.teamId)}</td>
       <td>${s.played}</td><td>${s.won}</td><td>${s.drawn}</td><td>${s.lost}</td>
       <td>${s.gf}</td><td>${s.ga}</td><td><strong>${s.pts}</strong></td>
     </tr>`
@@ -555,6 +1077,19 @@ let engine = null
 function startMatchFromLeague(rivalId, fixture) {
   const rival = getTeamObj(rivalId)
   if (!rival) return
+
+  if (!state.convocatoriaValidada) {
+    alert('Debes validar la convocatoria antes del partido. Ve a Club > Convocatoria.')
+    return
+  }
+
+  /* Set starting five on court */
+  state.players.forEach(p => { p.enPista = false })
+  state.startingFive.forEach(id => {
+    const p = state.players.find(x => x.id === id)
+    if (p) p.enPista = true
+  })
+
   document.getElementById('league-matchday-wrap').classList.add('hidden')
   document.getElementById('league-results-wrap').classList.add('hidden')
   document.getElementById('match-live').classList.remove('hidden')
@@ -575,6 +1110,10 @@ function startMatchFromLeague(rivalId, fixture) {
     addFeedEvent(event, minute)
     if (minute === 20) addFeedEvent({ text: '— DESCANSO —', type: 'break' }, minute)
   }
+
+  /* Starting lineup announcement */
+  const titularesStr = state.startingFive.map(id => { const p = state.players.find(x => x.id === id); return p ? `${p.name} (${POSITIONS[p.position].label})` : '' }).join(', ')
+  addFeedEvent({ text: `🏁 Once titular: ${titularesStr}`, type: 'break' }, 1)
 
   engine.onFinish = () => {
     addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' }, 40)
@@ -597,7 +1136,11 @@ function addFeedEvent(event, minute) {
     el.textContent = event.text
   } else {
     const time = formatTime(minute)
-    el.className = `feed-event${event.type === 'homeGoal' || event.type === 'awayGoal' ? ' goal' : ''}`
+    let extra = ''
+    if (event.type === 'homeGoal' || event.type === 'awayGoal') extra = ' goal'
+    else if (event.type === 'sub') extra = ' sub'
+    else if (event.type === 'injury') extra = ' injury'
+    el.className = `feed-event${extra}`
     el.innerHTML = `<strong>${time}</strong> ${event.text}`
   }
   feed.appendChild(el)
@@ -613,15 +1156,24 @@ function finishMatch(isHome, fixture, rival) {
   fixture.awayScore = isHome ? engine.awayScore : engine.homeScore
   fixture.played = true
 
-  /* Finance & energy */
+  /* Finance */
   let reward
   if (userScore > rivalScore) { reward = 800; state.stats.wins++ }
   else if (userScore === rivalScore) { reward = 300; state.stats.draws++ }
   else { reward = -200; state.stats.losses++ }
   state.finances.balance += reward
   state.finances.history.push({ reason: `J${state.currentMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
-  state.players.forEach(p => { p.energy = Math.max(30, p.energy - randInt(15, 35)) })
   updateHeaderBalance()
+
+  /* Post-match recovery: restore some energy for next matchday */
+  state.players.forEach(p => {
+    p.enPista = false
+    p.minutosEnPista = 0
+    p.convocado = false
+    p.titular = false
+    p.energy = Math.min(100, p.energy + randInt(15, 30))
+  })
+  state.convocatoriaValidada = false
 
   /* Player stats */
   const scorer = pickRandom(state.players)
@@ -667,6 +1219,15 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
 
   document.getElementById('btn-advance-matchday').onclick = () => {
     state.currentMatchday++
+    /* Avanzar recuperación de lesiones */
+    for (const p of state.players) {
+      if (!p.injury) continue
+      p.injury.remaining--
+      if (p.injury.remaining <= 0) {
+        p.energy = p.injury.recoveryEnergy
+        p.injury = null
+      }
+    }
     document.getElementById('league-results-wrap').classList.add('hidden')
     document.getElementById('league-matchday-wrap').classList.remove('hidden')
     renderLeague()
@@ -703,9 +1264,10 @@ function renderMarketContent() {
     container.innerHTML = filtered.map(p => {
       const pos = POSITIONS[p.position]
       const canBuy = state.players.length < MAX_SQUAD && state.finances.balance >= p.value
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
       return `
         <div class="market-card" data-player-id="${p.id}" data-team-id="${p.teamId}">
-          <div class="player-avatar" style="width:36px;height:36px;font-size:12px;background:${pos.color}">${getInitials(p.name)}</div>
+          <div class="player-avatar" style="width:36px;height:36px;font-size:12px;${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
           <div class="market-card-info">
             <div class="market-card-name">${p.name}</div>
             <div class="market-card-detail">${pos.label} · ${p.teamName} · HAB ${p.skill}</div>
@@ -752,9 +1314,10 @@ function renderMarketContent() {
     }
     container.innerHTML = filtered.map(p => {
       const pos = POSITIONS[p.position]
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
       return `
         <div class="market-card" data-player-id="${p.id}">
-          <div class="player-avatar" style="width:36px;height:36px;font-size:12px;background:${pos.color}">${getInitials(p.name)}</div>
+          <div class="player-avatar" style="width:36px;height:36px;font-size:12px;${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
           <div class="market-card-info">
             <div class="market-card-name">${p.name}</div>
             <div class="market-card-detail">${pos.label} · Precio: ${formatMoney(p.salePrice)}</div>
@@ -791,7 +1354,7 @@ function buyPlayer(player, team) {
   state.finances.history.push({ reason: `Compra: ${player.name}`, amount: -player.value })
   const idx = team.players.indexOf(player)
   if (idx >= 0) team.players.splice(idx, 1)
-  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, listed: false, salePrice: 0 }
+  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, listed: false, salePrice: 0, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }
   state.players.push(newPlayer)
   updateHeaderBalance()
   renderMarketContent()
@@ -800,8 +1363,9 @@ function buyPlayer(player, team) {
 /* ============ PLAYER MODAL ============ */
 function openPlayerModal(player, mode) {
   const pos = POSITIONS[player.position]
-  document.getElementById('modal-avatar').textContent = getInitials(player.name)
-  document.getElementById('modal-avatar').style.background = pos.color
+  const avatarEl = document.getElementById('modal-avatar')
+  avatarEl.textContent = player.avatar ? '' : getInitials(player.name)
+  avatarEl.style.background = player.avatar ? `url(${player.avatar}) center/cover, ${pos.color}` : pos.color
   document.getElementById('modal-name').textContent = player.name
   document.getElementById('modal-nationality').textContent = player.nationality || '🇪🇸 España'
   const posBadge = document.getElementById('modal-position')
@@ -906,12 +1470,12 @@ function setupNavigation() {
       state.clubSubTab = btn.dataset.subtab
       document.querySelectorAll('#view-club .sub-tab').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
+      document.getElementById('club-squad-content').classList.add('hidden')
+      document.getElementById('club-tactics-content').classList.add('hidden')
       if (state.clubSubTab === 'squad') {
-        document.getElementById('club-tactics-content').classList.add('hidden')
         document.getElementById('club-squad-content').classList.remove('hidden')
         renderSquad(state.players)
       } else {
-        document.getElementById('club-squad-content').classList.add('hidden')
         document.getElementById('club-tactics-content').classList.remove('hidden')
         renderTactics(state.tactic)
       }
@@ -978,15 +1542,25 @@ function newGame(coach) {
   state.coach = coach
   state.team = selectedTeam.name
   state.teamId = selectedTeam.id
+  state.teamLogo = selectedTeam.logo || ''
   state.countryId = selectedCountry.id
   state.leagueId = selectedLeague.id
   state.gameId = Date.now()
   state.stats = { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 }
   state.tactic = { formation: '1-2-1', mentality: 'balanced' }
+  state.tacticsSlots = []
+  state.benchIds = []
+  state.reserveIds = []
+  state.convocatoriaValidada = false
+  /* Clear old tactics save */
+  try { const all = JSON.parse(localStorage.getItem(TACTICS_KEY)) || {}; delete all[state.gameId]; localStorage.setItem(TACTICS_KEY, JSON.stringify(all)) } catch {}
   state.finances = { balance: 5000, history: [] }
 
   /* Assign user squad (FC Barcelona) or create default */
-  state.players = FCB_SQUAD.map(p => ({ ...p, value: calcValue(p.skill) }))
+  state.players = FCB_SQUAD.map(p => ({
+    ...p, value: calcValue(p.skill),
+    enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null,
+  }))
 
   /* Generate CPU teams */
   state.leagueTeams = []
@@ -1016,6 +1590,7 @@ function loadGame(id) {
   state.coach = data.coach
   state.team = data.team
   state.teamId = data.teamId
+  state.teamLogo = data.teamLogo || ''
   state.countryId = data.countryId
   state.leagueId = data.leagueId
   state.gameId = data.id
@@ -1027,6 +1602,9 @@ function loadGame(id) {
   state.currentMatchday = data.currentMatchday || 1
   state.totalMatchdays = data.totalMatchdays || 0
   state.fixtures = data.fixtures || []
+  state.tacticsSlots = data.tacticsSlots || []
+  state.benchIds = data.benchIds || []
+  state.reserveIds = data.reserveIds || []
   startGame()
 }
 
@@ -1034,8 +1612,8 @@ function startGame() {
   document.getElementById('menu-screen').classList.add('hidden')
   document.getElementById('game-screen').classList.remove('hidden')
   document.getElementById('header-title').textContent = state.team
+  loadTactics()
   setupNavigation()
-  /* Start on club view */
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
   document.querySelector('[data-tab="club"]').classList.add('active')
   renderTab('club')
@@ -1128,7 +1706,7 @@ function showLoadMenu() {
     const matchday = s.matchday || 1
     return `
       <div class="save-card" data-id="${s.id}">
-        <div class="save-crest"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#E5E7EB"/><text x="24" y="24" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#6B7280">${getInitials(s.team)}</text></svg></div>
+        <div class="save-crest">${s.teamLogo ? `<img src="${s.teamLogo}" style="width:48px;height:48px;object-fit:contain" alt="${s.team}">` : `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#E5E7EB"/><text x="24" y="24" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#6B7280">${getInitials(s.team)}</text></svg>`}</div>
         <div class="save-body">
           <div class="save-team">${s.team}</div>
           <div class="save-manager">Manager: ${s.coach}</div>

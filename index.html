@@ -75,40 +75,18 @@
         <!-- CLUB -->
         <section id="view-club" class="view active">
           <div class="view-header">
-            <h2>Club</h2>
-            <span class="player-count" id="club-player-count">0/14 jugadores</span>
+            <div class="view-header-left">
+              <span id="club-logo"></span>
+              <h2>Club</h2>
+            </div>
+            <span class="player-count" id="club-player-count">0/16 jugadores</span>
           </div>
           <div class="sub-tabs">
             <button class="sub-tab active" data-subtab="squad">Plantilla</button>
             <button class="sub-tab" data-subtab="tactics">Táctica</button>
           </div>
           <div id="club-squad-content"></div>
-          <div id="club-tactics-content" class="hidden">
-            <div class="tactics-section">
-              <label class="tactics-label">Formación</label>
-              <div class="tactics-options" id="formation-options">
-                <button class="tactics-btn active" data-formation="1-2-1">1-2-1</button>
-                <button class="tactics-btn" data-formation="2-2">2-2</button>
-                <button class="tactics-btn" data-formation="1-1-2">1-1-2</button>
-              </div>
-            </div>
-            <div class="tactics-section">
-              <label class="tactics-label">Mentalidad</label>
-              <div class="tactics-options" id="mentality-options">
-                <button class="tactics-btn" data-mentality="defensive">Defensiva</button>
-                <button class="tactics-btn active" data-mentality="balanced">Balanceada</button>
-                <button class="tactics-btn" data-mentality="attacking">Atacante</button>
-              </div>
-            </div>
-            <div class="tactics-preview" id="tactics-preview">
-              <div class="pitch">
-                <div class="pitch-role portero">1</div>
-                <div class="pitch-role cierre">2</div>
-                <div class="pitch-role ala">3</div>
-                <div class="pitch-role pivot">4</div>
-              </div>
-            </div>
-          </div>
+          <div id="club-tactics-content" class="hidden"></div>
         </section>
 
         <!-- LIGA -->
@@ -243,6 +221,17 @@
           <div class="modal-market-actions" id="modal-market-actions"></div>
         </div>
         <button class="btn-secondary modal-close" id="modal-close">CERRAR</button>
+      </div>
+    </div>
+
+    <!-- SLOT PICKER MODAL -->
+    <div id="slot-picker-modal" class="modal-overlay hidden">
+      <div class="modal-content" style="max-width:320px">
+        <div class="modal-scroll">
+          <div style="text-align:center;font-size:15px;font-weight:700;margin-bottom:8px" id="slot-picker-title">Elegir jugador</div>
+          <div id="slot-picker-list" style="width:100%"></div>
+        </div>
+        <button class="btn-secondary modal-close" id="slot-picker-close">CANCELAR</button>
       </div>
     </div>
 

@@ -116,10 +116,24 @@ html, body {
   margin-bottom: 16px;
 }
 
+.view-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .view-header h2 {
   font-size: 20px;
   font-weight: 700;
   color: var(--text);
+}
+
+.team-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 4px;
 }
 
 .player-count {
@@ -159,6 +173,9 @@ html, body {
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .player-info {
@@ -1430,6 +1447,353 @@ html, body {
 .modal-close {
   margin: 0 20px 16px;
   flex-shrink: 0;
+}
+
+/* ───────── TACTICS / SLOT PITCH ───────── */
+.pitch-tactics {
+  background: #1565C0;
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  width: 358px;
+  height: 520px;
+  gap: 8px;
+  position: relative;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,0.2), inset 0 0 0 6px rgba(255,255,255,0.1);
+}
+
+.pitch-tactics::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-50%);
+}
+
+.pitch-tactics::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pitch-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.pitch-row.wide {
+  gap: 80px;
+}
+
+.pitch-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pitch-slot {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2.5px dashed rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+
+.pitch-slot:active {
+  transform: scale(0.92);
+}
+
+.pitch-slot.filled {
+  border-style: solid;
+  border-width: 3px;
+  background-size: cover;
+  background-position: center;
+}
+
+.pitch-slot .slot-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background-size: cover;
+  background-position: center;
+}
+
+.pitch-slot.empty {
+  font-size: 24px;
+  color: rgba(255,255,255,0.6);
+}
+
+.pitch-slot-role {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.pitch-slot-role[data-penalty]::after {
+  content: attr(data-penalty);
+  position: absolute;
+  left: calc(100% + 4px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  font-weight: 700;
+  color: #FCD34D;
+  white-space: nowrap;
+}
+
+.pitch-slot-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ───────── TACTICS BENCH ───────── */
+.tactics-subsection-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 8px 0 6px;
+}
+
+.bench-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.bench-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 60px;
+}
+
+.bench-slot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px dashed rgba(0,0,0,0.2);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.1s;
+  font-size: 20px;
+  color: var(--text-muted);
+}
+
+.bench-slot:active {
+  transform: scale(0.92);
+}
+
+.bench-slot.filled {
+  border-style: solid;
+  border-width: 2px;
+  background-size: cover;
+  background-position: center;
+}
+
+.bench-slot .slot-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background-size: cover;
+  background-position: center;
+}
+
+.bench-slot-name {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.bench-slot-wrap .stat-row {
+  margin-top: 1px;
+}
+
+.bench-slot-wrap .stat-circle {
+  width: 18px;
+  height: 18px;
+  font-size: 8px;
+}
+
+.bc-injury-text {
+  font-size: 11px;
+  color: #EF4444;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* ───────── TACTICS VALIDATE ───────── */
+.tactics-validate-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+  margin-top: 12px;
+}
+
+.tactics-validate-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.tactics-validate-btn.disabled {
+  background: var(--border);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+/* ───────── SLOT PICKER MODAL ───────── */
+.slot-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+
+.slot-picker-item:last-child {
+  border-bottom: none;
+}
+
+.slot-picker-item:active {
+  background: var(--bg-surface);
+}
+
+.slot-picker-item .sp-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.slot-picker-item .sp-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.slot-picker-item .sp-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.slot-picker-item .sp-detail {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.slot-picker-item .sp-penalty {
+  font-size: 10px;
+  font-weight: 600;
+  color: #F59E0B;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ───────── FATIGA FEED ───────── */
+.feed-event.sub {
+  border-left-color: #F59E0B;
+}
+
+.feed-event.injury {
+  border-left-color: #EF4444;
+}
+
+.feed-event.sub strong,
+.feed-event.injury strong {
+  color: inherit;
 }
 
 /* Utilities */
