@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Futsal Manager</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="apple-touch-icon" href="app_icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="app_icon.png">
+</head>
+<body>
+  <div id="app">
+
+    <!-- MENU SCREEN -->
+    <div id="menu-screen">
+      <div id="menu-main">
+        <div class="menu-hero">
+          <span class="menu-logo">⚡</span>
+          <h1 class="menu-title">Futsal<br>Manager</h1>
+        </div>
+        <div class="menu-buttons">
+          <button class="btn-primary menu-btn" id="btn-new-game">Nueva Partida</button>
+          <button class="btn-secondary menu-btn" id="btn-load-game">Cargar Partida</button>
+        </div>
+      </div>
+      <div id="menu-browser" class="hidden">
+        <div class="menu-browser-header">
+          <button class="btn-back" id="btn-browser-back">← Volver</button>
+          <span id="menu-browser-title">Selecciona un país</span>
+        </div>
+        <div id="menu-browser-content" class="menu-list"></div>
+      </div>
+      <div id="menu-load" class="hidden">
+        <div class="load-header">
+          <span class="load-title">CARGAR PARTIDA</span>
+        </div>
+        <div id="load-scroll">
+          <div id="load-content"></div>
+        </div>
+        <div class="load-footer">
+          <button class="load-footer-btn" id="btn-load-cancel">CANCELAR</button>
+        </div>
+      </div>
+      <div id="menu-coach" class="hidden">
+        <div class="menu-browser-header">
+          <button class="btn-back" id="btn-coach-back">← Volver</button>
+          <span>Nuevo entrenador</span>
+        </div>
+        <div class="coach-section">
+          <p class="coach-summary" id="coach-summary"></p>
+          <label class="coach-label">Nombre del entrenador</label>
+          <input class="coach-input" id="coach-input" type="text" placeholder="Ej: Carlos" maxlength="30" autocomplete="off">
+          <button class="btn-primary menu-btn" id="btn-start-game">¡Empezar!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden">
+      <header id="app-header">
+        <div class="header-left">
+          <span class="header-icon">⚡</span>
+          <span class="header-title" id="header-title">Futsal Manager</span>
+        </div>
+        <div class="header-right">
+          <button class="header-save" id="btn-save-game">Guardar</button>
+          <span class="header-balance" id="header-balance">€5,000</span>
+        </div>
+      </header>
+
+      <main id="app-content">
+
+        <!-- CLUB -->
+        <section id="view-club" class="view active">
+          <div class="view-header">
+            <h2>Club</h2>
+            <span class="player-count" id="club-player-count">0/14 jugadores</span>
+          </div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" data-subtab="squad">Plantilla</button>
+            <button class="sub-tab" data-subtab="tactics">Táctica</button>
+          </div>
+          <div id="club-squad-content"></div>
+          <div id="club-tactics-content" class="hidden">
+            <div class="tactics-section">
+              <label class="tactics-label">Formación</label>
+              <div class="tactics-options" id="formation-options">
+                <button class="tactics-btn active" data-formation="1-2-1">1-2-1</button>
+                <button class="tactics-btn" data-formation="2-2">2-2</button>
+                <button class="tactics-btn" data-formation="1-1-2">1-1-2</button>
+              </div>
+            </div>
+            <div class="tactics-section">
+              <label class="tactics-label">Mentalidad</label>
+              <div class="tactics-options" id="mentality-options">
+                <button class="tactics-btn" data-mentality="defensive">Defensiva</button>
+                <button class="tactics-btn active" data-mentality="balanced">Balanceada</button>
+                <button class="tactics-btn" data-mentality="attacking">Atacante</button>
+              </div>
+            </div>
+            <div class="tactics-preview" id="tactics-preview">
+              <div class="pitch">
+                <div class="pitch-role portero">1</div>
+                <div class="pitch-role cierre">2</div>
+                <div class="pitch-role ala">3</div>
+                <div class="pitch-role pivot">4</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LIGA -->
+        <section id="view-league" class="view">
+          <div class="league-header">
+            <select id="league-selector" class="league-select"></select>
+          </div>
+          <div id="league-content">
+            <div id="league-table-wrap"></div>
+            <div id="league-matchday-wrap"></div>
+            <div id="match-live" class="hidden">
+              <div class="scoreboard">
+                <div class="score-team">
+                  <span class="score-name">Tu Equipo</span>
+                  <span class="score-value" id="score-home">0</span>
+                </div>
+                <div class="score-clock">
+                  <span class="clock-icon">⚽</span>
+                  <span class="clock-time" id="match-clock">00:00</span>
+                </div>
+                <div class="score-team">
+                  <span class="score-name">Rival</span>
+                  <span class="score-value" id="score-away">0</span>
+                </div>
+              </div>
+              <div class="match-feed" id="match-feed"></div>
+              <button class="btn-secondary hidden" id="btn-end-match">Finalizar</button>
+            </div>
+            <div id="league-results-wrap" class="hidden">
+              <h3 class="results-title">Resultados Jornada</h3>
+              <div id="league-results-list" class="results-list"></div>
+              <div id="league-standings-change" class="results-standings"></div>
+              <button class="btn-primary" id="btn-advance-matchday">Continuar →</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- MERCADO -->
+        <section id="view-market" class="view">
+          <div class="view-header">
+            <h2>Mercado</h2>
+          </div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" data-market-tab="buy">Disponibles</button>
+            <button class="sub-tab" data-market-tab="sell">Transferibles</button>
+          </div>
+          <div class="market-search-wrap">
+            <input class="market-search" id="market-search" type="text" placeholder="🔍 Buscar jugador...">
+          </div>
+          <div id="market-content"></div>
+        </section>
+
+        <!-- ECONOMÍA -->
+        <section id="view-finances" class="view">
+          <div class="view-header">
+            <h2>Economía</h2>
+          </div>
+          <div class="finance-card">
+            <span class="finance-label">Balance Total</span>
+            <span class="finance-balance" id="finance-balance">€5,000</span>
+          </div>
+          <div class="finance-history" id="finance-history"></div>
+        </section>
+
+      </main>
+
+      <nav id="bottom-nav">
+        <button class="nav-item active" data-tab="club">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="nav-label">Club</span>
+        </button>
+        <button class="nav-item" data-tab="league">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 7 9 7"/>
+            <path d="M18 9h1.5a2.5 2.5 0 000-5C17 4 17 7 15 7"/>
+            <line x1="4" y1="22" x2="14" y2="22"/>
+            <line x1="9" y1="14" x2="9" y2="22"/>
+            <line x1="14" y1="17" x2="14" y2="22"/>
+            <path d="M5 16a9 9 0 1114 0"/>
+          </svg>
+          <span class="nav-label">Liga</span>
+        </button>
+        <button class="nav-item" data-tab="market">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+          </svg>
+          <span class="nav-label">Mercado</span>
+        </button>
+        <button class="nav-item" data-tab="finances">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+          </svg>
+          <span class="nav-label">Economía</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- PLAYER MODAL -->
+    <div id="player-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-scroll">
+          <div class="modal-avatar-wrap" id="modal-avatar-wrap">
+            <div class="player-avatar modal-avatar" id="modal-avatar"></div>
+          </div>
+          <div class="modal-name" id="modal-name"></div>
+          <div class="modal-nationality" id="modal-nationality"></div>
+          <div class="modal-position" id="modal-position"></div>
+          <div class="modal-stats-row">
+            <div class="modal-stat">
+              <span class="modal-stat-label">HAB</span>
+              <span class="modal-stat-value" id="modal-skill"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="modal-stat-label">ENE</span>
+              <span class="modal-stat-value" id="modal-energy"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="modal-stat-label">VALOR</span>
+              <span class="modal-stat-value modal-stat-money" id="modal-value"></span>
+            </div>
+          </div>
+          <div class="modal-season-stats">
+            <span>Goles: <strong id="modal-goals">0</strong></span>
+            <span>Partidos: <strong id="modal-matches">0</strong></span>
+          </div>
+          <div class="modal-market-actions" id="modal-market-actions"></div>
+        </div>
+        <button class="btn-secondary modal-close" id="modal-close">CERRAR</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
