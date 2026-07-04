@@ -1349,7 +1349,7 @@ function startMatchFromLeague(rivalId, fixture) {
   }
 
   renderPlayerRatings()
-  engine.iniciarCronometro()
+  setTimeout(() => { if (engine) engine.iniciarCronometro() }, 100)
 }
 
 function addFeedEvent(event) {

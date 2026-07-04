@@ -1017,7 +1017,7 @@ html, body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px 14px;
+  padding: 6px 8px;
   position: relative;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.2s ease;
@@ -1029,12 +1029,12 @@ html, body {
 }
 
 .nav-icon {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 .nav-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
@@ -1045,7 +1045,7 @@ html, body {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 26px;
+  width: 22px;
   height: 3px;
   background: var(--accent);
   border-radius: 0 0 3px 3px;
