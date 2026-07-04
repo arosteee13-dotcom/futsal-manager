@@ -410,6 +410,9 @@ html, body {
 }
 
 .cal-match-result.played { color: var(--text); }
+.cal-match-result.win  { color: #22c55e; }
+.cal-match-result.loss { color: #ef4444; }
+.cal-match-result.draw { color: #f97316; }
 
 .cal-back-btn {
   width: 100%;
