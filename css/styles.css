@@ -776,12 +776,13 @@ html, body {
   align-items: center;
   height: 100%;
   padding: 12px;
+  gap: 8px;
 }
 
-#view-match.active .match-feed {
+#view-match.active #log-partido {
   width: 100%;
   flex-shrink: 0;
-  min-height: 80px;
+  height: 150px;
 }
 
 #view-match.active .scoreboard {
@@ -797,8 +798,9 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  margin-bottom: 8px;
   min-height: 40px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .match-player-item {
@@ -864,15 +866,31 @@ html, body {
 
 .match-bottom-bar {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 0;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  padding: 3px;
   width: 100%;
   margin-top: auto;
 }
 
-.match-bottom-bar .btn-primary,
-.match-bottom-bar .btn-secondary {
+.match-bottom-bar button {
   flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.1s;
+}
+.match-bottom-bar button:active {
+  background: #fff;
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 /* ───────── FALTAS ───────── */
@@ -882,7 +900,6 @@ html, body {
   justify-content: center;
   gap: 12px;
   padding: 6px 16px;
-  margin-bottom: 4px;
   width: 100%;
 }
 .fouls-team { display: flex; align-items: center; gap: 3px; }
@@ -900,8 +917,8 @@ html, body {
   padding: 12px;
   background: #f8f9fa;
   border-radius: var(--radius-md);
-  max-height: 150px;
-  overflow-y: auto;
+  height: 140px;
+  overflow-y: scroll;
 }
 
 .match-planes {
@@ -1764,6 +1781,43 @@ html, body {
 .league-pos.p2 { color: #9CA3AF; }
 .league-pos.p3 { color: #D97706; }
 
+.zona-playoff {
+  background: #d4edda !important;
+}
+.zona-playoff .league-pos {
+  border: 2px solid rgba(40, 167, 69, 0.5);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.zona-permanencia {
+  background: #fff !important;
+}
+.zona-permanencia .league-pos {
+  border: 2px solid rgba(108, 117, 125, 0.3);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.zona-descenso {
+  background: #f8d7da !important;
+}
+.zona-descenso .league-pos {
+  border: 2px solid rgba(220, 53, 69, 0.5);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ───────── MATCHDAY CARD ───────── */
 .league-matchday-card {
   background: var(--bg-card);
@@ -1856,6 +1910,13 @@ html, body {
 
 .results-team.right {
   text-align: right;
+}
+
+.results-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .results-standings {
@@ -2095,6 +2156,11 @@ html, body {
   border-radius: var(--radius-sm);
 }
 
+/* ───────── TACTICS MODAL ───────── */
+#tactics-modal .modal-content { max-height: 95vh; }
+#tactics-modal .modal-scroll { padding: 16px; overflow-y: auto; max-height: 80vh; }
+#tactics-modal .pitch-grid { width: 100%; height: auto; aspect-ratio: 358/285; padding: 4px; box-sizing: border-box; }
+#tactics-modal .bench-slot-wrap { width: 56px; }
 .modal-avatar-wrap {
   margin-bottom: 4px;
 }

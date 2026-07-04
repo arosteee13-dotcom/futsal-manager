@@ -99,13 +99,17 @@ const COUNTRIES = [
             staff: [{ name: 'Javier Rodríguez Nebreda', nationality: '🇪🇸 España', role: 'headCoach', avatar: 'img/staff/3622776.png',
               career: [{ team: 'Barça', from: '01/09/2024', to: 'Actualidad', matches: 30, won: 18, drawn: 5, lost: 7 }]
             }] },
-          { id: '4146', name: 'ElPozo Murcia Costa Calida', logo: 'https://cdn.resfu.com/img_data/equipos/4146.png?size=120x&lossy=1' },
+          { id: '4146', name: 'ElPozo Murcia Costa Cálida', logo: 'https://cdn.resfu.com/img_data/equipos/4146.png?size=120x&lossy=1',
+            staff: [{ name: 'Josan González', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/70557.jpg?size=120x&lossy=1',
+              career: [{ team: 'ElPozo Murcia Costa Cálida', from: '06/02/2025', to: 'Actualidad', matches: 35, won: 20, drawn: 7, lost: 8 }]
+            }] },
           { id: '3093', name: 'Inter FS', logo: 'https://cdn.resfu.com/img_data/equipos/3093.png?size=120x&lossy=1' },
           { id: '3092', name: 'Palma Futsal', logo: 'https://cdn.resfu.com/img_data/equipos/3092.png?size=120x&lossy=1' },
           { id: '3219', name: 'Jaén FS', logo: 'https://cdn.resfu.com/img_data/equipos/3219.png?size=120x&lossy=1' },
-          { id: '83478', name: 'Cordoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1',
+          { id: '83478', name: 'Córdoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1',
             staff: [{ name: 'Ema Santoro', nationality: '🇦🇷 Argentina', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1',
-              career: [{ team: 'Cordoba Patrimonio', from: '01/07/2025', to: 'Actualidad', matches: 15, won: 6, drawn: 3, lost: 6 }]
+              career: [{ team: 'Córdoba Patrimonio', from: '01/07/2025', to: 'Actualidad', matches: 15, won: 6, drawn: 3, lost: 6 }]
             }] },
           { id: '69694', name: 'Inagroup El Ejido', logo: 'https://cdn.resfu.com/img_data/equipos/69694.png?size=120x&lossy=1' },
           { id: '3082', name: 'Industrias Santa Coloma', logo: 'https://cdn.resfu.com/img_data/equipos/3082.png?size=120x&lossy=1' },
@@ -114,15 +118,30 @@ const COUNTRIES = [
           { id: '7970', name: 'Noia Portus Apostoli', logo: 'https://cdn.resfu.com/img_data/equipos/7970.png?size=120x&lossy=1' },
           { id: '3193', name: 'O Parrulo Ferrol', logo: 'https://cdn.resfu.com/img_data/equipos/3193.png?size=120x&lossy=1' },
           { id: '2603', name: 'Osasuna Magna', logo: 'https://cdn.resfu.com/img_data/equipos/2603.png?size=120x&lossy=1' },
-          { id: '5208', name: 'Peñícola FS', logo: 'https://cdn.resfu.com/img_data/equipos/5208.png?size=120x&lossy=1' },
+          { id: '5208', name: 'Peñíscola FS', logo: 'https://cdn.resfu.com/img_data/equipos/5208.png?size=120x&lossy=1' },
           { id: '22225', name: 'Viña Albali Valdepeñas', logo: 'https://cdn.resfu.com/img_data/equipos/22225.png?size=120x&lossy=1' },
-          { id: '3096', name: 'Wanapix Sala 10', logo: 'https://cdn.resfu.com/img_data/equipos/3096.png?size=120x&lossy=1' },
+          { id: '3096', name: 'Wanapix Sala 10', logo: 'https://cdn.resfu.com/img_data/equipos/3096.png?size=120x&lossy=1',
+            staff: [{ name: 'Jorge Palos', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69296.jpg?size=120x&lossy=1',
+              career: [{ team: 'Wanapix Sala 10', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 10, drawn: 7, lost: 13 }]
+            }] },
         ] },
       { id: 'lnfs2', name: 'LNFS Segunda División',
         teams: [
-          { id: 'mra', name: 'MRA Navarra' },
-          { id: 'bis', name: 'Bisontes Castellón' },
-          { id: 'mel', name: 'MELilla' },
+          { id: 'seg-1',  name: 'Zambu Pinatar',                 logo: 'https://cdn.resfu.com/img_data/equipos/8222.png?size=120x&lossy=1' },
+          { id: 'seg-2',  name: 'Heredia 21 Málaga CR FS',       logo: 'https://cdn.resfu.com/img_data/equipos/5174.png?size=120x&lossy=1' },
+          { id: 'seg-3',  name: 'Ciudad de Móstoles',            logo: 'https://cdn.resfu.com/img_data/equipos/8038.png?size=120x&lossy=1' },
+          { id: 'seg-4',  name: 'Entrerríos Zaragoza',           logo: 'https://cdn.resfu.com/img_data/equipos/8008.png?size=120x&lossy=1' },
+          { id: 'seg-5',  name: 'Gasifred Atlético',             logo: 'https://cdn.resfu.com/img_data/equipos/4160.png?size=120x&lossy=1' },
+          { id: 'seg-6',  name: 'Barça Atlétic',                 logo: 'https://cdn.resfu.com/img_data/equipos/5172.png?size=120x&lossy=1' },
+          { id: 'seg-7',  name: 'CD Leganés FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/5196.png?size=120x&lossy=1' },
+          { id: 'seg-8',  name: 'Sala 5 Martorell',              logo: 'https://cdn.resfu.com/img_data/equipos/107592.png?size=120x&lossy=1' },
+          { id: 'seg-9',  name: 'Burela FS',                     logo: 'https://cdn.resfu.com/img_data/equipos/3094.png?size=120x&lossy=1' },
+          { id: 'seg-10', name: 'Levante UD FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/14230.png?size=120x&lossy=1' },
+          { id: 'seg-11', name: 'Melistar Futsal',               logo: 'https://cdn.resfu.com/img_data/equipos/8369.png?size=120x&lossy=1' },
+          { id: 'seg-12', name: 'Avanza Jaén Paraíso Int.',      logo: 'https://cdn.resfu.com/img_data/equipos/153125.png?size=120x&lossy=1' },
+          { id: 'seg-13', name: 'Unión África Ceutí',            logo: 'https://cdn.resfu.com/img_data/equipos/11126.png?size=120x&lossy=1' },
+          { id: 'seg-14', name: 'CD Tafa FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/8158.png?size=120x&lossy=1' },
         ] },
     ] },
   { id: 'pt', name: 'Portugal', flag: '🇵🇹',
@@ -528,8 +547,15 @@ function getFixtureForUser(matchday) {
 
 function getTeamName(id) {
   if (id === state.teamId) return state.team
-  const t = state.leagueTeams.find(x => x.teamId === id)
-  return t ? t.name : id
+  let t = state.leagueTeams.find(x => x.teamId === id)
+  if (t) return t.name
+  for (const c of COUNTRIES) {
+    for (const l of c.leagues) {
+      t = l.teams.find(x => x.id === id)
+      if (t) return t.name
+    }
+  }
+  return id
 }
 
 function getTeamLogo(id) {
@@ -1198,12 +1224,23 @@ function simularLesion() {
 }
 
 /* ============ LEAGUE VIEW ============ */
+function getLeagueTeams(leagueId) {
+  for (const c of COUNTRIES) {
+    const league = c.leagues.find(l => l.id === leagueId)
+    if (league) return league.teams || []
+  }
+  return []
+}
+
 function renderLeague() {
   const selector = document.getElementById('league-selector')
   const tableWrap = document.getElementById('league-table-wrap')
   const resultsWrap = document.getElementById('league-results-wrap')
 
   resultsWrap.classList.add('hidden')
+
+  /* Save selected league before rebuilding dropdown */
+  const selectedLeagueId = selector.value || state.leagueId
 
   /* Dropdown */
   const country = COUNTRIES.find(c => c.id === state.countryId)
@@ -1215,16 +1252,25 @@ function renderLeague() {
     opts += `<option value="${l.id}" data-country="${l.country.id}" ${isOwn ? 'selected' : ''}>${l.country.flag} ${l.name}</option>`
   }
   selector.innerHTML = opts
+  selector.value = selectedLeagueId
 
   /* Table */
-  const standings = updateLeagueStandings()
+  const isOwnLeague = selectedLeagueId === state.leagueId
+  const standings = isOwnLeague
+    ? updateLeagueStandings()
+    : getLeagueTeams(selectedLeagueId).map(t => ({
+        teamId: t.id, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0,
+        name: t.name, logo: t.logo
+      }))
   let tableHtml = `<table class="league-table"><tr><th>#</th><th>Equipo</th><th>PJ</th><th>V</th><th>E</th><th>D</th><th>GF</th><th>GC</th><th>Pts</th></tr>`
   standings.forEach((s, i) => {
-    const isUser = s.teamId === state.teamId
-    const logo = getTeamLogo(s.teamId)
-    tableHtml += `<tr class="${isUser ? 'league-row-user' : ''}" data-team-id="${s.teamId}" style="${!isUser ? 'cursor:pointer' : ''}">
+    const isUser = isOwnLeague && s.teamId === state.teamId
+    const zonaClass = i < 8 ? 'zona-playoff' : i < 14 ? 'zona-permanencia' : 'zona-descenso'
+    const logo = s.logo || getTeamLogo(s.teamId)
+    const name = s.name || getTeamName(s.teamId)
+    tableHtml += `<tr class="${isUser ? 'league-row-user ' : ''}${zonaClass}" data-team-id="${s.teamId}" style="${!isUser ? 'cursor:pointer' : ''}">
       <td><span class="league-pos ${i < 3 ? 'p' + (i+1) : ''}">${i + 1}</span></td>
-      <td>${logo ? `<img class="team-logo" src="${logo}" style="width:18px;height:18px;vertical-align:middle;margin-right:6px">` : ''}${getTeamName(s.teamId)}</td>
+      <td>${logo ? `<img class="team-logo" src="${logo}" style="width:18px;height:18px;vertical-align:middle;margin-right:6px">` : ''}${name}</td>
       <td>${s.played}</td><td>${s.won}</td><td>${s.drawn}</td><td>${s.lost}</td>
       <td>${s.gf}</td><td>${s.ga}</td><td><strong>${s.pts}</strong></td>
     </tr>`
@@ -1242,6 +1288,8 @@ let engine = null
 let tiempoSegundos = 0
 let intervaloCrono = null
 let parteActual = 1
+let faltasLocal = 0
+let faltasVisitante = 0
 let matchPaused = false
 const matchData = { homeScore: 0, awayScore: 0, homeFouls: 0, awayFouls: 0, rivalName: '' }
 
@@ -1252,14 +1300,14 @@ function irAlPartido() {
   document.getElementById('btn-header-menu').style.display = 'none'
   tiempoSegundos = 0
   parteActual = 1
+  faltasLocal = 0
+  faltasVisitante = 0
   if (intervaloCrono) { clearInterval(intervaloCrono); intervaloCrono = null }
   document.getElementById('cronometro').innerText = '00:00'
-  document.getElementById('match-feed').innerHTML = ''
-  document.getElementById('match-result-area').classList.add('hidden')
+  document.getElementById('log-partido').innerHTML = ''
   document.getElementById('match-players').innerHTML = ''
   document.getElementById('btn-start-match').style.display = 'block'
   document.getElementById('btn-end-match').style.display = 'none'
-  document.getElementById('btn-half-time').style.display = 'none'
 }
 
 function empezarPartido() {
@@ -1281,6 +1329,64 @@ function empezarPartido() {
       if (Math.random() < 0.008 / 60 && !p._yellowThisMatch) {
         p.yellowCards = (p.yellowCards || 0) + 1; p._yellowThisMatch = true
         addFeedEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'sub' })
+        if (Math.random() < 0.2) {
+          p.redCards = (p.redCards || 0) + 1
+          p._redThisMatch = true
+          p.enPista = false
+          addFeedEvent({ text: `🟥 Roja: ${p.name} — Expulsado`, type: 'injury' })
+        }
+      }
+    }
+
+    /* Faltas */
+    if (Math.random() < 0.02 / 60) {
+      const isHomeFault = Math.random() < 0.5
+      if (isHomeFault) {
+        faltasLocal++
+        document.getElementById('fouls-home').textContent = faltasLocal
+        const culprit = pickRandom(state.players.filter(p => p.enPista))
+        addFeedEvent({ text: `Falta: ${culprit ? culprit.name : state.team}`, type: 'sub' })
+        if (faltasLocal <= 5) {
+          if (Math.random() < 0.15) {
+            matchData.awayScore++
+            document.getElementById('score-away').textContent = matchData.awayScore
+            addFeedEvent({ text: `⚽ ${matchData.rivalName} (libre directo)`, type: 'awayGoal' })
+          }
+        } else {
+          addFeedEvent({ text: '🚨 ¡Sexta falta! ¡DOBLE PENALTI en contra!', type: 'sub' })
+          if (Math.random() < 0.7) {
+            matchData.awayScore++
+            document.getElementById('score-away').textContent = matchData.awayScore
+            addFeedEvent({ text: `⚽ ${matchData.rivalName} (penalti)`, type: 'awayGoal' })
+          }
+        }
+      } else {
+        faltasVisitante++
+        document.getElementById('fouls-away').textContent = faltasVisitante
+        addFeedEvent({ text: `Falta de ${matchData.rivalName}`, type: 'sub' })
+        if (faltasVisitante <= 5) {
+          if (Math.random() < 0.15) {
+            matchData.homeScore++
+            document.getElementById('score-home').textContent = matchData.homeScore
+            const g = pickRandom(state.players.filter(p => p.enPista))
+            if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 }
+            let goalText = `⚽ ${g ? g.name + ' (' + state.team + ')' : state.team} (libre directo)`
+            if (Math.random() < 0.35) {
+              const ass = pickRandom(state.players.filter(p => p.enPista && p.id !== g?.id))
+              if (ass) { ass.assists = (ass.assists || 0) + 1; goalText += ` 🅰️ ${ass.name}` }
+            }
+            addFeedEvent({ text: goalText, type: 'homeGoal' })
+          }
+        } else {
+          addFeedEvent({ text: `🚨 ¡Sexta falta de ${matchData.rivalName}! ¡DOBLE PENALTI a favor!`, type: 'sub' })
+          if (Math.random() < 0.7) {
+            matchData.homeScore++
+            document.getElementById('score-home').textContent = matchData.homeScore
+            const g = pickRandom(state.players.filter(p => p.enPista))
+            if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 }
+            addFeedEvent({ text: `⚽ ${g ? g.name + ' (' + state.team + ')' : state.team} (penalti)`, type: 'homeGoal' })
+          }
+        }
       }
     }
 
@@ -1291,11 +1397,17 @@ function empezarPartido() {
       clearInterval(intervaloCrono)
       intervaloCrono = null
       if (parteActual === 1) {
+        faltasLocal = 0
+        faltasVisitante = 0
+        document.getElementById('fouls-home').textContent = '0'
+        document.getElementById('fouls-away').textContent = '0'
         addFeedEvent({ text: '— DESCANSO —', type: 'break' })
+        parteActual = 2
         btn.innerText = '▶ EMPEZAR 2ª PARTE'
         btn.disabled = false
       } else {
         addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
+        btn.style.display = 'none'
         document.getElementById('btn-end-match').style.display = 'block'
       }
     }
@@ -1315,25 +1427,45 @@ function simularEventoPartido() {
   const teamName = isHomeAttack ? state.team : matchData.rivalName
   const teamSkill = isHomeAttack ? homeSkill : 70
   if (Math.random() < (teamSkill / 100) * 0.35) {
-    const t = pickRandom(EVENTS_POOL.goal)
     if (isHomeAttack) matchData.homeScore++; else matchData.awayScore++
     document.getElementById('score-home').textContent = matchData.homeScore
     document.getElementById('score-away').textContent = matchData.awayScore
-    if (isHomeAttack) { const g = pickRandom(enPista); if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 } }
-    addFeedEvent({ text: t.text(teamName), type: isHomeAttack ? 'homeGoal' : 'awayGoal' })
-  } else if (Math.random() < 0.55) {
-    addFeedEvent({ text: pickRandom(EVENTS_POOL.save).text(teamName), type: 'save' })
-  } else {
-    addFeedEvent({ text: pickRandom(EVENTS_POOL.miss).text(teamName), type: 'miss' })
+    if (isHomeAttack) {
+      const g = pickRandom(enPista); if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 }
+      let goalText = `⚽ ${g ? g.name + ' (' + state.team + ')' : state.team}`
+      if (Math.random() < 0.35) {
+        const ass = pickRandom(enPista.filter(x => x.id !== g?.id))
+        if (ass) { ass.assists = (ass.assists || 0) + 1; goalText += ` 🅰️ ${ass.name}` }
+      }
+      addFeedEvent({ text: goalText, type: 'homeGoal' })
+    } else {
+      addFeedEvent({ text: `⚽ ${matchData.rivalName}`, type: 'awayGoal' })
+    }
   }
 }
 
 function startMatchFromLeague(rivalId, fixture) {
   const rival = getTeamObj(rivalId)
   if (!rival) return
+  const tactic = state.tactic
 
   /* Set starting five */
-  const five = state.startingFive.length > 0 ? state.startingFive : state.tacticsSlots.filter(Boolean)
+  let five = state.startingFive.length > 0 ? state.startingFive : state.tacticsSlots.filter(Boolean)
+  five = five.filter(id => state.players.find(p => p.id === id))
+  if (five.length === 0) {
+    const roles = ['portero', 'cierre', 'ala', 'ala', 'pivot']
+    const assigned = []
+    five = roles.map(role => {
+      const candidates = state.players.filter(p => !p.injury && !assigned.includes(p.id))
+      const best = candidates.sort((a, b) => {
+        const multA = getPositionMultiplier(a.position, role)
+        const multB = getPositionMultiplier(b.position, role)
+        return multB !== multA ? multB - multA : b.skill - a.skill
+      })[0]
+      if (best) assigned.push(best.id)
+      return best ? best.id : null
+    }).filter(Boolean)
+  }
   state.players.forEach(p => { p.enPista = false })
   five.forEach(id => { const p = state.players.find(x => x.id === id); if (p) p.enPista = true })
 
@@ -1353,65 +1485,26 @@ function startMatchFromLeague(rivalId, fixture) {
 
   const isHome = fixture.home === state.teamId
 
-  /* Game plan selector */
-  const planesEl = document.getElementById('match-planes')
-  planesEl.innerHTML = `<select class="tactics-select" id="match-gameplan-select">
-    ${Object.entries(GAME_PLANS).map(([key, gp]) =>
-      `<option value="${key}" ${tactic.gamePlan === key ? 'selected' : ''}>${gp.label}</option>`
-    ).join('')}
-  </select>
-  <div class="gameplan-desc" id="match-gameplan-desc">${GAME_PLANS[tactic.gamePlan].desc}</div>`
-  document.getElementById('match-gameplan-select').onchange = (e) => {
-    tactic.gamePlan = e.target.value
-    addFeedEvent({ text: `🔄 Cambio táctico: ${GAME_PLANS[tactic.gamePlan].label}`, type: 'sub' })
-  }
-
-  /* Starting lineup */
-  const titularesStr = state.startingFive.map(id => { const p = state.players.find(x => x.id === id); return p ? `${p.name} (${POSITIONS[p.position].label})` : '' }).join(', ')
-  addFeedEvent({ text: `🏁 Once titular: ${titularesStr}`, type: 'break' })
-
-  /* Botón Segunda Parte */
-  document.getElementById('btn-half-time').onclick = () => {
-    document.getElementById('btn-half-time').style.display = 'none'
-    document.getElementById('btn-start-match').style.display = 'block'
-    parteActual = 2
-    tiempoSegundos = 1200
-    document.getElementById('cronometro').innerText = '20:00'
-    addFeedEvent({ text: '— SEGUNDA PARTE —', type: 'break' })
-    empezarPartido()
-  }
-
   /* Botón Finalizar */
   document.getElementById('btn-end-match').onclick = () => {
     if (intervaloCrono) { clearInterval(intervaloCrono); intervaloCrono = null }
     finishMatch(isHome, fixture, rival)
   }
 
-  /* Botón Táctica */
-  document.getElementById('btn-tactica').onclick = () => {
-    document.getElementById('view-match').classList.remove('active')
-    document.getElementById('view-club').classList.add('active')
-    document.getElementById('bottom-nav').style.display = ''
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
-    document.querySelector('[data-tab="club"]').classList.add('active')
-    state.clubSubTab = 'tactics'
-    renderClub()
-  }
-
   renderPlayerRatings()
 }
 
 function addFeedEvent(event) {
-  const feed = document.getElementById('match-feed')
+  const feed = document.getElementById('log-partido')
   const el = document.createElement('div')
   if (event.type === 'break') {
     el.className = 'feed-event minute'
     el.textContent = event.text
   } else {
-    const sec = engine ? engine.gameSeconds : 0
+    const sec = tiempoSegundos || 0
     const mm = String(Math.floor(sec / 60)).padStart(2, '0')
     const ss = String(sec % 60).padStart(2, '0')
-    const time = `${engine ? engine.half + 'T' : '1T'} ${mm}:${ss}`
+    const time = `${parteActual > 0 ? parteActual + 'T' : '1T'} ${mm}:${ss}`
     let extra = ''
     if (event.type === 'homeGoal' || event.type === 'awayGoal') extra = ' goal'
     else if (event.type === 'sub') extra = ' sub'
@@ -1427,6 +1520,8 @@ function renderPlayerRatings() {
   const container = document.getElementById('match-players')
   if (!container) return
   const enPista = state.players.filter(p => p.enPista)
+  const posOrder = { portero: 0, cierre: 1, ala: 2, pivot: 3 }
+  enPista.sort((a, b) => (posOrder[a.position] ?? 99) - (posOrder[b.position] ?? 99))
   container.innerHTML = enPista.map(p => {
     const pos = POSITIONS[p.position]
     const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
@@ -1438,6 +1533,220 @@ function renderPlayerRatings() {
       <span class="match-player-rating">${'★'.repeat(Math.max(1, Math.round(getHabilidadEfectiva(p) / 20)))}</span>
     </div>`
   }).join('')
+}
+
+/* ============ TACTICS MODAL ============ */
+function abrirTacticasModal() {
+  console.log('[TACTICS] modal opening')
+  /* Pause match timer */
+  if (intervaloCrono) {
+    clearInterval(intervaloCrono)
+    intervaloCrono = null
+  }
+
+  const modal = document.getElementById('tactics-modal')
+  const formContainer = document.getElementById('tm-formation')
+  const gpSelect = document.getElementById('tm-gameplan')
+  const gpDesc = document.getElementById('tm-gameplan-desc')
+  const pitch = document.getElementById('tm-pitch')
+  const bench = document.getElementById('tm-bench')
+  const reserves = document.getElementById('tm-reserves')
+  const tactic = state.tactic
+
+  /* Formation buttons */
+  formContainer.innerHTML = Object.keys(FORMATIONS).map(k =>
+    `<button class="tactics-btn ${tactic.formation === k ? 'active' : ''}" data-formation="${k}">${k}</button>`
+  ).join('')
+  formContainer.querySelectorAll('.tactics-btn').forEach(btn => {
+    btn.onclick = () => {
+      tactic.formation = btn.dataset.formation
+      abrirTacticasModal()
+    }
+  })
+
+  /* Game plan */
+  gpSelect.innerHTML = Object.entries(GAME_PLANS).map(([k, v]) =>
+    `<option value="${k}" ${tactic.gamePlan === k ? 'selected' : ''}>${v.label}</option>`
+  ).join('')
+  gpSelect.onchange = () => {
+    tactic.gamePlan = gpSelect.value
+    gpDesc.textContent = GAME_PLANS[tactic.gamePlan].desc
+  }
+  gpDesc.textContent = GAME_PLANS[tactic.gamePlan].desc
+
+  /* Pitch grid — same as Club renderTactics() */
+  const roles = SLOT_ROLES[tactic.formation] || SLOT_ROLES['1-2-1']
+  if (!state.tacticsSlots || state.tacticsSlots.length !== roles.length) {
+    state.tacticsSlots = roles.map(() => null)
+  }
+
+  const FORMATION_GRID = {
+    '1-2-1': [[null, null, null, null], [null, null, 2, null], [0, 1, null, 4], [null, null, 3, null], [null, null, null, null]],
+    '2-2':   [[null, null, null, null], [null, 1, null, 3], [0, null, null, null], [null, 2, null, 4], [null, null, null, null]],
+    '1-1-2': [[null, null, null, null], [null, null, null, 3], [0, 1, 2, null], [null, null, null, 4], [null, null, null, null]],
+  }
+
+  let html = `<div class="pitch-col-label" style="grid-area:1/1">POR</div>
+    <div class="pitch-col-label" style="grid-area:1/2">CIE</div>
+    <div class="pitch-col-label" style="grid-area:1/3">ALA</div>
+    <div class="pitch-col-label" style="grid-area:1/4">PIV</div>`
+
+  const gridData = FORMATION_GRID[tactic.formation] || FORMATION_GRID['1-2-1']
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 4; col++) {
+      const slotIdx = gridData[row][col]
+      if (slotIdx === null) continue
+      const cssRow = row + 2
+      const cssCol = col + 1
+      const area = `${cssRow}/${cssCol}`
+      const role = roles[slotIdx]
+      const pid = state.tacticsSlots[slotIdx] || null
+      const player = pid ? state.players.find(p => p.id === pid) : null
+      const pos = POSITIONS[role]
+
+      if (player) {
+        const isRed = player._redThisMatch
+        const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+        html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
+          <div class="pitch-slot filled" data-slot="${slotIdx}" style="border-color:${isRed ? '#EF4444' : pos.color};background:${isRed ? '#EF4444' : pos.color}">
+            <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
+          </div>
+          <span class="pitch-slot-role" style="color:${isRed ? '#EF4444' : '#fff'}">${isRed ? '🟥' : pos.label}</span>
+          <span class="pitch-slot-name">${isRed ? '🟥 Expulsado' : player.name}</span>
+          ${isRed ? '' : `<div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>`}
+        </div>`
+      } else {
+        html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
+          <div class="pitch-slot empty" data-slot="${slotIdx}">+</div>
+          <span class="pitch-slot-role">${pos.label}</span>
+        </div>`
+      }
+    }
+  }
+  pitch.innerHTML = html
+
+  /* Click on filled slot → remove player (unless expelled) */
+  pitch.querySelectorAll('.pitch-slot.filled').forEach(el => {
+    el.onclick = () => {
+      const slotIdx = parseInt(el.dataset.slot)
+      const pid = state.tacticsSlots[slotIdx]
+      const player = pid ? state.players.find(p => p.id === pid) : null
+      if (player && !player._redThisMatch) {
+        player.enPista = false
+        state.tacticsSlots[slotIdx] = null
+        renderPlayerRatings()
+        abrirTacticasModal()
+      }
+    }
+  })
+
+  /* Click on empty slot → assign best bench player for that role */
+  pitch.querySelectorAll('.pitch-slot.empty').forEach(el => {
+    el.onclick = () => {
+      const slotIdx = parseInt(el.dataset.slot)
+      const role = roles[slotIdx]
+      const candidates = state.players.filter(p => !p.enPista && !p.injury && !p._redThisMatch && !state.tacticsSlots.includes(p.id))
+      const best = candidates.sort((a, b) => {
+        const mA = getPositionMultiplier(a.position, role)
+        const mB = getPositionMultiplier(b.position, role)
+        return mB !== mA ? mB - mA : b.skill - a.skill
+      })[0]
+      if (best) {
+        state.tacticsSlots[slotIdx] = best.id
+        best.enPista = true
+        renderPlayerRatings()
+        abrirTacticasModal()
+      }
+    }
+  })
+
+  /* Filter available players (not on court, not injured, not expelled, not already in slots) */
+  const available = state.players.filter(p => !p.enPista && !p.injury && !p._redThisMatch && !state.tacticsSlots.includes(p.id))
+
+  /* Bench (9 max) */
+  const benchPlayers = available.slice(0, MAX_BENCH)
+  document.getElementById('tm-bench-label').textContent = `BANQUILLO (${benchPlayers.length})`
+
+  if (benchPlayers.length === 0) {
+    bench.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);width:100%">Sin suplentes</div>'
+  } else {
+    bench.innerHTML = benchPlayers.map(p => {
+      const pos = POSITIONS[p.position]
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      return `<div class="bench-slot-wrap">
+        <div class="bench-slot filled" data-pid="${p.id}" style="border-color:${pos.color}">
+          <div class="slot-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
+        </div>
+        <span class="bench-slot-name">${p.name}</span>
+        <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(p.energy)}">${p.energy}</div><div class="stat-circle" style="background:#9CA3AF">${p.skill}</div></div>
+      </div>`
+    }).join('')
+    bench.querySelectorAll('.bench-slot.filled').forEach(el => {
+      el.onclick = () => assignToSlot(el.dataset.pid, roles)
+    })
+  }
+
+  /* Reserves (8 max) */
+  const reservePlayers = available.slice(MAX_BENCH, MAX_BENCH + MAX_RESERVES)
+  document.getElementById('tm-reserves-label').textContent = `RESERVAS (${reservePlayers.length})`
+
+  if (reservePlayers.length === 0) {
+    reserves.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);width:100%">Sin reservas</div>'
+  } else {
+    reserves.innerHTML = reservePlayers.map(p => {
+      const pos = POSITIONS[p.position]
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      return `<div class="bench-slot-wrap">
+        <div class="bench-slot filled" data-pid="${p.id}" style="border-color:${pos.color}">
+          <div class="slot-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
+        </div>
+        <span class="bench-slot-name">${p.name}</span>
+        <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(p.energy)}">${p.energy}</div><div class="stat-circle" style="background:#9CA3AF">${p.skill}</div></div>
+      </div>`
+    }).join('')
+    reserves.querySelectorAll('.bench-slot.filled').forEach(el => {
+      el.onclick = () => assignToSlot(el.dataset.pid, roles)
+    })
+  }
+
+  function assignToSlot(pid, slotRoles) {
+    const player = state.players.find(p => p.id === pid)
+    if (!player) return
+    const emptySlots = state.tacticsSlots.map((s, i) => s === null ? i : -1).filter(i => i >= 0)
+    const bestSlot = emptySlots.sort((a, b) => {
+      const mA = getPositionMultiplier(player.position, slotRoles[a])
+      const mB = getPositionMultiplier(player.position, slotRoles[b])
+      return mB !== mA ? mB - mA : 0
+    })[0]
+    if (bestSlot !== undefined) {
+      state.tacticsSlots[bestSlot] = player.id
+      player.enPista = true
+      renderPlayerRatings()
+      abrirTacticasModal()
+    }
+  }
+
+  /* Apply button */
+  document.getElementById('tm-apply').onclick = () => {
+    addFeedEvent({ text: `🔄 Cambio táctico`, type: 'sub' })
+    modal.classList.remove('open')
+    resumeMatchTimer()
+  }
+
+  /* Close button */
+  document.getElementById('tm-close').onclick = () => {
+    modal.classList.remove('open')
+    resumeMatchTimer()
+  }
+
+  modal.classList.add('open')
+}
+
+function resumeMatchTimer() {
+  if (intervaloCrono) return
+  /* Don't auto-resume at halftime (parteActual=2, time at 20:00) */
+  if (parteActual === 2 && tiempoSegundos === 1200) return
+  empezarPartido()
 }
 
 function finishMatch(isHome, fixture, rival) {
@@ -1540,49 +1849,54 @@ function resetSeason() {
 }
 
 function showMatchdayResults(userScore, rivalScore, rivalName) {
-  /* Show result card in match view */
   document.getElementById('btn-end-match').style.display = 'none'
-  document.getElementById('match-result-area').classList.remove('hidden')
-  document.getElementById('result-home-display').textContent = userScore
-  document.getElementById('result-away-display').textContent = rivalScore
 
-  document.getElementById('btn-match-back').onclick = () => {
-    document.getElementById('view-match').classList.remove('active')
-    document.getElementById('view-league').classList.add('active')
-    document.getElementById('bottom-nav').style.display = ''
-    document.getElementById('btn-header-menu').style.display = ''
-    document.getElementById('match-result-area').classList.add('hidden')
+  /* Go directly to league results view */
+  document.getElementById('view-match').classList.remove('active')
+  document.getElementById('view-league').classList.add('active')
+  document.getElementById('bottom-nav').style.display = ''
+  document.getElementById('btn-header-menu').style.display = ''
 
-    const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
-    const list = document.getElementById('league-results-list')
-    list.innerHTML = fixtures.map(f => {
-      const homeName = getTeamName(f.home)
-      const awayName = getTeamName(f.away)
-      const isUserMatch = f.home === state.teamId || f.away === state.teamId
-      return `
-        <div class="results-item ${isUserMatch ? 'results-item-user' : ''}">
-          <span class="results-team right">${homeName}</span>
-          <span class="results-score">${f.homeScore} - ${f.awayScore}</span>
-          <span class="results-team">${awayName}</span>
-        </div>
-      `
-    }).join('')
+  const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
+  const list = document.getElementById('league-results-list')
+  list.innerHTML = fixtures.map(f => {
+    const homeName = getTeamName(f.home)
+    const awayName = getTeamName(f.away)
+    const homeLogo = getTeamLogo(f.home)
+    const awayLogo = getTeamLogo(f.away)
+    const isUserMatch = f.home === state.teamId || f.away === state.teamId
+    return `
+      <div class="results-item ${isUserMatch ? 'results-item-user' : ''}">
+        <img class="results-logo" src="${homeLogo}" alt="" onerror="this.style.display='none'">
+        <span class="results-team">${homeName}</span>
+        <span class="results-score">${f.homeScore} - ${f.awayScore}</span>
+        <span class="results-team">${awayName}</span>
+        <img class="results-logo" src="${awayLogo}" alt="" onerror="this.style.display='none'">
+      </div>
+    `
+  }).join('')
 
-    const standings = updateLeagueStandings()
-    const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
-    document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
-    document.getElementById('league-results-wrap').classList.remove('hidden')
+  const standings = updateLeagueStandings()
+  const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
+  document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
+  document.getElementById('league-results-wrap').classList.remove('hidden')
 
-    document.getElementById('btn-advance-matchday').onclick = () => {
-      state.currentMatchday++
-      for (const p of state.players) {
-        if (!p.injury) continue
-        p.injury.remaining--
-        if (p.injury.remaining <= 0) { p.energy = p.injury.recoveryEnergy; p.injury = null }
-      }
-      document.getElementById('league-results-wrap').classList.add('hidden')
-      renderLeague()
+  document.getElementById('btn-advance-matchday').onclick = () => {
+    if (state.currentMatchday >= 30) {
+      const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
+      let msg = `📊 Temporada finalizada. Posición: ${pos}º`
+      if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
+      else if (pos <= 8) msg += '\n🏆 ¡Clasificado al Playoff por el título!'
+      alert(msg)
     }
+    state.currentMatchday++
+    for (const p of state.players) {
+      if (!p.injury) continue
+      p.injury.remaining--
+      if (p.injury.remaining <= 0) { p.energy = p.injury.recoveryEnergy; p.injury = null }
+    }
+    document.getElementById('league-results-wrap').classList.add('hidden')
+    renderLeague()
   }
 }
 
@@ -1908,7 +2222,7 @@ function setupNavigation() {
 
   /* League selector */
   document.getElementById('league-selector').onchange = (e) => {
-    // Just visual for now
+    renderLeague()
   }
 
   /* Modal close */
@@ -2339,9 +2653,15 @@ function showTeamInfo(teamId) {
       </div>
       <button class="btn-back" id="btn-team-back">← Volver</button>
     </div>
-    <div class="team-info-card">
-      <span class="finance-label">Posición en liga</span>
-      <span class="finance-balance">${pos}º de ${standings.length}</span>
+    <div class="team-info-card" style="display:flex;justify-content:space-around;padding:12px 0">
+      <div style="text-align:center">
+        <div class="finance-label" style="margin-bottom:4px">Posición en liga</div>
+        <div class="finance-balance">${pos}º</div>
+      </div>
+      <div style="text-align:center">
+        <div class="finance-label" style="margin-bottom:4px">Rating del equipo</div>
+        <div class="finance-balance">${Math.round(avgSkill(team.players))}</div>
+      </div>
     </div>
     ${team.staff && team.staff.length > 0 ? `<div class="tactics-subsection-label">Staff técnico (${team.staff.length})</div>${team.staff.map(s => {
       const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
@@ -2462,5 +2782,6 @@ document.getElementById('btn-new-game').onclick = () => showBrowser('countries')
 document.getElementById('btn-load-game').onclick = showLoadMenu
 document.getElementById('btn-browser-back').onclick = handleBrowserBack
 document.getElementById('btn-load-cancel').onclick = showMainMenu
+document.getElementById('btn-tactica').onclick = abrirTacticasModal
 
 showMainMenu()

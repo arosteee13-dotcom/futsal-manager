@@ -230,20 +230,21 @@
             </div>
             <span class="fouls-vs">VS</span>
             <div class="fouls-team">
-              <span class="fouls-limit">5</span>
-              <span class="fouls-sep">/</span>
-              <span class="fouls-count" id="fouls-away">0</span>
               <span class="fouls-label">Faltas</span>
+              <span class="fouls-count" id="fouls-away">0</span>
+              <span class="fouls-sep">/</span>
+              <span class="fouls-limit">5</span>
             </div>
           </div>
-          <div class="match-planes" id="match-planes"></div>
-          <div class="match-feed" id="match-feed"></div>
+          <div class="match-planes" id="match-planes" style="display:none"></div>
+          <div class="feed-event minute" id="eventos-header">⚡ Eventos</div>
+          <div class="match-feed" id="log-partido"></div>
+          <div class="feed-event minute" id="quinteto-header">🏁 Quinteto titular</div>
           <div class="match-players" id="match-players"></div>
           <div class="match-bottom-bar">
-            <button class="btn-primary" id="btn-start-match" style="display:none" onclick="empezarPartido()">JUGAR</button>
-            <button class="btn-primary" id="btn-half-time" style="display:none">▶ 2ª PARTE</button>
-            <button class="btn-secondary" id="btn-end-match" style="display:none">FINALIZAR</button>
-            <button class="btn-primary" id="btn-tactica">📋 TÁCTICA</button>
+            <button id="btn-start-match" style="display:none" onclick="empezarPartido()">JUGAR</button>
+            <button id="btn-end-match" style="display:none">FINALIZAR</button>
+            <button id="btn-tactica">TÁCTICA</button>
           </div>
           <div id="match-result-area" class="hidden">
             <div class="result-card">
@@ -375,12 +376,38 @@
         </div>
         <button class="btn-secondary modal-close" id="staff-modal-close">CERRAR</button>
       </div>
+    <!-- TACTICS MODAL -->
+    <div id="tactics-modal" class="modal-overlay">
+      <div class="modal-content" style="max-width:380px">
+        <div class="modal-scroll" style="gap:6px">
+          <div style="font-size:16px;font-weight:700">Táctica</div>
+          <div class="tactics-section">
+            <label class="tactics-label">Formación</label>
+            <div class="tactics-options" id="tm-formation"></div>
+          </div>
+          <div class="tactics-section">
+            <label class="tactics-label">Modelo</label>
+            <select class="tactics-select" id="tm-gameplan"></select>
+            <div class="gameplan-desc" id="tm-gameplan-desc"></div>
+          </div>
+          <div class="tactics-subsection-label">EN PISTA</div>
+          <div class="pitch-grid" id="tm-pitch"></div>
+          <div class="tactics-subsection-label" id="tm-bench-label">BANQUILLO</div>
+          <div class="bench-grid" id="tm-bench"></div>
+          <div class="tactics-subsection-label" id="tm-reserves-label">RESERVAS</div>
+          <div class="bench-grid" id="tm-reserves"></div>
+        </div>
+        <button class="btn-primary" id="tm-apply" style="margin:0 20px 8px">✅ APLICAR CAMBIOS</button>
+        <button class="btn-secondary modal-close" id="tm-close">← VOLVER</button>
+      </div>
     </div>
 
   </div>
 
   <script src="js/data/squad-fcb.js"></script>
   <script src="js/data/squad-cordoba.js"></script>
+  <script src="js/data/squad-sala10.js"></script>
+  <script src="js/data/squad-elpozo.js"></script>
   <script src="js/data/teams.js"></script>
   <script src="js/app.js"></script>
 </body>
