@@ -681,13 +681,13 @@ function renderTactics(tactic) {
     const pos = POSITIONS[role]
     if (player) {
       const mult = getPositionMultiplier(player.position, role)
-      const penalty = mult < 1 ? `${Math.round(mult * 100)}%` : ''
+      const penalty = mult < 1 ? '⚠️' : ''
       const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
       return `<div class="pitch-slot-wrap">
         <div class="pitch-slot filled" data-slot="${i}" style="border-color:${pos.color};background:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
         </div>
-        <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="⚠️ ${penalty}"` : ''}>${pos.label}</span>
+        <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="${penalty}"` : ''}>${pos.label}</span>
         <span class="pitch-slot-name">${player.name}</span>
         <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
       </div>`
@@ -717,13 +717,13 @@ function renderTactics(tactic) {
       const pos = POSITIONS[role]
       if (player) {
         const mult = getPositionMultiplier(player.position, role)
-        const penalty = mult < 1 ? `${Math.round(mult * 100)}%` : ''
+        const penalty = mult < 1 ? '⚠️' : ''
         const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
         html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
           <div class="pitch-slot filled" data-slot="${slotIdx}" style="border-color:${pos.color};background:${pos.color}">
             <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
           </div>
-          <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="⚠️ ${penalty}"` : ''}>${pos.label}</span>
+          <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="${penalty}"` : ''}>${pos.label}</span>
           <span class="pitch-slot-name">${player.name}</span>
           <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
         </div>`
@@ -865,7 +865,7 @@ function openSlotPicker(slotIndex, role, tactic) {
   } else {
     list.innerHTML = available.map(p => {
       const mult = getPositionMultiplier(p.position, role)
-      const penalty = mult < 1 ? ` ⚠️ ${Math.round(mult * 100)}%` : ''
+      const penalty = mult < 1 ? '⚠️' : ''
       const col = POSITIONS[p.position].color
       const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
       return `<div class="slot-picker-item" data-player-id="${p.id}">
