@@ -26,11 +26,11 @@ const GAME_PLANS = {
   porteroJugador: { label: 'Portero-Jug.',  desc: 'Superioridad numérica en ataque. Mucho riesgo: si pierdes el balón, gol seguro.', attack: 1.8, defense: 0.3, drain: 3, events: 1.40 },
 }
 
-const MAX_SQUAD = 16
+const MAX_SQUAD = 22
 const MAX_CONVOCADOS = 14
 const MAX_TITULARES = 5
 const MAX_BENCH = 9
-const MAX_RESERVES = 5
+const MAX_RESERVES = 8
 
 const INJURIES = [
   { type: 'sprain',    description: 'Esguince de tobillo',     duration: 2, recoveryEnergy: 20 },
@@ -93,14 +93,20 @@ function generateCpuSquad(teamId) {
 const COUNTRIES = [
   { id: 'es', name: 'España', flag: '🇪🇸',
     leagues: [
-      { id: 'lnfs1', name: 'LNFS Primera División',
+      { id: 'lnfs1', name: 'LNFS Primera División', logo: 'https://cdn.resfu.com/img_data/competiciones/108.png?size=120x&lossy=1',
         teams: [
-          { id: '1041', name: 'Barça', logo: 'https://cdn.resfu.com/img_data/equipos/1041.png?size=120x&lossy=1' },
+          { id: '1041', name: 'Barça', logo: 'https://cdn.resfu.com/img_data/equipos/1041.png?size=120x&lossy=1',
+            staff: [{ name: 'Javier Rodríguez Nebreda', nationality: '🇪🇸 España', role: 'headCoach', avatar: 'img/staff/3622776.png',
+              career: [{ team: 'Barça', from: '01/09/2024', to: 'Actualidad', matches: 30, won: 18, drawn: 5, lost: 7 }]
+            }] },
           { id: '4146', name: 'ElPozo Murcia Costa Calida', logo: 'https://cdn.resfu.com/img_data/equipos/4146.png?size=120x&lossy=1' },
           { id: '3093', name: 'Inter FS', logo: 'https://cdn.resfu.com/img_data/equipos/3093.png?size=120x&lossy=1' },
           { id: '3092', name: 'Palma Futsal', logo: 'https://cdn.resfu.com/img_data/equipos/3092.png?size=120x&lossy=1' },
           { id: '3219', name: 'Jaén FS', logo: 'https://cdn.resfu.com/img_data/equipos/3219.png?size=120x&lossy=1' },
-          { id: '83478', name: 'Cordoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1', coach: 'Ema Santoro', coachNationality: '🇦🇷 Argentina' },
+          { id: '83478', name: 'Cordoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1',
+            staff: [{ name: 'Ema Santoro', nationality: '🇦🇷 Argentina', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1',
+              career: [{ team: 'Cordoba Patrimonio', from: '01/07/2025', to: 'Actualidad', matches: 15, won: 6, drawn: 3, lost: 6 }]
+            }] },
           { id: '69694', name: 'Inagroup El Ejido', logo: 'https://cdn.resfu.com/img_data/equipos/69694.png?size=120x&lossy=1' },
           { id: '3082', name: 'Industrias Santa Coloma', logo: 'https://cdn.resfu.com/img_data/equipos/3082.png?size=120x&lossy=1' },
           { id: '14228', name: 'Jimbee Cartagena', logo: 'https://cdn.resfu.com/img_data/equipos/14228.png?size=120x&lossy=1' },
@@ -398,6 +404,7 @@ const state = {
   currentTab: 'club',
   clubSubTab: 'squad',
   marketTab: 'buy',
+  staff: [],
   tacticsSlots: [],
   benchIds: [],
   reserveIds: [],
@@ -452,6 +459,7 @@ function saveGame() {
     tacticsSlots: state.tacticsSlots,
     benchIds: state.benchIds,
     reserveIds: state.reserveIds,
+    staff: state.staff,
   }
   if (idx >= 0) saves[idx] = data; else saves.unshift(data)
   setSaves(saves)
@@ -592,7 +600,18 @@ function renderSquad(players) {
   if (!container) return
   const ordered = [...players].sort((a, b) => POS_ORDER.indexOf(a.position) - POS_ORDER.indexOf(b.position) || a.number - b.number)
   document.getElementById('club-player-count').textContent = `${players.length}/${MAX_SQUAD} jugadores`
-  container.innerHTML = ordered.map(p => {
+  let html = ''
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+  if (state.staff && state.staff.length > 0) {
+    html += `<div class="tactics-subsection-label">Staff técnico (${state.staff.length})</div>`
+    state.staff.forEach(s => {
+      const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
+      const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
+      html += `<div class="staff-card"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+    })
+  }
+  html += `<div class="tactics-subsection-label" style="margin-top:4px">PLANTILLA (${players.length})</div>`
+  container.innerHTML = html + ordered.map(p => {
     const pos = POSITIONS[p.position]
     const initials = getInitials(p.name)
     const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
@@ -623,6 +642,9 @@ function renderSquad(players) {
       const player = state.players.find(p => p.id === pid)
       if (player) openPlayerModal(player, 'own')
     }
+  })
+  container.querySelectorAll('.staff-card').forEach((card, i) => {
+    card.onclick = () => openStaffModal(state.staff[i])
   })
 }
 
@@ -667,7 +689,7 @@ function renderHome() {
           <div class="home-team-pos">${userPos}º</div>
         </div>
         <div class="home-vs">VS</div>
-        <div class="home-team-side">
+        <div class="home-team-side" style="cursor:pointer" onclick="showTeamInfo('${rivalId}')">
           <img class="home-team-logo" src="${rivalLogo}" alt="">
           <div class="home-team-label">${rivalName}</div>
           <div class="home-team-pos">${rivalPos}º</div>
@@ -1200,7 +1222,7 @@ function renderLeague() {
   standings.forEach((s, i) => {
     const isUser = s.teamId === state.teamId
     const logo = getTeamLogo(s.teamId)
-    tableHtml += `<tr class="${isUser ? 'league-row-user' : ''}">
+    tableHtml += `<tr class="${isUser ? 'league-row-user' : ''}" data-team-id="${s.teamId}" style="${!isUser ? 'cursor:pointer' : ''}">
       <td><span class="league-pos ${i < 3 ? 'p' + (i+1) : ''}">${i + 1}</span></td>
       <td>${logo ? `<img class="team-logo" src="${logo}" style="width:18px;height:18px;vertical-align:middle;margin-right:6px">` : ''}${getTeamName(s.teamId)}</td>
       <td>${s.played}</td><td>${s.won}</td><td>${s.drawn}</td><td>${s.lost}</td>
@@ -1209,6 +1231,9 @@ function renderLeague() {
   })
   tableHtml += '</table>'
   tableWrap.innerHTML = tableHtml
+  tableWrap.querySelectorAll('tr[data-team-id]').forEach(row => {
+    row.onclick = () => showTeamInfo(row.dataset.teamId)
+  })
 
   /* Matchday */
   if (state.currentMatchday > state.totalMatchdays) {
@@ -1770,6 +1795,33 @@ function closeModal() {
   document.getElementById('player-modal').classList.remove('open')
 }
 
+function openStaffModal(staff) {
+  const avatar = staff.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+  document.getElementById('staff-modal-avatar').src = avatar
+  document.getElementById('staff-modal-name').textContent = staff.name
+  document.getElementById('staff-modal-role').textContent = roleLabels[staff.role] || staff.role
+
+  const career = staff.career || [{ team: state.team, from: '—', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }]
+  const total = { matches: 0, won: 0, drawn: 0, lost: 0 }
+
+  document.getElementById('staff-modal-career').innerHTML = career.map(c => {
+    total.matches += c.matches; total.won += c.won; total.drawn += c.drawn; total.lost += c.lost
+    return `<div class="staff-career-item">
+      <span class="staff-career-team">${c.team}</span>
+      <span class="staff-career-dates">${c.from} → ${c.to}</span>
+      <span class="staff-career-record">${c.won}V ${c.drawn}E ${c.lost}D</span>
+      <span class="staff-career-matches">${c.matches} part.</span>
+    </div>`
+  }).join('')
+
+  document.getElementById('staff-modal-total').innerHTML = career.length > 0
+    ? `<div class="staff-career-total">TOTAL: ${total.matches} part. · ${total.won}V ${total.drawn}E ${total.lost}D</div>`
+    : ''
+
+  document.getElementById('staff-modal').classList.add('open')
+}
+
 /* ============ FINANCES VIEW ============ */
 function renderFinances() {
   document.getElementById('finance-balance').textContent = formatMoney(state.finances.balance)
@@ -1836,6 +1888,8 @@ function setupNavigation() {
   /* Modal close */
   document.getElementById('modal-close').onclick = closeModal
   document.getElementById('player-modal').onclick = (e) => { if (e.target === e.currentTarget) closeModal() }
+  document.getElementById('staff-modal-close').onclick = () => { document.getElementById('staff-modal').classList.remove('open') }
+  document.getElementById('staff-modal').onclick = (e) => { if (e.target === e.currentTarget) document.getElementById('staff-modal').classList.remove('open') }
 }
 
 function renderTab(tab) {
@@ -1861,6 +1915,7 @@ function newGame(coach) {
   state.team = selectedTeam.name
   state.teamId = selectedTeam.id
   state.teamLogo = selectedTeam.logo || ''
+  state.staff = selectedTeam.staff || []
   state.countryId = selectedCountry.id
   state.leagueId = selectedLeague.id
   state.gameId = Date.now()
@@ -1891,7 +1946,8 @@ function newGame(coach) {
     const squad = base
       ? base.map(p => ({ ...p, value: calcValue(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }))
       : generateCpuSquad(t.id)
-    state.leagueTeams.push({ teamId: t.id, name: t.name, players: squad, coach: t.coach || '', coachNationality: t.coachNationality || '' })
+    const defaultStaff = t.staff || [{ name: pickRandom(NAME_POOLS.ala), nationality: '🇪🇸 España', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: t.name, from: '01/09/2026', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }]
+    state.leagueTeams.push({ teamId: t.id, name: t.name, players: squad, staff: defaultStaff })
     allTeamIds.push(t.id)
   }
 
@@ -1983,6 +2039,7 @@ function loadGame(id) {
   state.tacticsSlots = data.tacticsSlots || []
   state.benchIds = data.benchIds || []
   state.reserveIds = data.reserveIds || []
+  state.staff = data.staff || []
   startGame()
 }
 
@@ -2236,6 +2293,80 @@ function renderCalendar() {
   document.querySelectorAll('.cal-day.match-day').forEach(el => {
     el.onclick = () => { document.getElementById('cal-back').click(); /* placeholder */ }
   })
+}
+
+/* ============ TEAM INFO ============ */
+function showTeamInfo(teamId) {
+  if (teamId === state.teamId) return
+  const team = getTeamObj(teamId)
+  if (!team) return
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
+  document.getElementById('view-team').classList.add('active')
+  const standings = updateLeagueStandings()
+  const pos = standings.findIndex(s => s.teamId === teamId) + 1
+  const logo = getTeamLogo(teamId)
+  const league = COUNTRIES.flatMap(c => c.leagues).find(l => l.id === state.leagueId)
+  const leagueLogo = league && league.logo ? league.logo : ''
+  let html = `
+    <div class="view-header">
+      <div class="view-header-left">
+        ${leagueLogo ? `<img class="team-logo" src="${leagueLogo}" style="width:22px;height:22px;opacity:0.5;margin-right:2px">` : ''}
+        ${logo ? `<img class="team-logo" src="${logo}" style="width:32px;height:32px">` : ''}
+        <h2>${team.name}</h2>
+      </div>
+      <button class="btn-back" id="btn-team-back">← Volver</button>
+    </div>
+    <div class="team-info-card">
+      <span class="finance-label">Posición en liga</span>
+      <span class="finance-balance">${pos}º de ${standings.length}</span>
+    </div>
+    ${team.staff && team.staff.length > 0 ? `<div class="tactics-subsection-label">Staff técnico (${team.staff.length})</div>${team.staff.map(s => {
+      const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+      const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
+      const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
+      return `<div class="staff-card staff-card-team" data-staff-name="${s.name}"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+    }).join('')}` : ''}
+    <div class="tactics-subsection-label">PLANTILLA (${team.players.length})</div>
+    <div class="squad-grid">`
+  team.players.forEach(p => {
+    const pos = POSITIONS[p.position]
+    const initials = getInitials(p.name)
+    const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+    const val = p.value || calcValue(p.skill)
+    html += `<div class="player-card">
+      <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
+      <div class="player-info">
+        <div class="player-row1">
+          <span class="player-name">${p.name}</span>
+          <span class="player-stat-num">${p.age ? `${p.age}y` : '-'}</span>
+          <span class="player-stat-num">${formatValue(val)}</span>
+          <span class="player-rating-num">${p.skill}</span>
+        </div>
+        <div class="player-row2">
+          <span class="player-position" style="background:${pos.color}">${pos.label}</span>
+          <span class="player-foot">${p.foot || 'DER'}</span>
+          <span class="player-nation">${p.nationality}</span>
+        </div>
+      </div>
+    </div>`
+  })
+  html += `</div><button class="btn-secondary" id="btn-team-back-2" style="margin-top:12px">← Volver</button>`
+  document.getElementById('team-info-content').innerHTML = html
+  document.getElementById('btn-team-back').onclick = goBackFromTeam
+  document.getElementById('btn-team-back-2').onclick = goBackFromTeam
+  document.querySelectorAll('#team-info-content .staff-card-team').forEach(card => {
+    const name = card.dataset.staffName
+    if (team.staff) {
+      const staff = team.staff.find(s => s.name === name)
+      if (staff) card.onclick = () => openStaffModal(staff)
+    }
+  })
+}
+function goBackFromTeam() {
+  document.getElementById('view-team').classList.remove('active')
+  const prevTab = state.currentTab
+  const v = document.getElementById(`view-${prevTab}`)
+  if (v) v.classList.add('active')
 }
 
 /* ============ MENU DROPDOWN ============ */

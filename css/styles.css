@@ -938,7 +938,7 @@ html, body {
 }
 
 /* Finances */
-.finance-card {
+.finance-card, .team-info-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -946,6 +946,55 @@ html, body {
   text-align: center;
   box-shadow: var(--shadow-sm);
   margin-bottom: 16px;
+}
+
+.staff-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.staff-card-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.staff-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.staff-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.staff-card-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+.staff-card-role {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  padding: 2px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .finance-label {
@@ -1937,6 +1986,82 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+}
+
+/* ───────── STAFF MODAL ───────── */
+.staff-modal-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bg-surface);
+}
+
+.staff-modal-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.staff-modal-role {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+.staff-career-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  width: 100%;
+}
+
+.staff-career-item:last-child { border-bottom: none; }
+
+.staff-career-team {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staff-career-dates {
+  font-size: 10px;
+  color: var(--text-muted);
+  min-width: 70px;
+  text-align: center;
+}
+
+.staff-career-record {
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 55px;
+  text-align: right;
+}
+
+.staff-career-matches {
+  font-size: 10px;
+  color: var(--text-muted);
+  min-width: 40px;
+  text-align: right;
+}
+
+.staff-career-total {
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
 }
 
 .modal-avatar-wrap {

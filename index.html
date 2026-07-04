@@ -137,7 +137,7 @@
               <span id="club-logo"></span>
               <h2 id="club-title">Barça</h2>
             </div>
-            <span class="player-count" id="club-player-count">0/16 jugadores</span>
+            <span class="player-count" id="club-player-count">0/22 jugadores</span>
           </div>
           <div class="sub-tabs">
             <button class="sub-tab active" data-subtab="squad">Plantilla</button>
@@ -243,6 +243,11 @@
           </div>
         </section>
 
+        <!-- TEAM INFO -->
+        <section id="view-team" class="view">
+          <div id="team-info-content"></div>
+        </section>
+
       </main>
 
       <nav id="bottom-nav">
@@ -337,6 +342,23 @@
           <div id="slot-picker-list" style="width:100%"></div>
         </div>
         <button class="btn-secondary modal-close" id="slot-picker-close">CANCELAR</button>
+      </div>
+    </div>
+
+    <!-- STAFF MODAL -->
+    <div id="staff-modal" class="modal-overlay">
+      <div class="modal-content" style="max-width:340px">
+        <div class="modal-scroll">
+          <div style="text-align:center;margin-bottom:12px">
+            <img class="staff-modal-avatar" id="staff-modal-avatar" src="">
+            <div class="staff-modal-name" id="staff-modal-name"></div>
+            <div class="staff-modal-role" id="staff-modal-role"></div>
+          </div>
+          <div class="tactics-subsection-label">Historial como técnico</div>
+          <div id="staff-modal-career"></div>
+          <div id="staff-modal-total" style="margin-top:8px"></div>
+        </div>
+        <button class="btn-secondary modal-close" id="staff-modal-close">CERRAR</button>
       </div>
     </div>
 
