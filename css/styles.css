@@ -1040,6 +1040,7 @@ html, body {
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
+  overflow: hidden;
 }
 
 .staff-card-info {
@@ -2110,6 +2111,12 @@ html, body {
 #team-preview-modal .player-card {
   width: 337.29px;
   height: 70px;
+}
+
+#team-preview-modal .staff-card.staff-card-team {
+  width: 337.29px;
+  min-height: 58px;
+  height: 58px;
 }
 
 #tp-close {

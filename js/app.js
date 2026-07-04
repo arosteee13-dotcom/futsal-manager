@@ -164,7 +164,8 @@ const COUNTRIES = [
               avatar: 'https://cdn.resfu.com/img_data/people/original/55631.jpg?size=120x&lossy=1',
               career: [{ team: 'Viña Albali Valdepeñas', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 15, drawn: 5, lost: 10 }]
             }] },
-          { id: 'ribera', name: 'Ribera Navarra FS', rating: 75, logo: 'https://cdn.resfu.com/img_data/equipos/4154.png?size=120x&lossy=1' },
+          { id: 'ribera', name: 'Ribera Navarra FS', rating: 75, logo: 'https://cdn.resfu.com/img_data/equipos/4154.png?size=120x&lossy=1',
+            staff: [{ name: 'Álvaro Martínez', nationality: '🇪🇸 España', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Ribera Navarra FS', from: '01/07/2025', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
         ] },
       { id: 'lnfs2', name: 'LNFS Segunda División',
         teams: [
@@ -2466,6 +2467,7 @@ function newGame(coach) {
     state.leagueTeams.push({ teamId: t.id, name: t.name, players: squad, staff: defaultStaff })
     allTeamIds.push(t.id)
   }
+  console.log('[INIT] leagueTeams:', state.leagueTeams.map(t => t.name + ': ' + t.players.length + ' players').join(', '))
 
   /* Generate fixtures */
   state.fixtures = generateFixtures(allTeamIds)
@@ -2655,10 +2657,10 @@ function showTeamPreview(teamId) {
   if (staff.length > 0) {
     html += `<div class="tactics-subsection-label">Staff técnico (${staff.length})</div>`
     const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+    const noface = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
     staff.forEach(s => {
-      const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
-      const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
-      html += `<div class="staff-card staff-card-team"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality || ''}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+      const avatar = s.avatar || noface
+      html += `<div class="staff-card staff-card-team"><div class="staff-card-avatar" style="background:var(--bg-surface)"><img src="${avatar}" onerror="this.src='${noface}'" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality || ''}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
     })
   }
 
