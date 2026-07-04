@@ -18,10 +18,12 @@ const FORMATIONS = {
   '1-1-2': { label: '1-1-2', roles: ['portero', 'cierre', 'ala', 'ala'], multiplier: 1.1 },
 }
 
-const MENTALITIES = {
-  defensive: { label: 'Defensiva', attackMod: 0.7, defenseMod: 1.3 },
-  balanced: { label: 'Balanceada', attackMod: 1.0, defenseMod: 1.0 },
-  attacking: { label: 'Atacante', attackMod: 1.3, defenseMod: 0.7 },
+const GAME_PLANS = {
+  bloqueBajo:     { label: 'Bloque Bajo',   desc: 'Equipo replegado, defiende al borde del área. Ahorra energía pero cede el control.', attack: 0.6, defense: 1.4, drain: 1, events: 0.70 },
+  juegoCuatro:    { label: 'Juego de 4',    desc: 'Rotación constante de los 4 jugadores. Pases rápidos y mucha movilidad. Desgasta el doble.', attack: 1.2, defense: 0.9, drain: 6, events: 1.20 },
+  juegoPivot:     { label: 'Juego Pívot',   desc: 'Juego directo al pívot. Ideal si tienes un delantero fuerte. Ataques verticales y rápidos.', attack: 1.3, defense: 0.8, drain: 3, events: 1.00 },
+  roboTransicion: { label: 'Robo y Trans.', desc: 'Presión en media pista para robar y salir en transición. Requiere alas rápidas.', attack: 1.4, defense: 1.1, drain: 4, events: 0.80 },
+  porteroJugador: { label: 'Portero-Jug.',  desc: 'Superioridad numérica en ataque. Mucho riesgo: si pierdes el balón, gol seguro.', attack: 1.8, defense: 0.3, drain: 3, events: 1.40 },
 }
 
 const MAX_SQUAD = 16
@@ -81,7 +83,7 @@ function generateCpuSquad(teamId) {
         nationality: '🇪🇸 España',
         goals: 0, matches: 0,
         value, listed: false, salePrice: 0,
-        enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null,
+        enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']),
       })
     }
   }
@@ -191,11 +193,11 @@ function avgEnergy(players) {
   return players.reduce((sum, p) => sum + p.energy, 0) / players.length
 }
 
-function calcTacticMultiplier(formation, mentality) {
+function calcTacticMultiplier(formation, gamePlan) {
   const f = FORMATIONS[formation]
-  const m = MENTALITIES[mentality]
+  const m = GAME_PLANS[gamePlan]
   if (!f || !m) return 1
-  return f.multiplier * m.attackMod
+  return f.multiplier * m.attack
 }
 
 class MatchEngine {
@@ -209,7 +211,8 @@ class MatchEngine {
     this._timer = null
     this.onEvent = null
     this.onFinish = null
-    this.tacticMult = calcTacticMultiplier(tactic.formation, tactic.mentality)
+    this.tacticMult = calcTacticMultiplier(tactic.formation, tactic.gamePlan)
+    this.gamePlan = GAME_PLANS[tactic.gamePlan] || GAME_PLANS.juegoCuatro
     this.homeName = homeName || 'Tu Equipo'
     this.awayName = awayName || 'Rival'
   }
@@ -219,9 +222,9 @@ class MatchEngine {
     this.minute++
     if (this.minute > 40) { this._finish(); return }
 
-    /* Desgaste y lesiones */
+    /* Desgaste con drain del plan activo */
     const enPista = state.players.filter(p => p.enPista)
-    enPista.forEach(p => aplicarDesgaste(p))
+    enPista.forEach(p => aplicarDesgaste(p, this.gamePlan.drain))
 
     const lesionado = simularLesion()
     if (lesionado) {
@@ -252,10 +255,10 @@ class MatchEngine {
     const homeSkill = enPista.reduce((s, p) => s + getHabilidadEfectiva(p), 0) / enPista.length * this.tacticMult
     const homeEnergyAVG = enPista.reduce((s, p) => s + p.energy, 0) / enPista.length / 100
 
-    const homeChance = homeSkill * (0.5 + homeEnergyAVG * 0.3)
-    const awayChance = this.awaySkill * 0.5
+    const homeChance = homeSkill * (0.5 + homeEnergyAVG * 0.3) * this.gamePlan.attack
+    const awayChance = this.awaySkill * 0.5 * this.gamePlan.defense
     const totalChance = homeChance + awayChance
-    if (Math.random() > 0.42) return null
+    if (Math.random() > 0.42 * this.gamePlan.events) return null
     const roll = Math.random() * totalChance
     const isHomeAttack = roll < homeChance
     const teamName = isHomeAttack ? this.homeName : this.awayName
@@ -293,7 +296,7 @@ const state = {
   matchdaySquad: [], startingFive: [], subsBench: [], convocatoriaValidada: false,
   stats: { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 },
   players: [],
-  tactic: { formation: '1-2-1', mentality: 'balanced' },
+  tactic: { formation: '1-2-1', gamePlan: 'juegoCuatro' },
   finances: { balance: 5000, history: [] },
   leagueTeams: [],
   currentMatchday: 1,
@@ -316,6 +319,12 @@ function getInitials(name) {
 function formatMoney(amount) {
   const sign = amount >= 0 ? '' : '-'
   return `${sign}€${Math.abs(amount).toLocaleString()}`
+}
+
+function formatValue(val) {
+  if (val >= 1000000) return `€${(val / 1000000).toFixed(1)}M`
+  if (val >= 1000) return `€${(val / 1000).toFixed(1)}K`
+  return `€${val}`
 }
 
 function formatTimestamp(isoString) {
@@ -359,7 +368,7 @@ function deleteSave(id) { let s = getSaves(); setSaves(s.filter(x => x.id !== id
 
 function autoSaveTactics() {
   if (!state.gameId) return
-  const data = { formation: state.tactic.formation, mentality: state.tactic.mentality, tacticsSlots: state.tacticsSlots, benchIds: state.benchIds, reserveIds: state.reserveIds }
+  const data = { formation: state.tactic.formation, gamePlan: state.tactic.gamePlan, tacticsSlots: state.tacticsSlots, benchIds: state.benchIds, reserveIds: state.reserveIds }
   try { const all = JSON.parse(localStorage.getItem(TACTICS_KEY)) || {}; all[state.gameId] = data; localStorage.setItem(TACTICS_KEY, JSON.stringify(all)) } catch {}
 }
 
@@ -370,7 +379,7 @@ function loadTactics() {
     const data = all[state.gameId]
     if (data) {
       state.tactic.formation = data.formation || state.tactic.formation
-      state.tactic.mentality = data.mentality || state.tactic.mentality
+      state.tactic.gamePlan = data.gamePlan || state.tactic.gamePlan
       state.tacticsSlots = data.tacticsSlots || []
       state.benchIds = data.benchIds || []
       state.reserveIds = data.reserveIds || []
@@ -481,23 +490,21 @@ function renderSquad(players) {
     const pos = POSITIONS[p.position]
     const initials = getInitials(p.name)
     const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+    const val = p.value || calcValue(p.skill)
     return `
       <div class="player-card" data-player-id="${p.id}">
         <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
         <div class="player-info">
-          <div class="player-name">${p.name}</div>
-          <span class="player-position" style="background:${pos.color}">${pos.label}</span>
-        </div>
-        <div class="player-stats">
-          <div class="player-stat">
-            <span class="stat-label">HAB</span>
-            <span class="stat-value">${p.skill}</span>
-            <div class="stat-bar"><div class="stat-bar-fill" style="width:${p.skill}%"></div></div>
+          <div class="player-row1">
+            <span class="player-name">${p.name}</span>
+            <span class="player-stat-num">${p.age || '-'}</span>
+            <span class="player-stat-num">${formatValue(val)}</span>
+            <span class="player-rating-num">${p.skill}</span>
           </div>
-          <div class="player-stat">
-            <span class="stat-label">ENE</span>
-            <span class="stat-value" style="color:${p.energy > 60 ? 'var(--accent)' : '#EF4444'}">${p.energy}</span>
-            <div class="stat-bar"><div class="stat-bar-fill" style="width:${p.energy}%;background:${p.energy > 60 ? 'var(--accent)' : '#EF4444'}"></div></div>
+          <div class="player-row2">
+            <span class="player-position" style="background:${pos.color}">${pos.label}</span>
+            <span class="player-foot">${p.foot || 'DER'}</span>
+            <span class="player-nation">${p.nationality}</span>
           </div>
         </div>
       </div>
@@ -626,12 +633,13 @@ function renderTactics(tactic) {
     </div>
   </div>
   <div class="tactics-section">
-    <label class="tactics-label">Mentalidad</label>
-    <div class="tactics-options" id="mentality-options">
-      <button class="tactics-btn ${tactic.mentality === 'defensive' ? 'active' : ''}" data-mentality="defensive">Defensiva</button>
-      <button class="tactics-btn ${tactic.mentality === 'balanced' ? 'active' : ''}" data-mentality="balanced">Balanceada</button>
-      <button class="tactics-btn ${tactic.mentality === 'attacking' ? 'active' : ''}" data-mentality="attacking">Atacante</button>
-    </div>
+    <label class="tactics-label">Modelo</label>
+    <select id="gameplan-select" class="tactics-select">
+      ${Object.entries(GAME_PLANS).map(([key, gp]) =>
+        `<option value="${key}" ${tactic.gamePlan === key ? 'selected' : ''}>${gp.label}</option>`
+      ).join('')}
+    </select>
+    <div class="gameplan-desc" id="gameplan-desc">${GAME_PLANS[tactic.gamePlan].desc}</div>
   </div>`
 
   /* Vertical pitch: attack top → goalkeeper bottom */
@@ -794,9 +802,12 @@ function renderTactics(tactic) {
   document.querySelectorAll('#formation-options .tactics-btn').forEach(btn => {
     btn.onclick = () => { tactic.formation = btn.dataset.formation; renderTactics(tactic) }
   })
-  document.querySelectorAll('#mentality-options .tactics-btn').forEach(btn => {
-    btn.onclick = () => { tactic.mentality = btn.dataset.mentality; renderTactics(tactic) }
-  })
+  document.getElementById('gameplan-select').onchange = (e) => {
+    tactic.gamePlan = e.target.value
+    const descEl = document.getElementById('gameplan-desc')
+    if (descEl) descEl.textContent = GAME_PLANS[tactic.gamePlan].desc
+    renderTactics(tactic)
+  }
   document.querySelectorAll('.pitch-slot, .bench-slot').forEach(el => {
     el.onclick = () => handleSlotClick(el, tactic)
   })
@@ -955,8 +966,8 @@ function getHabilidadEfectiva(player, assignedRole) {
   return Math.round(base * mult)
 }
 
-function aplicarDesgaste(player) {
-  const base = 3
+function aplicarDesgaste(player, drainMult) {
+  const base = drainMult || 3
   const extraMap = { portero: -1, ala: 1 }
   const extra = extraMap[player.position] || 0
   player.energy = Math.max(0, player.energy - (base + extra + randInt(-1, 1)))
@@ -1116,6 +1127,22 @@ function startMatchFromLeague(rivalId, fixture) {
     document.getElementById('match-clock').textContent = formatTime(minute)
     addFeedEvent(event, minute)
     if (minute === 20) addFeedEvent({ text: '— DESCANSO —', type: 'break' }, minute)
+  }
+
+  /* Game plan selector */
+  const planesEl = document.getElementById('match-planes')
+  planesEl.innerHTML = `<select class="tactics-select" id="match-gameplan-select">
+    ${Object.entries(GAME_PLANS).map(([key, gp]) =>
+      `<option value="${key}" ${tactic.gamePlan === key ? 'selected' : ''}>${gp.label}</option>`
+    ).join('')}
+  </select>
+  <div class="gameplan-desc" id="match-gameplan-desc">${GAME_PLANS[tactic.gamePlan].desc}</div>`
+  document.getElementById('match-gameplan-select').onchange = (e) => {
+    if (tactic.gamePlan === e.target.value) return
+    tactic.gamePlan = e.target.value
+    if (engine) engine.gamePlan = GAME_PLANS[tactic.gamePlan]
+    document.getElementById('match-gameplan-desc').textContent = GAME_PLANS[tactic.gamePlan].desc
+    addFeedEvent({ text: `🔄 Cambio táctico: ${GAME_PLANS[tactic.gamePlan].label}`, type: 'sub' }, engine ? engine.minute : 1)
   }
 
   /* Starting lineup announcement */
@@ -1392,7 +1419,7 @@ function buyPlayer(player, team) {
   state.finances.history.push({ reason: `Compra: ${player.name}`, amount: -player.value })
   const idx = team.players.indexOf(player)
   if (idx >= 0) team.players.splice(idx, 1)
-  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, listed: false, salePrice: 0, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }
+  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, listed: false, salePrice: 0, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']) }
   state.players.push(newPlayer)
   updateHeaderBalance()
   renderMarketContent()
@@ -1585,7 +1612,7 @@ function newGame(coach) {
   state.leagueId = selectedLeague.id
   state.gameId = Date.now()
   state.stats = { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 }
-  state.tactic = { formation: '1-2-1', mentality: 'balanced' }
+  state.tactic = { formation: '1-2-1', gamePlan: 'juegoCuatro' }
   state.tacticsSlots = []
   state.benchIds = []
   state.reserveIds = []
