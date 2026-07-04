@@ -1181,9 +1181,6 @@ function renderLeague() {
   const tableWrap = document.getElementById('league-table-wrap')
   const mdWrap = document.getElementById('league-matchday-wrap')
   const resultsWrap = document.getElementById('league-results-wrap')
-  const liveWrap = document.getElementById('match-live')
-
-  liveWrap.classList.add('hidden')
   resultsWrap.classList.add('hidden')
 
   /* Dropdown */
