@@ -1525,6 +1525,13 @@ html, body {
   color: rgba(255,255,255,0.6);
 }
 
+.pitch-slot.selected,
+.bench-slot.selected {
+  box-shadow: 0 0 0 3px #FCD34D, 0 0 12px rgba(252,211,77,0.6);
+  transform: scale(1.08);
+  border-color: #FCD34D !important;
+}
+
 .pitch-slot-role {
   font-size: 9px;
   font-weight: 700;

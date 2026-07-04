@@ -28,6 +28,7 @@ const MAX_SQUAD = 16
 const MAX_CONVOCADOS = 14
 const MAX_TITULARES = 5
 const MAX_BENCH = 9
+const MAX_RESERVES = 5
 
 const INJURIES = [
   { type: 'sprain',    description: 'Esguince de tobillo',     duration: 2, recoveryEnergy: 20 },
@@ -40,23 +41,6 @@ const INJURIES = [
 ]
 
 /* FC Barcelona — plantilla real */
-const CDN = 'https://cdn.resfu.com/img_data/players/medium'
-const FCB_SQUAD = [
-  { id: 'fcb-1', name: 'Dídac Plana', position: 'portero', skill: 83, energy: 95, number: 21, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622208.jpg?size=120x&lossy=1` },
-  { id: 'fcb-2', name: 'Miquel Feixas', position: 'portero', skill: 72, energy: 100, number: 26, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622210.jpg?size=120x&lossy=1` },
-  { id: 'fcb-3', name: 'Joao Alves', position: 'cierre', skill: 85, energy: 90, number: 5, nationality: '🇵🇹 Portugal', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622190.jpg?size=120x&lossy=1` },
-  { id: 'fcb-4', name: 'Antonio Pérez Ortega', position: 'cierre', skill: 78, energy: 88, number: 6, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622212.jpg?size=120x&lossy=1` },
-  { id: 'fcb-5', name: 'Matheus Rodrigues', position: 'ala', skill: 86, energy: 85, number: 3, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622216.jpg?size=120x&lossy=1` },
-  { id: 'fcb-6', name: 'Adolfo Fernández', position: 'ala', skill: 80, energy: 82, number: 8, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622219.jpg?size=120x&lossy=1` },
-  { id: 'fcb-7', name: 'Mamadou Touré', position: 'ala', skill: 82, energy: 78, number: 11, nationality: '🇸🇳 Senegal', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622228.jpg?size=120x&lossy=1` },
-  { id: 'fcb-8', name: 'Catela', position: 'ala', skill: 88, energy: 80, number: 13, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622223.jpg?size=120x&lossy=1` },
-  { id: 'fcb-9', name: 'Eric Martel', position: 'ala', skill: 76, energy: 92, number: 14, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622226.jpg?size=120x&lossy=1` },
-  { id: 'fcb-10', name: 'Sergio González Pérez', position: 'ala', skill: 79, energy: 86, number: 16, nationality: '🇪🇸 España', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622227.jpg?size=120x&lossy=1` },
-  { id: 'fcb-11', name: 'Luciano Gauna', position: 'ala', skill: 84, energy: 75, number: 25, nationality: '🇦🇷 Argentina', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622351.jpg?size=120x&lossy=1` },
-  { id: 'fcb-12', name: 'Pito', position: 'pivot', skill: 92, energy: 83, number: 10, nationality: '🇧🇷 Brasil', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622231.jpg?size=120x&lossy=1` },
-  { id: 'fcb-13', name: 'Fits', position: 'pivot', skill: 87, energy: 79, number: 19, nationality: '🇦🇴 Angola', goals: 0, matches: 0, value: 0, listed: false, salePrice: 0, avatar: `${CDN}/3622234.jpg?size=120x&lossy=1` },
-]
-
 /* Pool de nombres españoles para CPU */
 const NAME_POOLS = {
   portero: ['Álex Ruiz', 'David Molina', 'Jesús Serrano', 'Manuel Blanco', 'Pablo Morales', 'Raúl Gil', 'Sergio Ramos', 'Víctor Navarro'],
@@ -114,7 +98,7 @@ const COUNTRIES = [
           { id: '3093', name: 'Inter FS', logo: 'https://cdn.resfu.com/img_data/equipos/3093.png?size=120x&lossy=1' },
           { id: '3092', name: 'Palma Futsal', logo: 'https://cdn.resfu.com/img_data/equipos/3092.png?size=120x&lossy=1' },
           { id: '3219', name: 'Jaén FS', logo: 'https://cdn.resfu.com/img_data/equipos/3219.png?size=120x&lossy=1' },
-          { id: '83478', name: 'Cordoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1' },
+          { id: '83478', name: 'Cordoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1', coach: 'Ema Santoro', coachNationality: '🇦🇷 Argentina' },
           { id: '69694', name: 'Inagroup El Ejido', logo: 'https://cdn.resfu.com/img_data/equipos/69694.png?size=120x&lossy=1' },
           { id: '3082', name: 'Industrias Santa Coloma', logo: 'https://cdn.resfu.com/img_data/equipos/3082.png?size=120x&lossy=1' },
           { id: '14228', name: 'Jimbee Cartagena', logo: 'https://cdn.resfu.com/img_data/equipos/14228.png?size=120x&lossy=1' },
@@ -321,6 +305,7 @@ const state = {
   tacticsSlots: [],
   benchIds: [],
   reserveIds: [],
+  selectedPlayerId: null,
 }
 
 /* ============ HELPERS ============ */
@@ -688,7 +673,7 @@ function renderTactics(tactic) {
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
         </div>
         <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="${penalty}"` : ''}>${pos.label}</span>
-        <span class="pitch-slot-name">${player.name}</span>
+        <span class="pitch-slot-name">${player.injury ? '🩹 ' : ''}${player.name}</span>
         <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
       </div>`
     }
@@ -724,7 +709,7 @@ function renderTactics(tactic) {
             <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
           </div>
           <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="${penalty}"` : ''}>${pos.label}</span>
-          <span class="pitch-slot-name">${player.name}</span>
+          <span class="pitch-slot-name">${player.injury ? '🩹 ' : ''}${player.name}</span>
           <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
         </div>`
       } else {
@@ -747,10 +732,10 @@ function renderTactics(tactic) {
       const pos = POSITIONS[player.position]
       const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
       html += `<div class="bench-slot-wrap">
-        <div class="bench-slot filled" data-bench="${i}">
+        <div class="bench-slot filled" data-bench="${i}" style="border-color:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
         </div>
-        <span class="bench-slot-name">${player.name}</span>
+        <span class="bench-slot-name">${player.injury ? '🩹 ' : ''}${player.name}</span>
         <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
       </div>`
     } else {
@@ -765,17 +750,17 @@ function renderTactics(tactic) {
   /* Reserve slots (2) */
   html += `<div class="tactics-subsection-label">RESERVAS</div>
     <div class="bench-grid">`
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < MAX_RESERVES; i++) {
     const pid = state.reserveIds[i]
     const player = pid ? state.players.find(p => p.id === pid) : null
     if (player) {
       const pos = POSITIONS[player.position]
       const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
       html += `<div class="bench-slot-wrap">
-        <div class="bench-slot filled" data-reserve="${i}">
+        <div class="bench-slot filled" data-reserve="${i}" style="border-color:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
         </div>
-        <span class="bench-slot-name">${player.name}</span>
+        <span class="bench-slot-name">${player.injury ? '🩹 ' : ''}${player.name}</span>
         <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
       </div>`
     } else {
@@ -796,7 +781,7 @@ function renderTactics(tactic) {
         return `<div class="bench-card unavailable">
           <div class="bc-avatar" style="background:#EF4444;font-size:14px">🚑</div>
           <div class="bc-info">
-            <div class="bc-name-row"><span class="bc-name">${p.name}</span></div>
+            <div class="bc-name-row"><span class="bc-name">🩹 ${p.name}</span></div>
             <div class="bc-injury-text">${i.description} (${rt})</div>
           </div>
         </div>`
@@ -812,36 +797,15 @@ function renderTactics(tactic) {
   document.querySelectorAll('#mentality-options .tactics-btn').forEach(btn => {
     btn.onclick = () => { tactic.mentality = btn.dataset.mentality; renderTactics(tactic) }
   })
-  document.querySelectorAll('.pitch-slot').forEach(el => {
-    el.onclick = () => {
-      const idx = parseInt(el.dataset.slot)
-      if (slots[idx]) { openSwapPicker(slots[idx], tactic) }
-      else { openSlotPicker(idx, roles[idx], tactic) }
-    }
+  document.querySelectorAll('.pitch-slot, .bench-slot').forEach(el => {
+    el.onclick = () => handleSlotClick(el, tactic)
   })
-  document.querySelectorAll('.bench-slot').forEach(el => {
-    el.onclick = () => {
-      const benchIdx = el.dataset.bench
-      const reserveIdx = el.dataset.reserve
-      if (benchIdx !== undefined) {
-        const idx = parseInt(benchIdx)
-        if (el.classList.contains('filled')) {
-          const pid = state.benchIds[idx]
-          if (pid) openSwapPicker(pid, tactic)
-        } else {
-          openBenchPicker(idx, tactic)
-        }
-      } else if (reserveIdx !== undefined) {
-        const idx = parseInt(reserveIdx)
-        if (el.classList.contains('filled')) {
-          const pid = state.reserveIds[idx]
-          if (pid) openSwapPicker(pid, tactic)
-        } else {
-          openReservePicker(idx, tactic)
-        }
-      }
-    }
-  })
+  /* Clear selection on click outside */
+  document.getElementById('club-tactics-content').onclick = (e) => {
+    if (e.target.closest('.pitch-slot') || e.target.closest('.bench-slot')) return
+    state.selectedPlayerId = null
+    document.querySelectorAll('.pitch-slot.selected, .bench-slot.selected').forEach(s => s.classList.remove('selected'))
+  }
   /* Auto-validate whenever formation is complete */
   if (complete && hasGK && enoughAvailable) {
     state.matchdaySquad = [...slots, ...state.benchIds, ...state.reserveIds]
@@ -851,151 +815,137 @@ function renderTactics(tactic) {
   } else {
     state.convocatoriaValidada = false
   }
+
+  /* Re-apply selected class after re-render */
+  if (state.selectedPlayerId) {
+    document.querySelectorAll('.pitch-slot, .bench-slot').forEach(el => {
+      const sid = getPlayerIdFromSlot(el)
+      if (sid === state.selectedPlayerId) el.classList.add('selected')
+    })
+  }
+
   autoSaveTactics()
 }
 
-function openSlotPicker(slotIndex, role, tactic) {
-  const assignedIds = state.tacticsSlots.filter(Boolean)
-  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
-  const pos = POSITIONS[role]
-  document.getElementById('slot-picker-title').textContent = `Elegir jugador para ${pos.label}`
-  const list = document.getElementById('slot-picker-list')
-  if (available.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted)">No hay jugadores disponibles</div>'
-  } else {
-    list.innerHTML = available.map(p => {
-      const mult = getPositionMultiplier(p.position, role)
-      const penalty = mult < 1 ? '⚠️' : ''
-      const col = POSITIONS[p.position].color
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
-      return `<div class="slot-picker-item" data-player-id="${p.id}">
-        <div class="sp-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
-        <div class="sp-info">
-          <div class="sp-name">${p.name}</div>
-          <div class="sp-detail">${POSITIONS[p.position].label} · HAB ${p.skill}</div>
-        </div>
-        <div class="sp-penalty">${penalty}</div>
-      </div>`
-    }).join('')
-    list.querySelectorAll('.slot-picker-item').forEach(el => {
-      el.onclick = () => {
-        state.tacticsSlots[slotIndex] = el.dataset.playerId
-        closeSlotPicker()
-        renderTactics(tactic)
-      }
-    })
-  }
-  document.getElementById('slot-picker-modal').classList.remove('hidden')
-  document.getElementById('slot-picker-close').onclick = closeSlotPicker
-}
+function autoAssignSquad() {
+  const roles = SLOT_ROLES[state.tactic.formation] || SLOT_ROLES['1-2-1']
+  const assigned = []
+  const available = state.players.filter(p => !p.injury)
 
-function closeSlotPicker() {
-  document.getElementById('slot-picker-modal').classList.add('hidden')
-}
-
-function openBenchPicker(slotIndex, tactic) {
-  const assignedIds = [...state.tacticsSlots.filter(Boolean), ...state.benchIds.filter(Boolean)]
-  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
-  document.getElementById('slot-picker-title').textContent = `Elegir suplente (slot ${slotIndex + 1})`
-  const list = document.getElementById('slot-picker-list')
-  if (available.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted)">No hay jugadores disponibles</div>'
-  } else {
-    list.innerHTML = available.map(p => {
-      const col = POSITIONS[p.position].color
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
-      return `<div class="slot-picker-item" data-player-id="${p.id}">
-        <div class="sp-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
-        <div class="sp-info">
-          <div class="sp-name">${p.name}</div>
-          <div class="sp-detail">${POSITIONS[p.position].label} · HAB ${p.skill}</div>
-        </div>
-      </div>`
-    }).join('')
-    list.querySelectorAll('.slot-picker-item').forEach(el => {
-      el.onclick = () => {
-        state.benchIds[slotIndex] = el.dataset.playerId
-        closeSlotPicker()
-        renderTactics(tactic)
-      }
-    })
-  }
-  document.getElementById('slot-picker-modal').classList.remove('hidden')
-  document.getElementById('slot-picker-close').onclick = closeSlotPicker
-}
-
-function openReservePicker(slotIndex, tactic) {
-  const assignedIds = [...state.tacticsSlots.filter(Boolean), ...state.benchIds.filter(Boolean), ...state.reserveIds.filter(Boolean)]
-  const available = state.players.filter(p => !assignedIds.includes(p.id) && !p.injury)
-  document.getElementById('slot-picker-title').textContent = `Elegir reserva (slot ${slotIndex + 1})`
-  const list = document.getElementById('slot-picker-list')
-  if (available.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted)">No hay jugadores disponibles</div>'
-  } else {
-    list.innerHTML = available.map(p => {
-      const col = POSITIONS[p.position].color
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${col}` : `background:${col}`
-      return `<div class="slot-picker-item" data-player-id="${p.id}">
-        <div class="sp-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
-        <div class="sp-info">
-          <div class="sp-name">${p.name}</div>
-          <div class="sp-detail">${POSITIONS[p.position].label} · HAB ${p.skill}</div>
-        </div>
-      </div>`
-    }).join('')
-    list.querySelectorAll('.slot-picker-item').forEach(el => {
-      el.onclick = () => {
-        state.reserveIds[slotIndex] = el.dataset.playerId
-        closeSlotPicker()
-        renderTactics(tactic)
-      }
-    })
-  }
-  document.getElementById('slot-picker-modal').classList.remove('hidden')
-  document.getElementById('slot-picker-close').onclick = closeSlotPicker
-}
-
-function openSwapPicker(playerId, tactic) {
-  const player = state.players.find(p => p.id === playerId)
-  if (!player) return
-  const slots = state.tacticsSlots
-  const formRoles = SLOT_ROLES[tactic.formation] || SLOT_ROLES['1-2-1']
-  document.getElementById('slot-picker-title').textContent = `Intercambiar a ${player.name}`
-  const list = document.getElementById('slot-picker-list')
-  list.innerHTML = formRoles.map((role, i) => {
-    const pid = slots[i]
-    const occupant = pid ? state.players.find(p => p.id === pid) : null
-    const pos = POSITIONS[role]
-    const avatarStyle = occupant
-      ? (occupant.avatar ? `background-image:url(${occupant.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`)
-      : `background:${pos.color}`
-    return `<div class="slot-picker-item" data-slot="${i}">
-      <div class="sp-avatar" style="${avatarStyle}">${occupant ? (occupant.avatar ? '' : getInitials(occupant.name)) : '—'}</div>
-      <div class="sp-info">
-        <div class="sp-name">${occupant ? occupant.name : '— Vacío —'}</div>
-        <div class="sp-detail" style="color:${pos.color}">${pos.label}</div>
-      </div>
-    </div>`
-  }).join('')
-  list.querySelectorAll('.slot-picker-item').forEach(el => {
-    el.onclick = () => {
-      const slotIdx = parseInt(el.dataset.slot)
-      const prevId = slots[slotIdx]
-      slots[slotIdx] = playerId
-      if (prevId && prevId !== playerId) {
-        state.benchIds = state.benchIds.filter(id => id !== playerId)
-        if (!state.benchIds.includes(prevId)) {
-          if (state.benchIds.length < MAX_BENCH) state.benchIds.push(prevId)
-        }
-      } else {
-        state.benchIds = state.benchIds.filter(id => id !== playerId)
-      }
-      closeSlotPicker()
-      renderTactics(tactic)
-    }
+  state.tacticsSlots = roles.map(role => {
+    const candidates = available.filter(p => !assigned.includes(p.id))
+    const best = candidates.sort((a, b) => {
+      const multA = getPositionMultiplier(a.position, role)
+      const multB = getPositionMultiplier(b.position, role)
+      if (multB !== multA) return multB - multA
+      return b.skill - a.skill
+    })[0]
+    if (best) assigned.push(best.id)
+    return best ? best.id : null
   })
-  document.getElementById('slot-picker-modal').classList.remove('hidden')
-  document.getElementById('slot-picker-close').onclick = closeSlotPicker
+
+  const benchPool = available.filter(p => !assigned.includes(p.id))
+  state.benchIds = benchPool.slice(0, MAX_BENCH).map(p => p.id)
+  assigned.push(...state.benchIds)
+
+  const reservePool = available.filter(p => !assigned.includes(p.id))
+  state.reserveIds = reservePool.slice(0, MAX_RESERVES).map(p => p.id)
+}
+
+function getPlayerIdFromSlot(el) {
+  const slotIdx = el.dataset.slot
+  const benchIdx = el.dataset.bench
+  const reserveIdx = el.dataset.reserve
+  if (slotIdx !== undefined) return state.tacticsSlots[parseInt(slotIdx)]
+  if (benchIdx !== undefined) return state.benchIds[parseInt(benchIdx)]
+  if (reserveIdx !== undefined) return state.reserveIds[parseInt(reserveIdx)]
+  return null
+}
+
+function handleSlotClick(el, tactic) {
+  const filled = el.classList.contains('filled')
+  const pid = el.dataset.playerId
+  const slotIdx = el.dataset.slot
+  const benchIdx = el.dataset.bench
+  const reserveIdx = el.dataset.reserve
+
+  /* Determine the container type and current player ID */
+  let currentPid = null
+  let targetArray = null
+  let targetIndex = -1
+  if (slotIdx !== undefined) {
+    targetIndex = parseInt(slotIdx)
+    currentPid = state.tacticsSlots[targetIndex]
+    targetArray = 'tacticsSlots'
+  } else if (benchIdx !== undefined) {
+    targetIndex = parseInt(benchIdx)
+    currentPid = state.benchIds[targetIndex]
+    targetArray = 'benchIds'
+  } else if (reserveIdx !== undefined) {
+    targetIndex = parseInt(reserveIdx)
+    currentPid = state.reserveIds[targetIndex]
+    targetArray = 'reserveIds'
+  }
+
+  /* No player selected yet */
+  if (!state.selectedPlayerId) {
+    if (filled && currentPid) {
+      state.selectedPlayerId = currentPid
+      document.querySelectorAll('.pitch-slot.selected, .bench-slot.selected').forEach(s => s.classList.remove('selected'))
+      el.classList.add('selected')
+    }
+    renderTactics(tactic)
+    return
+  }
+
+  /* Same player clicked → deselect */
+  if (state.selectedPlayerId === currentPid) {
+    state.selectedPlayerId = null
+    document.querySelectorAll('.pitch-slot.selected, .bench-slot.selected').forEach(s => s.classList.remove('selected'))
+    renderTactics(tactic)
+    return
+  }
+
+  /* Different player or empty slot → place selected player here */
+  if (targetArray && targetIndex >= 0) {
+    if (currentPid) {
+      /* Swap: find where selected player is and swap places */
+      for (let arr of ['tacticsSlots', 'benchIds', 'reserveIds']) {
+        const a = state[arr]
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] === state.selectedPlayerId) {
+            a[i] = currentPid
+            state[targetArray][targetIndex] = state.selectedPlayerId
+            state.selectedPlayerId = null
+            document.querySelectorAll('.pitch-slot.selected, .bench-slot.selected').forEach(s => s.classList.remove('selected'))
+            renderTactics(tactic)
+            return
+          }
+        }
+      }
+    } else {
+      /* Empty slot: place selected player here */
+      for (let arr of ['tacticsSlots', 'benchIds', 'reserveIds']) {
+        const a = state[arr]
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] === state.selectedPlayerId) {
+            if (targetArray === 'tacticsSlots' || targetArray === 'benchIds' || targetArray === 'reserveIds') {
+              a[i] = null
+            }
+            state[targetArray][targetIndex] = state.selectedPlayerId
+            state.selectedPlayerId = null
+            document.querySelectorAll('.pitch-slot.selected, .bench-slot.selected').forEach(s => s.classList.remove('selected'))
+            renderTactics(tactic)
+            return
+          }
+        }
+      }
+    }
+  }
+
+  state.selectedPlayerId = null
+  document.querySelectorAll('.pitch-slot.selected, .bench-slot.selected').forEach(s => s.classList.remove('selected'))
+  renderTactics(tactic)
 }
 
 /* ============ FATIGA & SUSTITUCIONES ============ */
@@ -1093,7 +1043,16 @@ function renderLeague() {
 
   /* Matchday */
   if (state.currentMatchday > state.totalMatchdays) {
-    mdWrap.innerHTML = '<div class="league-finished">🏆 Temporada completada</div>'
+    const finalStandings = updateLeagueStandings()
+    const userPos = finalStandings.findIndex(s => s.teamId === state.teamId) + 1
+    mdWrap.innerHTML = `
+      <div class="league-finished">
+        <div style="font-size:32px;margin-bottom:8px">🏆</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Temporada completada</div>
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px">Has quedado <strong>${userPos}º</strong> de ${finalStandings.length}</div>
+        <button class="btn-primary" id="btn-new-season">🏆 NUEVA TEMPORADA</button>
+      </div>`
+    document.getElementById('btn-new-season').onclick = resetSeason
     return
   }
 
@@ -1240,6 +1199,37 @@ function finishMatch(isHome, fixture, rival) {
   updateLeagueStandings()
   showMatchdayResults(userScore, rivalScore, rival.name)
   autoSave()
+}
+
+function resetSeason() {
+  state.currentMatchday = 1
+  state.stats = { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 }
+
+  /* Reset league standings */
+  state.fixtures.forEach(f => { f.played = false; f.homeScore = null; f.awayScore = null })
+
+  /* Reset players */
+  state.players.forEach(p => { p.energy = 100; p.injury = null; p.goals = 0; p.matches = 0 })
+
+  /* Reset CPU teams */
+  state.leagueTeams.forEach(t => {
+    t.players.forEach(p => { p.energy = 100; p.injury = null; p.goals = 0; p.matches = 0 })
+  })
+
+  /* Reset tactics */
+  state.tacticsSlots = []
+  state.benchIds = []
+  state.reserveIds = []
+  state.convocatoriaValidada = false
+  state.selectedPlayerId = null
+
+  /* Season prize */
+  state.finances.balance += 2000
+  state.finances.history.push({ reason: '🏆 Premio temporada', amount: 2000 })
+
+  autoSaveTactics()
+  saveGame()
+  renderLeague()
 }
 
 function showMatchdayResults(userScore, rivalScore, rivalName) {
@@ -1604,21 +1594,24 @@ function newGame(coach) {
   try { const all = JSON.parse(localStorage.getItem(TACTICS_KEY)) || {}; delete all[state.gameId]; localStorage.setItem(TACTICS_KEY, JSON.stringify(all)) } catch {}
   state.finances = { balance: 5000, history: [] }
 
-  /* Assign user squad (FC Barcelona) or create default */
-  state.players = FCB_SQUAD.map(p => ({
+  /* Assign user squad based on selected team */
+  const userSquad = REAL_SQUADS[state.teamId] || FCB_SQUAD
+  state.players = userSquad.map(p => ({
     ...p, value: calcValue(p.skill),
     enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null,
   }))
+  state.players.forEach(p => { p.energy = 100 })
 
   /* Generate CPU teams */
   state.leagueTeams = []
   const allTeamIds = [state.teamId]
   for (const t of league.teams) {
     if (t.id === state.teamId) continue
-    const squad = generateCpuSquad(t.id)
-    state.leagueTeams.push({
-      teamId: t.id, name: t.name, players: squad,
-    })
+    const base = REAL_SQUADS[t.id]
+    const squad = base
+      ? base.map(p => ({ ...p, value: calcValue(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }))
+      : generateCpuSquad(t.id)
+    state.leagueTeams.push({ teamId: t.id, name: t.name, players: squad, coach: t.coach || '', coachNationality: t.coachNationality || '' })
     allTeamIds.push(t.id)
   }
 
@@ -1627,6 +1620,8 @@ function newGame(coach) {
   state.totalMatchdays = state.fixtures.filter(f => f.matchday === 1).length > 0
     ? Math.max(...state.fixtures.map(f => f.matchday)) : 0
   state.currentMatchday = 1
+
+  autoAssignSquad()
 
   startGame()
 }
@@ -1706,7 +1701,10 @@ function showBrowser(step) {
     })
   } else if (step === 'teams') {
     title.textContent = selectedLeague.name
-    content.innerHTML = selectedLeague.teams.map(t => `<div class="menu-list-item" data-id="${t.id}"><span class="menu-item-text">${t.name}</span><span class="menu-item-arrow">›</span></div>`).join('')
+    content.innerHTML = selectedLeague.teams.map(t => {
+      const logoHtml = t.logo ? `<img class="team-logo" src="${t.logo}" style="width:24px;height:24px;margin-right:8px">` : ''
+      return `<div class="menu-list-item" data-id="${t.id}">${logoHtml}<span class="menu-item-text">${t.name}</span><span class="menu-item-arrow">›</span></div>`
+    }).join('')
     content.querySelectorAll('.menu-list-item').forEach(el => {
       el.onclick = () => { selectedTeam = selectedLeague.teams.find(t => t.id === el.dataset.id); showCoachInput() }
     })
