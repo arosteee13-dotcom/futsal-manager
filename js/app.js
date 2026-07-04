@@ -686,7 +686,9 @@ function renderHome() {
   if (!container) return
   const standings = updateLeagueStandings()
   const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
-  const fixture = getFixtureForUser(state.currentMatchday)
+  const fixture = state.fixtures
+    .filter(f => (f.home === state.teamId || f.away === state.teamId) && !f.played)
+    .sort((a, b) => a.matchday - b.matchday)[0] || null
   const rivalId = fixture ? (fixture.home === state.teamId ? fixture.away : fixture.home) : null
   const rivalName = rivalId ? getTeamName(rivalId) : '—'
   const isHome = fixture ? fixture.home === state.teamId : false
@@ -723,7 +725,7 @@ function renderHome() {
       </div>
       ${isPlayoffs
         ? `<div class="home-matchday-label">${roundNames[state.playoffs.round] || 'Eliminatoria'}</div>`
-        : `<div class="home-matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays} · ${fixture.horario || ''}</div>`
+        : `<div class="home-matchday-label">Jornada ${fixture.matchday} de ${state.totalMatchdays} · ${fixture.horario || ''}</div>`
       }
       <div class="home-match-location">${isHome ? '🏠 Local' : '✈️ Visitante'}</div>
       <button class="btn-primary" id="btn-home-play">▶ IR AL PARTIDO</button>
@@ -2615,13 +2617,21 @@ function renderCalendar() {
       const isHome = f.home === state.teamId
       const fd = getSeasonDate(f.matchday)
       const result = f.played ? `${f.homeScore} - ${f.awayScore}` : '—'
+      let outcomeClass = ''
+      if (f.played) {
+        const userGoals = isHome ? f.homeScore : f.awayScore
+        const oppGoals = isHome ? f.awayScore : f.homeScore
+        if (userGoals > oppGoals) outcomeClass = ' win'
+        else if (userGoals < oppGoals) outcomeClass = ' loss'
+        else outcomeClass = ' draw'
+      }
       gridHtml += `<div class="cal-match-item">
         <img class="cal-match-logo" src="${rivalLogo || ''}" alt="">
         <div class="cal-match-info">
           <div class="cal-match-rival">J${f.matchday} · ${rivalName}</div>
           <div class="cal-match-meta">${String(fd.getDate()).padStart(2,'0')}/${String(fd.getMonth()+1).padStart(2,'0')} · ${f.horario || ''} ${isHome ? '🏠' : '✈️'}</div>
         </div>
-        <div class="cal-match-result${f.played ? ' played' : ''}">${result}</div>
+        <div class="cal-match-result${f.played ? ' played' : ''}${outcomeClass}">${result}</div>
       </div>`
     })
     gridHtml += `</div>`
