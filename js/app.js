@@ -1308,6 +1308,7 @@ function irAlPartido() {
   document.getElementById('match-players').innerHTML = ''
   document.getElementById('btn-start-match').style.display = 'block'
   document.getElementById('btn-end-match').style.display = 'none'
+  document.getElementById('match-result-area').classList.add('hidden')
 }
 
 function empezarPartido() {
@@ -1851,12 +1852,12 @@ function resetSeason() {
 function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('btn-end-match').style.display = 'none'
 
-  /* Go directly to league results view */
-  document.getElementById('view-match').classList.remove('active')
-  document.getElementById('view-league').classList.add('active')
-  document.getElementById('bottom-nav').style.display = ''
-  document.getElementById('btn-header-menu').style.display = ''
+  /* Show match result screen first */
+  document.getElementById('result-home-display').textContent = matchData.homeScore
+  document.getElementById('result-away-display').textContent = matchData.awayScore
+  document.getElementById('match-result-area').classList.remove('hidden')
 
+  /* Pre-build league results content so it is ready when user navigates to liga */
   const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
   const list = document.getElementById('league-results-list')
   list.innerHTML = fixtures.map(f => {
@@ -1879,7 +1880,17 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
   const standings = updateLeagueStandings()
   const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
   document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
-  document.getElementById('league-results-wrap').classList.remove('hidden')
+
+  /* "Volver a Liga" button: navigate to league view with updated standings and matchday results */
+  document.getElementById('btn-match-back').onclick = () => {
+    document.getElementById('match-result-area').classList.add('hidden')
+    document.getElementById('view-match').classList.remove('active')
+    document.getElementById('view-league').classList.add('active')
+    document.getElementById('bottom-nav').style.display = ''
+    document.getElementById('btn-header-menu').style.display = ''
+    renderLeague()
+    document.getElementById('league-results-wrap').classList.remove('hidden')
+  }
 
   document.getElementById('btn-advance-matchday').onclick = () => {
     if (state.currentMatchday >= 30) {
