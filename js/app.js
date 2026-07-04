@@ -468,7 +468,7 @@ function setSaves(saves) { localStorage.setItem(STORAGE_KEY, JSON.stringify(save
 function saveGame() {
   const saves = getSaves()
   const idx = saves.findIndex(s => s.id === state.gameId)
-  const matchday = state.stats.wins + state.stats.draws + state.stats.losses + 1
+  const matchday = state.currentMatchday || 1
   const data = {
     id: state.gameId, name: `${state.coach} - ${state.team}`, coach: state.coach, team: state.team, teamId: state.teamId, teamLogo: state.teamLogo,
     countryId: state.countryId, leagueId: state.leagueId,
@@ -543,6 +543,18 @@ function generateFixtures(teamIds) {
 
 function getFixtureForUser(matchday) {
   return state.fixtures.find(f => f.matchday === matchday && (f.home === state.teamId || f.away === state.teamId))
+}
+
+function getNextUnplayedFixture() {
+  return state.fixtures
+    .filter(f => (f.home === state.teamId || f.away === state.teamId) && !f.played)
+    .sort((a, b) => a.matchday - b.matchday)[0] || null
+}
+
+function syncCurrentMatchday() {
+  const nextFixture = getNextUnplayedFixture()
+  state.currentMatchday = nextFixture ? nextFixture.matchday : state.totalMatchdays + 1
+  return nextFixture
 }
 
 function getTeamName(id) {
@@ -686,9 +698,7 @@ function renderHome() {
   if (!container) return
   const standings = updateLeagueStandings()
   const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
-  const fixture = state.fixtures
-    .filter(f => (f.home === state.teamId || f.away === state.teamId) && !f.played)
-    .sort((a, b) => a.matchday - b.matchday)[0] || null
+  const fixture = getNextUnplayedFixture()
   const rivalId = fixture ? (fixture.home === state.teamId ? fixture.away : fixture.home) : null
   const rivalName = rivalId ? getTeamName(rivalId) : '—'
   const isHome = fixture ? fixture.home === state.teamId : false
@@ -1293,6 +1303,7 @@ let parteActual = 1
 let faltasLocal = 0
 let faltasVisitante = 0
 let matchPaused = false
+let currentMatchContext = null
 const matchData = { homeScore: 0, awayScore: 0, homeFouls: 0, awayFouls: 0, rivalName: '' }
 
 function irAlPartido() {
@@ -1411,7 +1422,7 @@ function empezarPartido() {
       } else {
         addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
         btn.style.display = 'none'
-        document.getElementById('btn-end-match').style.display = 'block'
+        completeCurrentMatch()
       }
     }
   }, 40)
@@ -1487,12 +1498,10 @@ function startMatchFromLeague(rivalId, fixture) {
   irAlPartido()
 
   const isHome = fixture.home === state.teamId
+  currentMatchContext = { isHome, fixture, rival }
 
   /* Botón Finalizar */
-  document.getElementById('btn-end-match').onclick = () => {
-    if (intervaloCrono) { clearInterval(intervaloCrono); intervaloCrono = null }
-    finishMatch(isHome, fixture, rival)
-  }
+  document.getElementById('btn-end-match').onclick = completeCurrentMatch
 
   renderPlayerRatings()
 }
@@ -1752,7 +1761,19 @@ function resumeMatchTimer() {
   empezarPartido()
 }
 
+function completeCurrentMatch() {
+  if (intervaloCrono) {
+    clearInterval(intervaloCrono)
+    intervaloCrono = null
+  }
+  if (!currentMatchContext) return
+  const { isHome, fixture, rival } = currentMatchContext
+  currentMatchContext = null
+  finishMatch(isHome, fixture, rival)
+}
+
 function finishMatch(isHome, fixture, rival) {
+  const playedMatchday = fixture.matchday
   const userScore = isHome ? matchData.homeScore : matchData.awayScore
   const rivalScore = isHome ? matchData.awayScore : matchData.homeScore
 
@@ -1767,11 +1788,11 @@ function finishMatch(isHome, fixture, rival) {
   else if (userScore === rivalScore) { reward = 300; state.stats.draws++ }
   else { reward = -200; state.stats.losses++ }
   state.finances.balance += reward
-  state.finances.history.push({ reason: `J${state.currentMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
+  state.finances.history.push({ reason: `J${playedMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
   
 
   /* Post-match recovery: calculate days until next match */
-  const nextFixture = getFixtureForUser(state.currentMatchday + 1)
+  const nextFixture = getNextUnplayedFixture()
   let recoveryMult = 1.0
   if (nextFixture && nextFixture.date) {
     const curDate = new Date(fixture.date + 'T12:00:00')
@@ -1793,7 +1814,7 @@ function finishMatch(isHome, fixture, rival) {
     if (!p.matchHistory) p.matchHistory = []
     const rating = Math.round(5 + (p._yellowThisMatch ? -0.5 : 0) + (p._redThisMatch ? -2 : 0) + ((p.goals || 0) > 0 ? 2 : 0) + ((p.assists || 0) > 0 ? 1 : 0) + Math.random() * 2)
     p.matchHistory.push({
-      matchday: state.currentMatchday,
+      matchday: playedMatchday,
       rival: rival.name,
       minutes: p.minutosEnPista || 0,
       rating: Math.min(10, Math.max(1, rating)),
@@ -1807,7 +1828,7 @@ function finishMatch(isHome, fixture, rival) {
   })
 
   /* Auto-simulate other matches */
-  const otherFixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday && f.played === false)
+  const otherFixtures = state.fixtures.filter(f => f.matchday === playedMatchday && f.played === false)
   for (const f of otherFixtures) {
     const result = autoSimulateOtherMatch(f.home, f.away)
     f.homeScore = result.homeScore
@@ -1816,7 +1837,8 @@ function finishMatch(isHome, fixture, rival) {
   }
 
   updateLeagueStandings()
-  showMatchdayResults(userScore, rivalScore, rival.name)
+  syncCurrentMatchday()
+  showMatchdayResults(playedMatchday, userScore, rivalScore, rival.name)
   autoSave()
 }
 
@@ -1851,7 +1873,7 @@ function resetSeason() {
   renderLeague()
 }
 
-function showMatchdayResults(userScore, rivalScore, rivalName) {
+function showMatchdayResults(matchday, userScore, rivalScore, rivalName) {
   document.getElementById('btn-end-match').style.display = 'none'
 
   /* Show match result screen first */
@@ -1860,7 +1882,7 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('match-result-area').classList.remove('hidden')
 
   /* Pre-build league results content so it is ready when user navigates to liga */
-  const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
+  const fixtures = state.fixtures.filter(f => f.matchday === matchday)
   const list = document.getElementById('league-results-list')
   list.innerHTML = fixtures.map(f => {
     const homeName = getTeamName(f.home)
@@ -1895,14 +1917,13 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
   }
 
   document.getElementById('btn-advance-matchday').onclick = () => {
-    if (state.currentMatchday >= 30) {
+    if (matchday >= state.totalMatchdays) {
       const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
       let msg = `📊 Temporada finalizada. Posición: ${pos}º`
       if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
       else if (pos <= 8) msg += '\n🏆 ¡Clasificado al Playoff por el título!'
       alert(msg)
     }
-    state.currentMatchday++
     for (const p of state.players) {
       if (!p.injury) continue
       p.injury.remaining--
@@ -1910,6 +1931,7 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
     }
     document.getElementById('league-results-wrap').classList.add('hidden')
     renderLeague()
+    autoSave()
   }
 }
 
@@ -2400,6 +2422,7 @@ function startGame() {
   document.getElementById('menu-screen').classList.add('hidden')
   document.getElementById('game-screen').classList.remove('hidden')
   loadTactics()
+  syncCurrentMatchday()
   setupNavigation()
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
   document.querySelector('[data-tab="home"]').classList.add('active')
