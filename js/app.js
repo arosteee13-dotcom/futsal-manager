@@ -700,7 +700,7 @@ function renderHome() {
         : `<div class="home-matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays} · ${fixture.horario || ''}</div>`
       }
       <div class="home-match-location">${isHome ? '🏠 Local' : '✈️ Visitante'}</div>
-      <button class="btn-primary" id="btn-home-play">▶ JUGAR PARTIDO</button>
+      <button class="btn-primary" id="btn-home-play">▶ IR AL PARTIDO</button>
     </div>` : '<div class="home-card home-match"><div class="home-section-title">🏆 Temporada completada</div></div>'}
   `
   const playBtn = document.getElementById('btn-home-play')
@@ -1201,8 +1201,8 @@ function simularLesion() {
 function renderLeague() {
   const selector = document.getElementById('league-selector')
   const tableWrap = document.getElementById('league-table-wrap')
-  const mdWrap = document.getElementById('league-matchday-wrap')
   const resultsWrap = document.getElementById('league-results-wrap')
+
   resultsWrap.classList.add('hidden')
 
   /* Dropdown */
@@ -1235,88 +1235,123 @@ function renderLeague() {
     row.onclick = () => showTeamInfo(row.dataset.teamId)
   })
 
-  /* Matchday */
-  if (state.currentMatchday > state.totalMatchdays) {
-    const finalStandings = updateLeagueStandings()
-    const userPos = finalStandings.findIndex(s => s.teamId === state.teamId) + 1
-    mdWrap.innerHTML = `
-      <div class="league-finished">
-        <div style="font-size:32px;margin-bottom:8px">🏆</div>
-        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Temporada completada</div>
-        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px">Has quedado <strong>${userPos}º</strong> de ${finalStandings.length}</div>
-        <button class="btn-primary" id="btn-new-season">🏆 NUEVA TEMPORADA</button>
-      </div>`
-    document.getElementById('btn-new-season').onclick = resetSeason
-    return
-  }
-
-  const fixture = getFixtureForUser(state.currentMatchday)
-  if (!fixture) {
-    mdWrap.innerHTML = '<div class="league-finished">No hay partido esta jornada</div>'
-    return
-  }
-
-  const rivalId = fixture.home === state.teamId ? fixture.away : fixture.home
-  const rivalName = getTeamName(rivalId)
-  const isHome = fixture.home === state.teamId
-  const location = isHome ? '🏠 Local' : '✈️ Visitante'
-
-  mdWrap.innerHTML = `
-    <div class="league-matchday-card">
-      <div class="matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays}</div>
-      <div class="matchday-rival">🆚 ${rivalName}</div>
-      <div class="matchday-location">${location} · ${fixture.horario || ''}</div>
-      <button class="btn-primary" id="btn-play-match">▶ JUGAR PARTIDO</button>
-    </div>
-  `
-  document.getElementById('btn-play-match').onclick = () => startMatchFromLeague(rivalId, fixture)
 }
 
 /* ============ MATCH ============ */
 let engine = null
+let tiempoSegundos = 0
+let intervaloCrono = null
+let parteActual = 1
+let matchPaused = false
+const matchData = { homeScore: 0, awayScore: 0, homeFouls: 0, awayFouls: 0, rivalName: '' }
+
+function irAlPartido() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
+  document.getElementById('view-match').classList.add('active')
+  document.getElementById('bottom-nav').style.display = 'none'
+  document.getElementById('btn-header-menu').style.display = 'none'
+  tiempoSegundos = 0
+  parteActual = 1
+  if (intervaloCrono) { clearInterval(intervaloCrono); intervaloCrono = null }
+  document.getElementById('cronometro').innerText = '00:00'
+  document.getElementById('match-feed').innerHTML = ''
+  document.getElementById('match-result-area').classList.add('hidden')
+  document.getElementById('match-players').innerHTML = ''
+  document.getElementById('btn-start-match').style.display = 'block'
+  document.getElementById('btn-end-match').style.display = 'none'
+  document.getElementById('btn-half-time').style.display = 'none'
+}
+
+function empezarPartido() {
+  const btn = document.getElementById('btn-start-match')
+  btn.disabled = true
+  btn.innerText = 'JUGANDO...'
+  if (intervaloCrono) clearInterval(intervaloCrono)
+  intervaloCrono = setInterval(() => {
+    tiempoSegundos += 1
+    let mm = Math.floor(tiempoSegundos / 60)
+    let ss = tiempoSegundos % 60
+    document.getElementById('cronometro').innerText = String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0')
+
+    /* Desgaste */
+    state.players.filter(p => p.enPista).forEach(p => aplicarDesgaste(p, 0.05))
+
+    /* Tarjetas */
+    for (const p of state.players.filter(x => x.enPista)) {
+      if (Math.random() < 0.008 / 60 && !p._yellowThisMatch) {
+        p.yellowCards = (p.yellowCards || 0) + 1; p._yellowThisMatch = true
+        addFeedEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'sub' })
+      }
+    }
+
+    /* Evento de juego */
+    simularEventoPartido()
+
+    if ((parteActual === 1 && tiempoSegundos >= 1200) || (parteActual === 2 && tiempoSegundos >= 2400)) {
+      clearInterval(intervaloCrono)
+      intervaloCrono = null
+      if (parteActual === 1) {
+        addFeedEvent({ text: '— DESCANSO —', type: 'break' })
+        btn.innerText = '▶ EMPEZAR 2ª PARTE'
+        btn.disabled = false
+      } else {
+        addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
+        document.getElementById('btn-end-match').style.display = 'block'
+      }
+    }
+  }, 40)
+}
+
+function simularEventoPartido() {
+  const enPista = state.players.filter(p => p.enPista)
+  if (enPista.length === 0) return
+  const homeSkill = enPista.reduce((s, p) => s + getHabilidadEfectiva(p), 0) / enPista.length
+  const homeEnergyAVG = enPista.reduce((s, p) => s + p.energy, 0) / enPista.length / 100
+  const gamePlan = GAME_PLANS[state.tactic.gamePlan] || GAME_PLANS.juegoCuatro
+  if (Math.random() > (0.42 / 60) * gamePlan.events) return
+  const homeChance = homeSkill * (0.5 + homeEnergyAVG * 0.3) * gamePlan.attack
+  const awayChance = 70 * 0.5 * gamePlan.defense
+  const isHomeAttack = Math.random() * (homeChance + awayChance) < homeChance
+  const teamName = isHomeAttack ? state.team : matchData.rivalName
+  const teamSkill = isHomeAttack ? homeSkill : 70
+  if (Math.random() < (teamSkill / 100) * 0.35) {
+    const t = pickRandom(EVENTS_POOL.goal)
+    if (isHomeAttack) matchData.homeScore++; else matchData.awayScore++
+    document.getElementById('score-home').textContent = matchData.homeScore
+    document.getElementById('score-away').textContent = matchData.awayScore
+    if (isHomeAttack) { const g = pickRandom(enPista); if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 } }
+    addFeedEvent({ text: t.text(teamName), type: isHomeAttack ? 'homeGoal' : 'awayGoal' })
+  } else if (Math.random() < 0.55) {
+    addFeedEvent({ text: pickRandom(EVENTS_POOL.save).text(teamName), type: 'save' })
+  } else {
+    addFeedEvent({ text: pickRandom(EVENTS_POOL.miss).text(teamName), type: 'miss' })
+  }
+}
 
 function startMatchFromLeague(rivalId, fixture) {
   const rival = getTeamObj(rivalId)
   if (!rival) return
 
-  /* Set starting five on court */
+  /* Set starting five */
   const five = state.startingFive.length > 0 ? state.startingFive : state.tacticsSlots.filter(Boolean)
   state.players.forEach(p => { p.enPista = false })
-  five.forEach(id => {
-    const p = state.players.find(x => x.id === id)
-    if (p) p.enPista = true
-  })
+  five.forEach(id => { const p = state.players.find(x => x.id === id); if (p) p.enPista = true })
 
-  document.getElementById('view-league').classList.remove('active')
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
-  document.getElementById('view-match').classList.add('active')
-  document.getElementById('bottom-nav').style.display = 'none'
-  document.getElementById('btn-header-menu').style.display = 'none'
-  document.getElementById('match-result-area').classList.add('hidden')
-  document.getElementById('score-home').textContent = '0'
-  document.getElementById('score-away').textContent = '0'
-  document.getElementById('match-clock').textContent = '00:00'
-  document.getElementById('match-feed').innerHTML = ''
-  document.getElementById('btn-end-match').style.display = 'none'
+  /* Match data */
+  matchData.homeScore = 0; matchData.awayScore = 0; matchData.homeFouls = 0; matchData.awayFouls = 0
+  matchData.rivalName = rival.name
+  engine = { homeScore: 0, awayScore: 0 }
+
+  /* Scoreboard */
   document.getElementById('match-home-name').textContent = state.team
   document.getElementById('match-away-name').textContent = rival.name
   document.getElementById('match-home-logo').src = state.teamLogo || ''
   document.getElementById('match-away-logo').src = getTeamLogo(rivalId) || ''
 
+  /* Show match view */
+  irAlPartido()
+
   const isHome = fixture.home === state.teamId
-  const awaySkill = avgSkill(rival.players)
-  engine = new MatchEngine(state.players, state.tactic, awaySkill, state.team, rival.name, isHome)
-
-  engine.onClockUpdate = (clockStr) => {
-    document.getElementById('match-clock').textContent = clockStr
-    document.getElementById('score-home').textContent = isHome ? engine.homeScore : engine.awayScore
-    document.getElementById('score-away').textContent = isHome ? engine.awayScore : engine.homeScore
-    renderPlayerRatings()
-  }
-
-  engine.onEvent = (event) => {
-    addFeedEvent(event)
-  }
 
   /* Game plan selector */
   const planesEl = document.getElementById('match-planes')
@@ -1327,39 +1362,32 @@ function startMatchFromLeague(rivalId, fixture) {
   </select>
   <div class="gameplan-desc" id="match-gameplan-desc">${GAME_PLANS[tactic.gamePlan].desc}</div>`
   document.getElementById('match-gameplan-select').onchange = (e) => {
-    if (tactic.gamePlan === e.target.value) return
     tactic.gamePlan = e.target.value
-    if (engine) engine.gamePlan = GAME_PLANS[tactic.gamePlan]
-    document.getElementById('match-gameplan-desc').textContent = GAME_PLANS[tactic.gamePlan].desc
     addFeedEvent({ text: `🔄 Cambio táctico: ${GAME_PLANS[tactic.gamePlan].label}`, type: 'sub' })
   }
 
-  /* Starting lineup announcement */
+  /* Starting lineup */
   const titularesStr = state.startingFive.map(id => { const p = state.players.find(x => x.id === id); return p ? `${p.name} (${POSITIONS[p.position].label})` : '' }).join(', ')
   addFeedEvent({ text: `🏁 Once titular: ${titularesStr}`, type: 'break' })
 
-  engine.onHalfTime = () => {
-    addFeedEvent({ text: '— DESCANSO —', type: 'break' })
-    document.getElementById('btn-half-time').classList.remove('hidden')
-    document.getElementById('btn-end-match').style.display = 'none'
+  /* Botón Segunda Parte */
+  document.getElementById('btn-half-time').onclick = () => {
+    document.getElementById('btn-half-time').style.display = 'none'
+    document.getElementById('btn-start-match').style.display = 'block'
+    parteActual = 2
+    tiempoSegundos = 1200
+    document.getElementById('cronometro').innerText = '20:00'
+    addFeedEvent({ text: '— SEGUNDA PARTE —', type: 'break' })
+    empezarPartido()
   }
 
-  engine.onFinish = () => {
-    addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
-    document.getElementById('btn-end-match').style.display = 'block'
-    document.getElementById('btn-half-time').classList.add('hidden')
-  }
-
+  /* Botón Finalizar */
   document.getElementById('btn-end-match').onclick = () => {
-    if (engine) engine.stop()
+    if (intervaloCrono) { clearInterval(intervaloCrono); intervaloCrono = null }
     finishMatch(isHome, fixture, rival)
   }
 
-  document.getElementById('btn-half-time').onclick = () => {
-    document.getElementById('btn-half-time').classList.add('hidden')
-    if (engine) engine.iniciarSegundaParte()
-  }
-
+  /* Botón Táctica */
   document.getElementById('btn-tactica').onclick = () => {
     document.getElementById('view-match').classList.remove('active')
     document.getElementById('view-club').classList.add('active')
@@ -1371,7 +1399,6 @@ function startMatchFromLeague(rivalId, fixture) {
   }
 
   renderPlayerRatings()
-  setTimeout(() => { if (engine) engine.iniciarCronometro() }, 100)
 }
 
 function addFeedEvent(event) {
@@ -1407,18 +1434,19 @@ function renderPlayerRatings() {
       <div class="match-player-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
       <span class="match-player-name">${p.name}</span>
       <span class="match-player-ene" style="color:${getEneColor(p.energy)}">${p.energy}</span>
+      <div class="stamina-bar"><div class="stamina-fill" style="width:${p.energy}%;background:${getEneColor(p.energy)}"></div></div>
       <span class="match-player-rating">${'★'.repeat(Math.max(1, Math.round(getHabilidadEfectiva(p) / 20)))}</span>
     </div>`
   }).join('')
 }
 
 function finishMatch(isHome, fixture, rival) {
-  const userScore = isHome ? engine.homeScore : engine.awayScore
-  const rivalScore = isHome ? engine.awayScore : engine.homeScore
+  const userScore = isHome ? matchData.homeScore : matchData.awayScore
+  const rivalScore = isHome ? matchData.awayScore : matchData.homeScore
 
   /* Update fixture */
-  fixture.homeScore = isHome ? engine.homeScore : engine.awayScore
-  fixture.awayScore = isHome ? engine.awayScore : engine.homeScore
+  fixture.homeScore = isHome ? matchData.homeScore : matchData.awayScore
+  fixture.awayScore = isHome ? matchData.awayScore : matchData.homeScore
   fixture.played = true
 
   /* Finance */
@@ -1544,7 +1572,6 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
     const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
     document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
     document.getElementById('league-results-wrap').classList.remove('hidden')
-    document.getElementById('league-matchday-wrap').classList.add('hidden')
 
     document.getElementById('btn-advance-matchday').onclick = () => {
       state.currentMatchday++
@@ -1554,7 +1581,6 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
         if (p.injury.remaining <= 0) { p.energy = p.injury.recoveryEnergy; p.injury = null }
       }
       document.getElementById('league-results-wrap').classList.add('hidden')
-      document.getElementById('league-matchday-wrap').classList.remove('hidden')
       renderLeague()
     }
   }
@@ -2305,12 +2331,9 @@ function showTeamInfo(teamId) {
   const standings = updateLeagueStandings()
   const pos = standings.findIndex(s => s.teamId === teamId) + 1
   const logo = getTeamLogo(teamId)
-  const league = COUNTRIES.flatMap(c => c.leagues).find(l => l.id === state.leagueId)
-  const leagueLogo = league && league.logo ? league.logo : ''
   let html = `
     <div class="view-header">
       <div class="view-header-left">
-        ${leagueLogo ? `<img class="team-logo" src="${leagueLogo}" style="width:22px;height:22px;opacity:0.5;margin-right:2px">` : ''}
         ${logo ? `<img class="team-logo" src="${logo}" style="width:32px;height:32px">` : ''}
         <h2>${team.name}</h2>
       </div>
@@ -2333,7 +2356,7 @@ function showTeamInfo(teamId) {
     const initials = getInitials(p.name)
     const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
     const val = p.value || calcValue(p.skill)
-    html += `<div class="player-card">
+    html += `<div class="player-card" data-player-id="${p.id}">
       <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
       <div class="player-info">
         <div class="player-row1">
@@ -2359,6 +2382,13 @@ function showTeamInfo(teamId) {
     if (team.staff) {
       const staff = team.staff.find(s => s.name === name)
       if (staff) card.onclick = () => openStaffModal(staff)
+    }
+  })
+  document.querySelectorAll('#team-info-content .player-card').forEach(card => {
+    card.onclick = () => {
+      const pid = card.dataset.playerId
+      const player = team.players.find(p => p.id === pid)
+      if (player) openPlayerModal(player, 'cpu')
     }
   })
 }

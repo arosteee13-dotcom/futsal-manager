@@ -779,10 +779,9 @@ html, body {
 }
 
 #view-match.active .match-feed {
-  flex: 1;
   width: 100%;
-  max-height: none;
-  margin-bottom: 8px;
+  flex-shrink: 0;
+  min-height: 80px;
 }
 
 #view-match.active .scoreboard {
@@ -799,6 +798,7 @@ html, body {
   flex-direction: column;
   gap: 3px;
   margin-bottom: 8px;
+  min-height: 40px;
 }
 
 .match-player-item {
@@ -846,30 +846,61 @@ html, body {
   text-align: right;
 }
 
-.match-actions {
-  display: flex;
-  gap: 8px;
-  width: 100%;
+.stamina-bar {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: 4px;
+  flex-shrink: 0;
 }
 
-.match-actions .btn-primary,
-.match-actions .btn-secondary {
+.stamina-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.match-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.match-bottom-bar .btn-primary,
+.match-bottom-bar .btn-secondary {
   flex: 1;
 }
 
-#btn-half-time {
+/* ───────── FALTAS ───────── */
+.fouls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 6px 16px;
+  margin-bottom: 4px;
   width: 100%;
-  margin-bottom: 8px;
 }
+.fouls-team { display: flex; align-items: center; gap: 3px; }
+.fouls-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+.fouls-count { font-size: 16px; font-weight: 700; color: var(--text); min-width: 18px; text-align: center; }
+.fouls-count.limite-faltas { color: #EF4444; }
+.fouls-sep { font-size: 12px; color: var(--text-muted); }
+.fouls-limit { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.fouls-vs { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
 
 .match-feed {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  background: var(--bg-surface);
+  background: #f8f9fa;
   border-radius: var(--radius-md);
-  max-height: 320px;
+  max-height: 150px;
   overflow-y: auto;
 }
 

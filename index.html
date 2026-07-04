@@ -154,7 +154,6 @@
           </div>
           <div id="league-content">
             <div id="league-table-wrap"></div>
-            <div id="league-matchday-wrap"></div>
             <div id="league-results-wrap" class="hidden">
               <h3 class="results-title">Resultados Jornada</h3>
               <div id="league-results-list" class="results-list"></div>
@@ -214,7 +213,7 @@
             </div>
             <div class="score-clock">
               <span class="clock-icon">⏱️</span>
-              <span class="clock-time" id="match-clock">00:00</span>
+              <span class="clock-time" id="cronometro">00:00</span>
             </div>
             <div class="score-team">
               <img class="score-logo" id="match-away-logo" src="" alt="">
@@ -222,13 +221,29 @@
               <span class="score-value" id="score-away">0</span>
             </div>
           </div>
+          <div class="fouls-bar">
+            <div class="fouls-team">
+              <span class="fouls-label">Faltas</span>
+              <span class="fouls-count" id="fouls-home">0</span>
+              <span class="fouls-sep">/</span>
+              <span class="fouls-limit">5</span>
+            </div>
+            <span class="fouls-vs">VS</span>
+            <div class="fouls-team">
+              <span class="fouls-limit">5</span>
+              <span class="fouls-sep">/</span>
+              <span class="fouls-count" id="fouls-away">0</span>
+              <span class="fouls-label">Faltas</span>
+            </div>
+          </div>
           <div class="match-planes" id="match-planes"></div>
           <div class="match-feed" id="match-feed"></div>
           <div class="match-players" id="match-players"></div>
-          <button class="btn-primary" id="btn-half-time" style="display:none">▶ SEGUNDA PARTE</button>
-          <div class="match-actions">
+          <div class="match-bottom-bar">
+            <button class="btn-primary" id="btn-start-match" style="display:none" onclick="empezarPartido()">JUGAR</button>
+            <button class="btn-primary" id="btn-half-time" style="display:none">▶ 2ª PARTE</button>
+            <button class="btn-secondary" id="btn-end-match" style="display:none">FINALIZAR</button>
             <button class="btn-primary" id="btn-tactica">📋 TÁCTICA</button>
-            <button class="btn-secondary" id="btn-end-match" style="display:none">Finalizar</button>
           </div>
           <div id="match-result-area" class="hidden">
             <div class="result-card">
