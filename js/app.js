@@ -1766,7 +1766,10 @@ function completeCurrentMatch() {
     clearInterval(intervaloCrono)
     intervaloCrono = null
   }
-  if (!currentMatchContext) return
+  if (!currentMatchContext) {
+    console.warn('Match completion requested without an active match context. Ensure a match was properly started before calling completeCurrentMatch().')
+    return
+  }
   const { isHome, fixture, rival } = currentMatchContext
   currentMatchContext = null
   finishMatch(isHome, fixture, rival)
@@ -1917,7 +1920,7 @@ function showMatchdayResults(matchday, userScore, rivalScore, rivalName) {
   }
 
   document.getElementById('btn-advance-matchday').onclick = () => {
-    if (matchday >= state.totalMatchdays) {
+    if (matchday === state.totalMatchdays) {
       const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
       let msg = `📊 Temporada finalizada. Posición: ${pos}º`
       if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
