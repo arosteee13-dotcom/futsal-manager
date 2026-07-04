@@ -72,15 +72,6 @@ html, body {
   letter-spacing: -0.3px;
 }
 
-.header-balance {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-light);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
 #game-screen {
   display: flex;
   flex-direction: column;
@@ -142,6 +133,132 @@ html, body {
   background: var(--bg-surface);
   padding: 4px 12px;
   border-radius: 20px;
+}
+
+/* ───────── HOME ───────── */
+.home-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.home-avatar-wrap {
+  margin-bottom: 8px;
+}
+
+.home-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.home-team-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.home-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+}
+
+.home-stat {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.home-stat-icon {
+  font-size: 16px;
+}
+
+.home-match {
+  text-align: center;
+}
+
+.home-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.home-matchday-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.home-match-rival {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.home-match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.home-team-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.home-team-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.home-team-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.home-team-pos {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.home-vs {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.home-match-location {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 /* Squad Grid */
@@ -624,14 +741,15 @@ html, body {
 }
 
 .nav-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 12px;
+  padding: 8px 14px;
   position: relative;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.2s ease;
@@ -643,8 +761,8 @@ html, body {
 }
 
 .nav-icon {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 }
 
 .nav-label {
@@ -656,11 +774,11 @@ html, body {
 .nav-item.active::after {
   content: '';
   position: absolute;
-  top: -1px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 24px;
-  height: 2.5px;
+  width: 26px;
+  height: 3px;
   background: var(--accent);
   border-radius: 0 0 3px 3px;
 }
@@ -687,9 +805,12 @@ html, body {
 }
 
 .menu-logo {
-  font-size: 48px;
+  width: 80px;
+  height: 80px;
   display: block;
-  margin-bottom: 12px;
+  margin: 0 auto 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .menu-title {
@@ -1012,13 +1133,161 @@ html, body {
   color: var(--accent);
 }
 
-/* Header Save Button */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+#btn-load-cancel {
+  background: #EF4444;
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 10px 32px;
 }
 
+#btn-load-cancel:active {
+  background: #DC2626;
+}
+
+#btn-new-game {
+  background: #EF4444;
+  color: #fff;
+}
+
+#btn-new-game:active {
+  background: #DC2626;
+}
+
+#btn-load-game {
+  background: var(--accent);
+  color: #fff;
+}
+
+#btn-load-game:active {
+  background: var(--accent-hover);
+}
+
+/* Header Menu Button */
+.header-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  padding: 4px 4px;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+}
+
+.header-menu-btn svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Header Dropdown (side panel) */
+.dropdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.dropdown-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.header-dropdown {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  z-index: 201;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease, visibility 0.3s ease;
+  visibility: hidden;
+  padding-top: 4px;
+  border-radius: 0 16px 16px 0;
+}
+
+.header-dropdown.open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  margin-bottom: 4px;
+}
+
+.dropdown-header .dd-team-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.dropdown-header .dd-team-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+  position: relative;
+}
+
+.dropdown-item:active {
+  background: var(--accent-light);
+}
+
+.dropdown-item:active .nav-icon {
+  color: var(--accent);
+}
+
+.dropdown-item:active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.dropdown-item:last-child {
+  color: var(--accent);
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
+.dropdown-item .nav-icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+/* Header Save Button */
 .header-save {
   padding: 4px 10px;
   border: 1px solid var(--border);
@@ -1362,6 +1631,23 @@ html, body {
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-overlay .modal-content {
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.25s ease;
+}
+
+.modal-overlay.open .modal-content {
+  transform: scale(1) translateY(0);
 }
 
 .modal-content {
@@ -1451,10 +1737,69 @@ html, body {
 
 .modal-season-stats {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
   font-size: 13px;
   color: var(--text-secondary);
   padding: 8px 0;
+}
+
+.modal-history-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 0 4px;
+  text-align: center;
+}
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+}
+
+.hist-item:last-child { border-bottom: none; }
+
+.hist-matchday {
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 24px;
+}
+
+.hist-rival {
+  flex: 1;
+  color: var(--text);
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hist-minutes {
+  color: var(--text-muted);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.hist-rating {
+  color: #F59E0B;
+  min-width: 50px;
+  text-align: right;
+}
+
+.hist-actions {
+  min-width: 30px;
+  text-align: right;
+  font-size: 11px;
 }
 
 .modal-market-actions {
@@ -1495,6 +1840,8 @@ html, body {
 .modal-close {
   margin: 0 20px 16px;
   flex-shrink: 0;
+  width: 310px;
+  height: 45px;
 }
 
 /* ───────── TACTICS / SLOT PITCH ───────── */
@@ -1834,6 +2181,25 @@ html, body {
 .feed-event.injury strong {
   color: inherit;
 }
+
+/* ───────── BADGES ───────── */
+.player-badges {
+  display: inline-flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.player-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.badge-lt { background: #2563EB; }
+.badge-lc { background: #10B981; }
 
 /* Utilities */
 .hidden {

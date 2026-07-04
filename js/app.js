@@ -82,7 +82,7 @@ function generateCpuSquad(teamId) {
         energy: randInt(70, 100), number: pid,
         nationality: '🇪🇸 España',
         goals: 0, matches: 0,
-        value, listed: false, salePrice: 0,
+        value, transferListed: false, transferPrice: 0, loanListed: false, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [],
         enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']),
       })
     }
@@ -238,12 +238,32 @@ class MatchEngine {
       if (this.onEvent) this.onEvent({ text: `🔄 Sale: ${c.sale.name} (ENE:${c.sale.energy}) → Entra: ${c.entra.name} (ENE:${c.entra.energy})`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
     }
 
+    /* Tarjetas */
+    for (const p of state.players.filter(x => x.enPista)) {
+      if (Math.random() < 0.008 && !p._yellowThisMatch) {
+        p.yellowCards = (p.yellowCards || 0) + 1
+        p._yellowThisMatch = true
+        if (this.onEvent) this.onEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
+        if (Math.random() < 0.2) { p.redCards = (p.redCards || 0) + 1; p._redThisMatch = true; p.enPista = false; if (this.onEvent) this.onEvent({ text: `🟥 Roja: ${p.name} - Expulsado`, type: 'injury' }, this.homeScore, this.awayScore, this.minute) }
+      }
+    }
+
     /* Simular minuto */
     const event = this._simulateMinute()
     if (event) {
       this.events.push(event)
-      if (event.type === 'homeGoal') this.homeScore++
-      else if (event.type === 'awayGoal') this.awayScore++
+      if (event.type === 'homeGoal') { this.homeScore++; const g = pickRandom(state.players.filter(x => x.enPista)); if(g){g._goalsInMatch=(g._goalsInMatch||0)+1;g.goals=(g.goals||0)+1} }
+      else if (event.type === 'awayGoal') { this.awayScore++ }
+      /* Asistencia: 35% de probabilidad cuando hay gol */
+      if ((event.type === 'homeGoal' || event.type === 'awayGoal') && Math.random() < 0.35 && event.type === 'homeGoal') {
+        const teamPlayers = state.players.filter(x => x.enPista && (!x._assistThisMatch || Math.random() < 0.3))
+        const assister = pickRandom(teamPlayers)
+        if (assister) {
+          assister.assists = (assister.assists || 0) + 1
+          assister._assistThisMatch = true
+          if (this.onEvent) this.onEvent({ text: `🅰️ Asistencia: ${assister.name}`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
+        }
+      }
       if (this.onEvent) this.onEvent(event, this.homeScore, this.awayScore, this.minute)
     }
 
@@ -362,6 +382,7 @@ function saveGame() {
   }
   if (idx >= 0) saves[idx] = data; else saves.unshift(data)
   setSaves(saves)
+  autoSaveTactics()
 }
 function autoSave() { saveGame() }
 function deleteSave(id) { let s = getSaves(); setSaves(s.filter(x => x.id !== id)) }
@@ -380,9 +401,15 @@ function loadTactics() {
     if (data) {
       state.tactic.formation = data.formation || state.tactic.formation
       state.tactic.gamePlan = data.gamePlan || state.tactic.gamePlan
-      state.tacticsSlots = data.tacticsSlots || []
-      state.benchIds = data.benchIds || []
-      state.reserveIds = data.reserveIds || []
+      if (!state.tacticsSlots || state.tacticsSlots.length === 0) {
+        state.tacticsSlots = data.tacticsSlots || []
+      }
+      if (!state.benchIds || state.benchIds.length === 0) {
+        state.benchIds = data.benchIds || []
+      }
+      if (!state.reserveIds || state.reserveIds.length === 0) {
+        state.reserveIds = data.reserveIds || []
+      }
     }
   } catch {}
 }
@@ -399,11 +426,17 @@ function generateFixtures(teamIds) {
     for (let i = 0; i < m / 2; i++) {
       const home = ids[i]
       const away = ids[m - 1 - i]
-      if (home !== null && away !== null) {
+      if (home !== null && away !== null)
         fixtures.push({ matchday: r + 1, home, away, homeScore: null, awayScore: null, played: false })
-      }
     }
     ids.splice(1, 0, ids.pop())
+  }
+  const half = rounds
+  for (let r = 0; r < half; r++) {
+    for (let i = 0; i < m / 2; i++) {
+      const f = fixtures[r * (m / 2) + i]
+      fixtures.push({ matchday: r + 1 + half, home: f.away, away: f.home, homeScore: null, awayScore: null, played: false })
+    }
   }
   return fixtures
 }
@@ -497,7 +530,7 @@ function renderSquad(players) {
         <div class="player-info">
           <div class="player-row1">
             <span class="player-name">${p.name}</span>
-            <span class="player-stat-num">${p.age || '-'}</span>
+            <span class="player-stat-num">${p.age ? `${p.age}y` : '-'}</span>
             <span class="player-stat-num">${formatValue(val)}</span>
             <span class="player-rating-num">${p.skill}</span>
           </div>
@@ -505,6 +538,7 @@ function renderSquad(players) {
             <span class="player-position" style="background:${pos.color}">${pos.label}</span>
             <span class="player-foot">${p.foot || 'DER'}</span>
             <span class="player-nation">${p.nationality}</span>
+            ${p.transferListed || p.loanListed ? `<span class="player-badges">${p.transferListed ? '<span class="player-badge badge-lt">LT</span>' : ''}${p.loanListed ? '<span class="player-badge badge-lc">LC</span>' : ''}</span>` : ''}
           </div>
         </div>
       </div>
@@ -526,7 +560,61 @@ const formationRoles = {
   '1-1-2': [{ role: 'portero', label: '1' }, { role: 'cierre', label: '2' }, { role: 'ala', label: '3' }, { role: 'ala', label: '4' }],
 }
 
+function renderHome() {
+  const container = document.getElementById('home-content')
+  if (!container) return
+  const standings = updateLeagueStandings()
+  const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
+  const fixture = getFixtureForUser(state.currentMatchday)
+  const rivalId = fixture ? (fixture.home === state.teamId ? fixture.away : fixture.home) : null
+  const rivalName = rivalId ? getTeamName(rivalId) : '—'
+  const isHome = fixture ? fixture.home === state.teamId : false
+  const rivalPos = rivalId ? (standings.findIndex(s => s.teamId === rivalId) + 1) : '—'
+  const rivalLogo = rivalId ? getTeamLogo(rivalId) : ''
+  const isPlayoffs = state.playoffs && state.playoffs.fixtures && state.playoffs.fixtures.length > 0
+  const roundNames = { QF: 'Cuartos de final', SF: 'Semifinal', F: 'Final' }
+  container.innerHTML = `
+    <div class="home-card">
+      <div class="home-avatar-wrap">${state.teamLogo ? `<img class="home-logo" src="${state.teamLogo}" alt="">` : ''}</div>
+      <div class="home-team-name">${state.team}</div>
+      <div class="home-stats">
+        <div class="home-stat"><span class="home-stat-icon">🏆</span><span>${userPos}º de ${standings.length}</span></div>
+        <div class="home-stat"><span class="home-stat-icon">💰</span><span>${formatMoney(state.finances.balance)}</span></div>
+        <div class="home-stat"><span class="home-stat-icon">👥</span><span>${state.players.length}/${MAX_SQUAD}</span></div>
+        <div class="home-stat"><span class="home-stat-icon">📊</span><span>${state.stats.wins}V ${state.stats.draws}E ${state.stats.losses}D</span></div>
+      </div>
+    </div>
+    ${fixture ? `
+    <div class="home-card home-match">
+      <div class="home-section-title">Próximo encuentro</div>
+      <div class="home-match-teams">
+        <div class="home-team-side">
+          <img class="home-team-logo" src="${state.teamLogo || ''}" alt="">
+          <div class="home-team-label">${state.team}</div>
+          <div class="home-team-pos">${userPos}º</div>
+        </div>
+        <div class="home-vs">VS</div>
+        <div class="home-team-side">
+          <img class="home-team-logo" src="${rivalLogo}" alt="">
+          <div class="home-team-label">${rivalName}</div>
+          <div class="home-team-pos">${rivalPos}º</div>
+        </div>
+      </div>
+      ${isPlayoffs
+        ? `<div class="home-matchday-label">${roundNames[state.playoffs.round] || 'Eliminatoria'}</div>`
+        : `<div class="home-matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays}</div>`
+      }
+      <div class="home-match-location">${isHome ? '🏠 Local' : '✈️ Visitante'}</div>
+      <button class="btn-primary" id="btn-home-play">▶ JUGAR PARTIDO</button>
+    </div>` : '<div class="home-card home-match"><div class="home-section-title">🏆 Temporada completada</div></div>'}
+  `
+  const playBtn = document.getElementById('btn-home-play')
+  if (playBtn) playBtn.onclick = () => renderTab('league')
+}
+
 function renderClub() {
+  const titleEl = document.getElementById('club-title')
+  if (titleEl) titleEl.textContent = state.team
   const logoEl = document.getElementById('club-logo')
   if (logoEl) {
     logoEl.innerHTML = state.teamLogo ? `<img class="team-logo" src="${state.teamLogo}" alt="${state.team}">` : ''
@@ -1197,7 +1285,7 @@ function finishMatch(isHome, fixture, rival) {
   else { reward = -200; state.stats.losses++ }
   state.finances.balance += reward
   state.finances.history.push({ reason: `J${state.currentMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
-  updateHeaderBalance()
+  
 
   /* Post-match recovery: restore some energy for next matchday */
   state.players.forEach(p => {
@@ -1209,10 +1297,23 @@ function finishMatch(isHome, fixture, rival) {
   })
   state.convocatoriaValidada = false
 
-  /* Player stats */
-  const scorer = pickRandom(state.players)
-  scorer.goals = (scorer.goals || 0) + (userScore > 0 ? randInt(1, userScore) : 0)
-  scorer.matches = (scorer.matches || 0) + 1
+  /* Match history per player */
+  state.players.filter(p => p.minutosEnPista > 0).forEach(p => {
+    if (!p.matchHistory) p.matchHistory = []
+    const rating = Math.round(5 + (p._yellowThisMatch ? -0.5 : 0) + (p._redThisMatch ? -2 : 0) + ((p.goals || 0) > 0 ? 2 : 0) + ((p.assists || 0) > 0 ? 1 : 0) + Math.random() * 2)
+    p.matchHistory.push({
+      matchday: state.currentMatchday,
+      rival: rival.name,
+      minutes: p.minutosEnPista || 0,
+      rating: Math.min(10, Math.max(1, rating)),
+      goals: p._goalsInMatch || 0,
+      yellow: !!p._yellowThisMatch,
+      red: !!p._redThisMatch,
+    })
+    p.matches = (p.matches || 0) + 1
+    p.goals = (p.goals || 0) + (p._goalsInMatch || 0)
+    delete p._yellowThisMatch; delete p._redThisMatch; delete p._goalsInMatch; delete p._assistThisMatch
+  })
 
   /* Auto-simulate other matches */
   const otherFixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday && f.played === false)
@@ -1318,7 +1419,7 @@ function renderMarketContent() {
   }
 
   if (state.marketTab === 'buy') {
-    const available = allCpuPlayers.filter(p => !p.listed).sort((a, b) => b.value - a.value).slice(0, 20)
+    const available = allCpuPlayers.filter(p => !p.transferListed).sort((a, b) => b.value - a.value).slice(0, 20)
     const filtered = search ? available.filter(p => p.name.toLowerCase().includes(search)) : available
 
     if (filtered.length === 0) {
@@ -1367,7 +1468,7 @@ function renderMarketContent() {
       })
     })
   } else {
-    const listed = state.players.filter(p => p.listed)
+    const listed = state.players.filter(p => p.transferListed)
     if (listed.length === 0) {
       container.innerHTML = '<div class="market-empty">No tienes jugadores en venta.<br>Ve a Club > Plantilla y abre un jugador para listarlo.</div>'
       return
@@ -1385,7 +1486,7 @@ function renderMarketContent() {
           <div class="player-avatar" style="width:36px;height:36px;font-size:12px;${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
           <div class="market-card-info">
             <div class="market-card-name">${p.name}</div>
-            <div class="market-card-detail">${pos.label} · Precio: ${formatMoney(p.salePrice)}</div>
+            <div class="market-card-detail">${pos.label} · Precio: ${formatMoney(p.transferPrice)}</div>
           </div>
           <div class="market-card-right">
             <button class="market-card-btn sell">RETIRAR</button>
@@ -1404,8 +1505,8 @@ function renderMarketContent() {
         const pid = card.dataset.playerId
         const player = state.players.find(p => p.id === pid)
         if (!player) return
-        player.listed = false
-        player.salePrice = 0
+        player.transferListed = false
+        player.transferPrice = 0
         renderMarketContent()
       })
     })
@@ -1419,9 +1520,9 @@ function buyPlayer(player, team) {
   state.finances.history.push({ reason: `Compra: ${player.name}`, amount: -player.value })
   const idx = team.players.indexOf(player)
   if (idx >= 0) team.players.splice(idx, 1)
-  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, listed: false, salePrice: 0, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']) }
+  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [], transferListed: false, transferPrice: 0, loanListed: false, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']) }
   state.players.push(newPlayer)
-  updateHeaderBalance()
+  
   renderMarketContent()
 }
 
@@ -1432,51 +1533,86 @@ function openPlayerModal(player, mode) {
   avatarEl.textContent = player.avatar ? '' : getInitials(player.name)
   avatarEl.style.background = player.avatar ? `url(${player.avatar}) center/cover, ${pos.color}` : pos.color
   document.getElementById('modal-name').textContent = player.name
-  document.getElementById('modal-nationality').textContent = player.nationality || '🇪🇸 España'
+  document.getElementById('modal-nationality').textContent = `${player.nationality || '🇪🇸 España'}`
+  document.getElementById('modal-meta').textContent = `${player.age || '-'} años · ${player.foot || 'DER'}`
   const posBadge = document.getElementById('modal-position')
   posBadge.textContent = pos.label
   posBadge.style.background = pos.color
   document.getElementById('modal-skill').textContent = player.skill
   document.getElementById('modal-energy').textContent = player.energy
   document.getElementById('modal-value').textContent = formatMoney(player.value)
-  document.getElementById('modal-goals').textContent = player.goals || 0
-  document.getElementById('modal-matches').textContent = player.matches || 0
+  document.getElementById('modal-pj').textContent = player.matches || 0
+  document.getElementById('modal-g').textContent = player.goals || 0
+  document.getElementById('modal-a').textContent = player.assists || 0
+  document.getElementById('modal-ta').textContent = player.yellowCards || 0
+  document.getElementById('modal-tr').textContent = player.redCards || 0
+  document.getElementById('modal-mvp').textContent = player.mvp || 0
+
+  /* Match history */
+  const historyEl = document.getElementById('modal-history')
+  if (historyEl) {
+    const hist = (player.matchHistory || []).slice(-8).reverse()
+    historyEl.innerHTML = hist.length === 0
+      ? '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px">Sin partidos jugados</div>'
+      : hist.map(m => {
+          const acts = []
+          if (m.goals > 0) acts.push(`⚽${m.goals}`)
+          if (m.yellow) acts.push('🟨')
+          if (m.red) acts.push('🟥')
+          return `<div class="hist-item">
+            <span class="hist-matchday">J${m.matchday}</span>
+            <span class="hist-rival">vs ${m.rival}</span>
+            <span class="hist-minutes">${m.minutes}\'</span>
+            <span class="hist-rating">${'★'.repeat(Math.max(1, Math.round(m.rating / 2)))} ${m.rating}</span>
+            <span class="hist-actions">${acts.join(' ') || ''}</span>
+          </div>`
+        }).join('')
+  }
 
   const actions = document.getElementById('modal-market-actions')
   actions.innerHTML = ''
 
   if (mode === 'own') {
-    if (player.listed) {
-      actions.innerHTML = `
+    /* LT button */
+    if (player.transferListed) {
+      actions.innerHTML += `
         <div class="market-input-group">
           <span class="market-input-label">Precio de venta actual</span>
-          <div style="text-align:center;font-weight:700;font-size:16px;color:var(--text)">${formatMoney(player.salePrice)}</div>
+          <div style="text-align:center;font-weight:700;font-size:16px;color:var(--text)">${formatMoney(player.transferPrice)}</div>
         </div>
-        <button class="btn-secondary" id="modal-retirar">RETIRAR DEL MERCADO</button>
+        <button class="btn-secondary" id="modal-retirar-lt">RETIRAR DE TRANSFERIBLES</button>
       `
-      document.getElementById('modal-retirar').onclick = () => {
-        player.listed = false
-        player.salePrice = 0
-        closeModal()
-        renderMarketContent()
-      }
     } else {
-      actions.innerHTML = `
+      actions.innerHTML += `
         <div class="market-input-group">
-          <label class="market-input-label">Precio de venta</label>
-          <input class="market-price-input" id="modal-sale-price" type="number" value="${player.value}" min="1">
+          <label class="market-input-label">Precio para lista de transferibles</label>
+          <input class="market-price-input" id="modal-lt-price" type="number" value="${player.value}" min="1">
         </div>
-        <button class="btn-primary" id="modal-listar">LISTAR EN MERCADO</button>
+        <button class="btn-primary" id="modal-listar-lt" style="background:#EF4444">LISTA TRANSFERIBLES</button>
       `
-      document.getElementById('modal-listar').onclick = () => {
-        const price = parseInt(document.getElementById('modal-sale-price').value)
-        if (!price || price < 1) return
-        player.listed = true
-        player.salePrice = price
-        closeModal()
-        renderMarketContent()
-      }
     }
+    /* LC button */
+    if (player.loanListed) {
+      actions.innerHTML += `<button class="btn-secondary" id="modal-retirar-lc" style="margin-top:6px">RETIRAR DE CEDIBLES</button>`
+    } else {
+      actions.innerHTML += `<button class="btn-primary" id="modal-listar-lc" style="margin-top:6px;background:var(--accent)">LISTA CEDIBLES</button>`
+    }
+
+    /* LT events */
+    const retirarLT = document.getElementById('modal-retirar-lt')
+    if (retirarLT) retirarLT.onclick = () => { player.transferListed = false; player.transferPrice = 0; closeModal(); renderMarketContent(); renderSquad(state.players) }
+    const listarLT = document.getElementById('modal-listar-lt')
+    if (listarLT) listarLT.onclick = () => {
+      const price = parseInt(document.getElementById('modal-lt-price').value)
+      if (!price || price < 1) return
+      player.transferListed = true; player.transferPrice = price; closeModal(); renderMarketContent(); renderSquad(state.players)
+    }
+    /* LC events */
+    const retirarLC = document.getElementById('modal-retirar-lc')
+    if (retirarLC) retirarLC.onclick = () => { player.loanListed = false; closeModal(); renderSquad(state.players) }
+    const listarLC = document.getElementById('modal-listar-lc')
+    if (listarLC) listarLC.onclick = () => { player.loanListed = true; closeModal(); renderSquad(state.players) }
+
   } else if (mode === 'cpu') {
     const canBuy = state.players.length < MAX_SQUAD && state.finances.balance >= player.value
     actions.innerHTML = `
@@ -1487,19 +1623,16 @@ function openPlayerModal(player, mode) {
     if (canBuy) {
       document.getElementById('modal-comprar').onclick = () => {
         const team = state.leagueTeams.find(t => t.teamId === player.teamId || t.players?.includes(player))
-        if (team) {
-          buyPlayer(player, team)
-          closeModal()
-        }
+        if (team) { buyPlayer(player, team); closeModal() }
       }
     }
   }
 
-  document.getElementById('player-modal').classList.remove('hidden')
+  document.getElementById('player-modal').classList.add('open')
 }
 
 function closeModal() {
-  document.getElementById('player-modal').classList.add('hidden')
+  document.getElementById('player-modal').classList.remove('open')
 }
 
 /* ============ FINANCES VIEW ============ */
@@ -1565,25 +1698,9 @@ function setupNavigation() {
     // Just visual for now
   }
 
-  /* Save button */
-  document.getElementById('btn-save-game').onclick = () => {
-    saveGame()
-    const btn = document.getElementById('btn-save-game')
-    const orig = btn.textContent
-    btn.textContent = '✓ Guardado'
-    btn.style.borderColor = 'var(--accent)'
-    btn.style.color = 'var(--accent)'
-    setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ''; btn.style.color = '' }, 2000)
-  }
-
   /* Modal close */
   document.getElementById('modal-close').onclick = closeModal
   document.getElementById('player-modal').onclick = (e) => { if (e.target === e.currentTarget) closeModal() }
-}
-
-function updateHeaderBalance() {
-  const el = document.getElementById('header-balance')
-  if (el) el.textContent = formatMoney(state.finances.balance)
 }
 
 function renderTab(tab) {
@@ -1591,10 +1708,11 @@ function renderTab(tab) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
   const view = document.getElementById(`view-${tab}`)
   if (view) view.classList.add('active')
-  updateHeaderBalance()
+  
   switch (tab) {
     case 'club': renderClub(); break
     case 'league': renderLeague(); break
+    case 'home': renderHome(); break
     case 'market': renderMarket(); break
     case 'finances': renderFinances(); break
   }
@@ -1665,8 +1783,8 @@ function loadGame(id) {
   state.leagueId = data.leagueId
   state.gameId = data.id
   state.stats = data.stats || { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 }
-  state.players = data.players
-  state.tactic = data.tactic || { formation: '1-2-1', mentality: 'balanced' }
+  state.players = (data.players || []).map(p => ({ ...p, age: p.age || randInt(22, 34) }))
+  state.tactic = data.tactic || { formation: '1-2-1', gamePlan: 'juegoCuatro' }
   state.finances = data.finances || { balance: 5000, history: [] }
   state.leagueTeams = data.leagueTeams || []
   state.currentMatchday = data.currentMatchday || 1
@@ -1681,13 +1799,12 @@ function loadGame(id) {
 function startGame() {
   document.getElementById('menu-screen').classList.add('hidden')
   document.getElementById('game-screen').classList.remove('hidden')
-  document.getElementById('header-title').textContent = state.team
   loadTactics()
   setupNavigation()
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
-  document.querySelector('[data-tab="club"]').classList.add('active')
-  renderTab('club')
-  updateHeaderBalance()
+  document.querySelector('[data-tab="home"]').classList.add('active')
+  renderTab('home')
+  
 }
 
 /* ============ MENU ============ */
@@ -1758,6 +1875,7 @@ function showCoachInput() {
 function handleBrowserBack() {
   if (menuStep === 'leagues') { selectedCountry = null; showBrowser('countries') }
   else if (menuStep === 'teams') { selectedLeague = null; showBrowser('leagues') }
+  else { showMainMenu() }
 }
 
 /* ============ LOAD MENU ============ */
@@ -1788,7 +1906,7 @@ function showLoadMenu() {
         </div>
         <div class="save-actions">
           <button class="save-delete" data-id="${s.id}"><svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
-          <button class="save-load" data-id="${s.id}">CARGAR →</button>
+          <button class="save-load" data-id="${s.id}">CARGAR</button>
         </div>
       </div>
     `
@@ -1804,6 +1922,60 @@ function showLoadMenu() {
     }
   })
 }
+
+/* ============ MENU DROPDOWN ============ */
+function showSideMenu() {
+  const dd = document.getElementById('header-dropdown')
+  const overlay = document.getElementById('dropdown-overlay')
+  const logo = document.getElementById('dd-team-logo')
+  const name = document.getElementById('dd-team-name')
+  if (logo) logo.src = state.teamLogo || ''
+  if (name) name.textContent = state.team || 'Futsal Manager'
+  dd.classList.add('open')
+  overlay.classList.add('open')
+}
+
+function hideSideMenu() {
+  document.getElementById('header-dropdown').classList.remove('open')
+  document.getElementById('dropdown-overlay').classList.remove('open')
+}
+
+document.getElementById('btn-header-menu').onclick = (e) => {
+  e.stopPropagation()
+  if (document.getElementById('header-dropdown').classList.contains('open')) {
+    hideSideMenu()
+  } else {
+    showSideMenu()
+  }
+}
+
+document.getElementById('dropdown-overlay').onclick = hideSideMenu
+
+document.querySelectorAll('.dropdown-item').forEach(item => {
+  item.onclick = () => {
+    hideSideMenu()
+    const action = item.dataset.action
+    if (action === 'quit') {
+      saveGame()
+      hideSideMenu()
+      showMainMenu()
+    } else if (action === 'save') {
+      saveGame()
+      hideSideMenu()
+      const btn = document.getElementById('btn-header-menu')
+      btn.innerHTML = '✓'
+      setTimeout(() => {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>'
+      }, 1500)
+    } else if (action === 'calendar') {
+      alert('📅 Calendario — Próximamente')
+    } else if (action === 'history') {
+      alert('📊 Historial — Próximamente')
+    } else if (action === 'settings') {
+      alert('⚙️ Ajustes — Próximamente')
+    }
+  }
+})
 
 /* ============ INIT ============ */
 document.getElementById('btn-new-game').onclick = () => showBrowser('countries')
