@@ -650,12 +650,29 @@ function renderTactics(tactic) {
   </div>`
 
   /* Vertical pitch: attack top → goalkeeper bottom */
-  const PITCH_ROWS = {
-    '1-2-1': [[4], [2, 3], [1], [0]],
-    '2-2':   [[], [3, 4], [1, 2], [0]],
-    '1-1-2': [[3, 4], [2], [1], [0]],
+  const FORMATION_GRID = {
+    '1-2-1': [
+      [null, null, null, null],
+      [null, null,    2, null],
+      [   0,    1, null,    4],
+      [null, null,    3, null],
+      [null, null, null, null],
+    ],
+    '2-2': [
+      [null, null, null, null],
+      [null,    1, null,    3],
+      [   0, null, null, null],
+      [null,    2, null,    4],
+      [null, null, null, null],
+    ],
+    '1-1-2': [
+      [null, null, null, null],
+      [null, null, null,    3],
+      [   0,    1,    2, null],
+      [null, null, null,    4],
+      [null, null, null, null],
+    ],
   }
-  const layout = PITCH_ROWS[tactic.formation] || PITCH_ROWS['1-2-1']
 
   function renderPitchSlot(i) {
     const role = roles[i]
@@ -681,12 +698,43 @@ function renderTactics(tactic) {
     </div>`
   }
 
-  html += `<div class="pitch-tactics">`
-  layout.forEach(row => {
-    if (row.length === 0) { html += `<div style="flex:1"></div>`; return }
-    const wide = tactic.formation === '1-2-1' && row.length === 2
-    html += `<div class="pitch-row${wide ? ' wide' : ''}">${row.map(i => renderPitchSlot(i)).join('')}</div>`
-  })
+  html += `<div class="pitch-grid">
+    <div class="pitch-col-label" style="grid-area:1/1">POR</div>
+    <div class="pitch-col-label" style="grid-area:1/2">CIE</div>
+    <div class="pitch-col-label" style="grid-area:1/3">ALA</div>
+    <div class="pitch-col-label" style="grid-area:1/4">PIV</div>`
+  const gridData = FORMATION_GRID[tactic.formation] || FORMATION_GRID['1-2-1']
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 4; col++) {
+      const slotIdx = gridData[row][col]
+      if (slotIdx === null) continue
+      const cssRow = row + 2
+      const cssCol = col + 1
+      const area = `${cssRow}/${cssCol}`
+      const role = roles[slotIdx]
+      const pid = slots[slotIdx]
+      const player = pid ? state.players.find(p => p.id === pid) : null
+      const pos = POSITIONS[role]
+      if (player) {
+        const mult = getPositionMultiplier(player.position, role)
+        const penalty = mult < 1 ? `${Math.round(mult * 100)}%` : ''
+        const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+        html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
+          <div class="pitch-slot filled" data-slot="${slotIdx}" style="border-color:${pos.color};background:${pos.color}">
+            <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
+          </div>
+          <span class="pitch-slot-role" style="color:#fff" ${penalty ? `data-penalty="⚠️ ${penalty}"` : ''}>${pos.label}</span>
+          <span class="pitch-slot-name">${player.name}</span>
+          <div class="stat-row"><div class="stat-circle" style="background:${getEneColor(player.energy)}">${player.energy}</div><div class="stat-circle" style="background:#9CA3AF">${player.skill}</div></div>
+        </div>`
+      } else {
+        html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
+          <div class="pitch-slot empty" data-slot="${slotIdx}">+</div>
+          <span class="pitch-slot-role">${pos.label}</span>
+        </div>`
+      }
+    }
+  }
   html += `</div>`
 
   /* Bench grid (9 circles: 5 + 4) */
