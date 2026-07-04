@@ -95,53 +95,143 @@ const COUNTRIES = [
     leagues: [
       { id: 'lnfs1', name: 'LNFS Primera División', logo: 'https://cdn.resfu.com/img_data/competiciones/108.png?size=120x&lossy=1',
         teams: [
-          { id: '1041', name: 'Barça', logo: 'https://cdn.resfu.com/img_data/equipos/1041.png?size=120x&lossy=1',
+          { id: '1041', name: 'Barça', rating: 96, logo: 'https://cdn.resfu.com/img_data/equipos/1041.png?size=120x&lossy=1',
             staff: [{ name: 'Javier Rodríguez Nebreda', nationality: '🇪🇸 España', role: 'headCoach', avatar: 'img/staff/3622776.png',
               career: [{ team: 'Barça', from: '01/09/2024', to: 'Actualidad', matches: 30, won: 18, drawn: 5, lost: 7 }]
             }] },
-          { id: '4146', name: 'ElPozo Murcia Costa Cálida', logo: 'https://cdn.resfu.com/img_data/equipos/4146.png?size=120x&lossy=1',
+          { id: '4146', name: 'ElPozo Murcia Costa Cálida', rating: 94, logo: 'https://cdn.resfu.com/img_data/equipos/4146.png?size=120x&lossy=1',
             staff: [{ name: 'Josan González', nationality: '🇪🇸 España', role: 'headCoach',
               avatar: 'https://cdn.resfu.com/img_data/people/original/70557.jpg?size=120x&lossy=1',
               career: [{ team: 'ElPozo Murcia Costa Cálida', from: '06/02/2025', to: 'Actualidad', matches: 35, won: 20, drawn: 7, lost: 8 }]
             }] },
-          { id: '3093', name: 'Inter FS', logo: 'https://cdn.resfu.com/img_data/equipos/3093.png?size=120x&lossy=1' },
-          { id: '3092', name: 'Palma Futsal', logo: 'https://cdn.resfu.com/img_data/equipos/3092.png?size=120x&lossy=1' },
-          { id: '3219', name: 'Jaén FS', logo: 'https://cdn.resfu.com/img_data/equipos/3219.png?size=120x&lossy=1' },
-          { id: '83478', name: 'Córdoba Patrimonio', logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1',
+          { id: '3093', name: 'Inter FS', rating: 91, logo: 'https://cdn.resfu.com/img_data/equipos/3093.png?size=120x&lossy=1',
+            staff: [{ name: 'Alberto Riquer', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69291.jpg?size=120x&lossy=1',
+              career: [{ team: 'Inter FS', from: '01/07/2025', to: 'Actualidad', matches: 30, won: 18, drawn: 5, lost: 7 }]
+            }] },
+          { id: '3092', name: 'Palma Futsal', rating: 92, logo: 'https://cdn.resfu.com/img_data/equipos/3092.png?size=120x&lossy=1',
+            staff: [{ name: 'Antonio Vadillo', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55633.jpg?size=120x&lossy=1',
+              career: [{ team: 'Palma Futsal', from: '01/07/2024', to: 'Actualidad', matches: 40, won: 25, drawn: 7, lost: 8 }]
+            }] },
+          { id: '3219', name: 'Jaén FS', rating: 87, logo: 'https://cdn.resfu.com/img_data/equipos/3219.png?size=120x&lossy=1',
+            staff: [{ name: 'Dani Rodríguez', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55626.jpg?size=120x&lossy=1',
+              career: [{ team: 'Jaén FS', from: '01/07/2025', to: 'Actualidad', matches: 25, won: 15, drawn: 5, lost: 5 }]
+            }] },
+          { id: '83478', name: 'Córdoba Patrimonio', rating: 80, logo: 'https://cdn.resfu.com/img_data/equipos/83478.png?size=120x&lossy=1',
             staff: [{ name: 'Ema Santoro', nationality: '🇦🇷 Argentina', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1',
               career: [{ team: 'Córdoba Patrimonio', from: '01/07/2025', to: 'Actualidad', matches: 15, won: 6, drawn: 3, lost: 6 }]
             }] },
-          { id: '69694', name: 'Inagroup El Ejido', logo: 'https://cdn.resfu.com/img_data/equipos/69694.png?size=120x&lossy=1' },
-          { id: '3082', name: 'Industrias Santa Coloma', logo: 'https://cdn.resfu.com/img_data/equipos/3082.png?size=120x&lossy=1' },
-          { id: '14228', name: 'Jimbee Cartagena', logo: 'https://cdn.resfu.com/img_data/equipos/14228.png?size=120x&lossy=1' },
-          { id: '5203', name: 'Manzanares FS', logo: 'https://cdn.resfu.com/img_data/equipos/5203.png?size=120x&lossy=1' },
-          { id: '7970', name: 'Noia Portus Apostoli', logo: 'https://cdn.resfu.com/img_data/equipos/7970.png?size=120x&lossy=1' },
-          { id: '3193', name: 'O Parrulo Ferrol', logo: 'https://cdn.resfu.com/img_data/equipos/3193.png?size=120x&lossy=1' },
-          { id: '2603', name: 'Osasuna Magna', logo: 'https://cdn.resfu.com/img_data/equipos/2603.png?size=120x&lossy=1' },
-          { id: '5208', name: 'Peñíscola FS', logo: 'https://cdn.resfu.com/img_data/equipos/5208.png?size=120x&lossy=1' },
-          { id: '22225', name: 'Viña Albali Valdepeñas', logo: 'https://cdn.resfu.com/img_data/equipos/22225.png?size=120x&lossy=1' },
-          { id: '3096', name: 'Wanapix Sala 10', logo: 'https://cdn.resfu.com/img_data/equipos/3096.png?size=120x&lossy=1',
+          { id: 'alzira', name: 'Alzira FS', rating: 77, logo: 'https://cdn.resfu.com/img_data/equipos/108903.png?size=120x&lossy=1' },
+          { id: '3082', name: 'Industrias Santa Coloma', rating: 84, logo: 'https://cdn.resfu.com/img_data/equipos/3082.png?size=120x&lossy=1',
+            staff: [{ name: 'Xavi Closas', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55625.jpg?size=120x&lossy=1',
+              career: [{ team: 'Industrias Santa Coloma', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 12, drawn: 8, lost: 10 }]
+            }] },
+          { id: '14228', name: 'Jimbee Cartagena', rating: 91, logo: 'https://cdn.resfu.com/img_data/equipos/14228.png?size=120x&lossy=1',
+            staff: [{ name: 'Duda', nationality: '🇧🇷 Brasil', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/22642.jpg?size=120x&lossy=1',
+              career: [{ team: 'Jimbee Cartagena', from: '01/07/2024', to: 'Actualidad', matches: 35, won: 20, drawn: 8, lost: 7 }]
+            }] },
+          { id: '5203', name: 'Manzanares FS', rating: 87, logo: 'https://cdn.resfu.com/img_data/equipos/5203.png?size=120x&lossy=1',
+            staff: [{ name: 'Juan Luis Alonso', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55629.jpg?size=120x&lossy=1',
+              career: [{ team: 'Manzanares FS', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 14, drawn: 6, lost: 10 }]
+            }] },
+          { id: '7970', name: 'Noia Portus Apostoli', rating: 83, logo: 'https://cdn.resfu.com/img_data/equipos/7970.png?size=120x&lossy=1',
+            staff: [{ name: 'David Palmas', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69401.jpg?size=120x&lossy=1',
+              career: [{ team: 'Noia Portus Apostoli', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 12, drawn: 6, lost: 12 }]
+            }] },
+          { id: '3193', name: 'O Parrulo Ferrol', rating: 82, logo: 'https://cdn.resfu.com/img_data/equipos/3193.png?size=120x&lossy=1',
+            staff: [{ name: 'Gerard Casas', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69325.jpg?size=120x&lossy=1',
+              career: [{ team: 'O Parrulo Ferrol', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 10, drawn: 5, lost: 10 }]
+            }] },
+          { id: '2603', name: 'Osasuna Magna', rating: 79, logo: 'https://cdn.resfu.com/img_data/equipos/2603.png?size=120x&lossy=1',
+            staff: [{ name: 'Imanol Arregui', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55632.jpg?size=120x&lossy=1',
+              career: [{ team: 'Osasuna Magna', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 8, drawn: 8, lost: 14 }]
+            }] },
+          { id: '5208', name: 'Peñíscola FS', rating: 84, logo: 'https://cdn.resfu.com/img_data/equipos/5208.png?size=120x&lossy=1',
+            staff: [{ name: 'Santiago Valladares', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69307.jpg?size=120x&lossy=1',
+              career: [{ team: 'Peñíscola FS', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 11, drawn: 5, lost: 9 }]
+            }] },
+          { id: '22225', name: 'Viña Albali Valdepeñas', rating: 86, logo: 'https://cdn.resfu.com/img_data/equipos/22225.png?size=120x&lossy=1',
+            staff: [{ name: 'Marlon Velasco', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55631.jpg?size=120x&lossy=1',
+              career: [{ team: 'Viña Albali Valdepeñas', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 15, drawn: 5, lost: 10 }]
+            }] },
+          { id: 'ribera', name: 'Ribera Navarra FS', rating: 75, logo: 'https://cdn.resfu.com/img_data/equipos/4154.png?size=120x&lossy=1' },
+        ] },
+      { id: 'lnfs2', name: 'LNFS Segunda División',
+        teams: [
+          { id: 's17', name: 'Inagroup El Ejido',      rating: 74, logo: 'https://cdn.resfu.com/img_data/equipos/69694.png?size=120x&lossy=1',
+            staff: [{ name: 'Guille Martínez', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/76701.jpg?size=120x&lossy=1',
+              career: [{ team: 'Inagroup El Ejido', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 13, drawn: 4, lost: 8 }]
+            }] },
+          { id: 's18', name: 'Wanapix Sala 10',        rating: 73, logo: 'https://cdn.resfu.com/img_data/equipos/3096.png?size=120x&lossy=1',
             staff: [{ name: 'Jorge Palos', nationality: '🇪🇸 España', role: 'headCoach',
               avatar: 'https://cdn.resfu.com/img_data/people/original/69296.jpg?size=120x&lossy=1',
               career: [{ team: 'Wanapix Sala 10', from: '01/07/2024', to: 'Actualidad', matches: 30, won: 10, drawn: 7, lost: 13 }]
             }] },
-        ] },
-      { id: 'lnfs2', name: 'LNFS Segunda División',
-        teams: [
-          { id: 'seg-1',  name: 'Zambu Pinatar',                 logo: 'https://cdn.resfu.com/img_data/equipos/8222.png?size=120x&lossy=1' },
-          { id: 'seg-2',  name: 'Heredia 21 Málaga CR FS',       logo: 'https://cdn.resfu.com/img_data/equipos/5174.png?size=120x&lossy=1' },
-          { id: 'seg-3',  name: 'Ciudad de Móstoles',            logo: 'https://cdn.resfu.com/img_data/equipos/8038.png?size=120x&lossy=1' },
-          { id: 'seg-4',  name: 'Entrerríos Zaragoza',           logo: 'https://cdn.resfu.com/img_data/equipos/8008.png?size=120x&lossy=1' },
-          { id: 'seg-5',  name: 'Gasifred Atlético',             logo: 'https://cdn.resfu.com/img_data/equipos/4160.png?size=120x&lossy=1' },
-          { id: 'seg-6',  name: 'Barça Atlétic',                 logo: 'https://cdn.resfu.com/img_data/equipos/5172.png?size=120x&lossy=1' },
-          { id: 'seg-7',  name: 'CD Leganés FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/5196.png?size=120x&lossy=1' },
-          { id: 'seg-8',  name: 'Sala 5 Martorell',              logo: 'https://cdn.resfu.com/img_data/equipos/107592.png?size=120x&lossy=1' },
-          { id: 'seg-9',  name: 'Burela FS',                     logo: 'https://cdn.resfu.com/img_data/equipos/3094.png?size=120x&lossy=1' },
-          { id: 'seg-10', name: 'Levante UD FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/14230.png?size=120x&lossy=1' },
-          { id: 'seg-11', name: 'Melistar Futsal',               logo: 'https://cdn.resfu.com/img_data/equipos/8369.png?size=120x&lossy=1' },
-          { id: 'seg-12', name: 'Avanza Jaén Paraíso Int.',      logo: 'https://cdn.resfu.com/img_data/equipos/153125.png?size=120x&lossy=1' },
-          { id: 'seg-13', name: 'Unión África Ceutí',            logo: 'https://cdn.resfu.com/img_data/equipos/11126.png?size=120x&lossy=1' },
-          { id: 'seg-14', name: 'CD Tafa FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/8158.png?size=120x&lossy=1' },
+          { id: 's19', name: 'Zambu Pinatar',          rating: 71, logo: 'https://cdn.resfu.com/img_data/equipos/8222.png?size=120x&lossy=1',
+            staff: [{ name: 'Dani Martínez', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69305.jpg?size=120x&lossy=1',
+              career: [{ team: 'Zambu Pinatar', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 15, drawn: 3, lost: 7 }]
+            }] },
+          { id: 's20', name: 'Heredia 21 Málaga',      rating: 70, logo: 'https://cdn.resfu.com/img_data/equipos/5174.png?size=120x&lossy=1',
+            staff: [{ name: 'Tete', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/55634.jpg?size=120x&lossy=1',
+              career: [{ team: 'Heredia 21 Málaga', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 12, drawn: 5, lost: 8 }]
+            }] },
+          { id: 's21', name: 'Ciudad de Móstoles',     rating: 69, logo: 'https://cdn.resfu.com/img_data/equipos/8038.png?size=120x&lossy=1',
+            staff: [{ name: 'Tino de la Cruz', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/76674.jpg?size=120x&lossy=1',
+              career: [{ team: 'Ciudad de Móstoles', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 11, drawn: 5, lost: 9 }]
+            }] },
+          { id: 's22', name: 'Entrerríos Zaragoza',    rating: 68, logo: 'https://cdn.resfu.com/img_data/equipos/8008.png?size=120x&lossy=1',
+            staff: [{ name: 'Alfonso Rodríguez', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69320.jpg?size=120x&lossy=1',
+              career: [{ team: 'Entrerríos Zaragoza', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 10, drawn: 6, lost: 9 }]
+            }] },
+          { id: 's23', name: 'Gasifred Atlético',      rating: 68, logo: 'https://cdn.resfu.com/img_data/equipos/4160.png?size=120x&lossy=1',
+            staff: [{ name: 'José Fernández', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/69339.jpg?size=120x&lossy=1',
+              career: [{ team: 'Gasifred Atlético', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 10, drawn: 5, lost: 10 }]
+            }] },
+          { id: 's24', name: 'Barça Atlètic',          rating: 68, logo: 'https://cdn.resfu.com/img_data/equipos/5172.png?size=120x&lossy=1',
+            staff: [{ name: 'Fernandao', nationality: '🇧🇷 Brasil', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/76699.jpg?size=120x&lossy=1',
+              career: [{ team: 'Barça Atlètic', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 12, drawn: 4, lost: 9 }]
+            }] },
+          { id: 's25', name: 'CD Leganés FS',          rating: 66, logo: 'https://cdn.resfu.com/img_data/equipos/5196.png?size=120x&lossy=1' },
+          { id: 's26', name: 'Sala 5 Martorell',       rating: 66, logo: 'https://cdn.resfu.com/img_data/equipos/107592.png?size=120x&lossy=1',
+            staff: [{ name: 'Iván Calle', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/80699.jpg?size=120x&lossy=1',
+              career: [{ team: 'Sala 5 Martorell', from: '01/07/2024', to: 'Actualidad', matches: 20, won: 9, drawn: 4, lost: 7 }]
+            }] },
+          { id: 's27', name: 'Burela FS',              rating: 65, logo: 'https://cdn.resfu.com/img_data/equipos/3094.png?size=120x&lossy=1' },
+          { id: 's28', name: 'Levante UD FS',          rating: 65, logo: 'https://cdn.resfu.com/img_data/equipos/14230.png?size=120x&lossy=1',
+            staff: [{ name: 'Carlos Márquez', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1',
+              career: [{ team: 'Levante UD FS', from: '01/07/2024', to: 'Actualidad', matches: 25, won: 10, drawn: 5, lost: 10 }]
+            }] },
+          { id: 's29', name: 'Melistar Futsal',        rating: 64, logo: 'https://cdn.resfu.com/img_data/equipos/8369.png?size=120x&lossy=1' },
+          { id: 's30', name: 'Avanza Jaén',            rating: 64, logo: 'https://cdn.resfu.com/img_data/equipos/153125.png?size=120x&lossy=1',
+            staff: [{ name: 'Quique García', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1',
+              career: [{ team: 'Avanza Jaén', from: '01/07/2024', to: 'Actualidad', matches: 20, won: 9, drawn: 4, lost: 7 }]
+            }] },
+          { id: 's31', name: 'Unión África Ceutí',     rating: 63, logo: 'https://cdn.resfu.com/img_data/equipos/11126.png?size=120x&lossy=1' },
+          { id: 's32', name: 'CD Tafa FS',             rating: 60, logo: 'https://cdn.resfu.com/img_data/equipos/8158.png?size=120x&lossy=1',
+            staff: [{ name: 'Luisma', nationality: '🇪🇸 España', role: 'headCoach',
+              avatar: 'https://cdn.resfu.com/img_data/people/original/76673.jpg?size=120x&lossy=1',
+              career: [{ team: 'CD Tafa FS', from: '01/07/2024', to: 'Actualidad', matches: 20, won: 6, drawn: 4, lost: 10 }]
+            }] },
         ] },
     ] },
   { id: 'pt', name: 'Portugal', flag: '🇵🇹',
@@ -184,6 +274,45 @@ const COUNTRIES = [
           { id: 'ind', name: 'Independiente' },
         ] },
     ] },
+]
+
+/* ============ BASE DE DATOS DE EQUIPOS ============ */
+const baseDatosEquipos = [
+  // ─── 1ª División Nacional (division_id: 1) ───
+  { id: '1041',  nombre: 'Barça',                  division_id: 1, rating: 96, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '4146',  nombre: 'ElPozo Murcia Cálida',   division_id: 1, rating: 94, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '3092',  nombre: 'Palma Futsal',           division_id: 1, rating: 92, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '14228', nombre: 'Jimbee Cartagena',       division_id: 1, rating: 91, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '3093',  nombre: 'Inter FS',               division_id: 1, rating: 91, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '5203',  nombre: 'Manzanares FS',          division_id: 1, rating: 87, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '3219',  nombre: 'Jaén FS',                division_id: 1, rating: 87, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '22225', nombre: 'Viña Albali Valdepeñas', division_id: 1, rating: 86, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '3082',  nombre: 'Santa Coloma',           division_id: 1, rating: 84, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '5208',  nombre: 'Peñíscola FS',           division_id: 1, rating: 84, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '7970',  nombre: 'Noia Portus Apostoli',   division_id: 1, rating: 83, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '3193',  nombre: 'O Parrulo Ferrol',       division_id: 1, rating: 82, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '83478', nombre: 'Córdoba Patrimonio',     division_id: 1, rating: 80, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: '2603',  nombre: 'Osasuna Magna',          division_id: 1, rating: 79, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'alzira',nombre: 'Alzira FS',              division_id: 1, rating: 77, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'ribera',nombre: 'Ribera Navarra FS',      division_id: 1, rating: 75, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+
+  // ─── 2ª División Nacional (division_id: 2) ───
+  { id: 's17', nombre: 'Inagroup El Ejido',      division_id: 2, rating: 74, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's18', nombre: 'Wanapix Sala 10',        division_id: 2, rating: 73, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's19', nombre: 'Zambu Pinatar',          division_id: 2, rating: 71, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's20', nombre: 'Heredia 21 Málaga',      division_id: 2, rating: 70, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's21', nombre: 'Ciudad de Móstoles',     division_id: 2, rating: 69, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's22', nombre: 'Entrerríos Zaragoza',    division_id: 2, rating: 68, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's23', nombre: 'Gasifred Atlético',      division_id: 2, rating: 68, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's24', nombre: 'Barça Atlètic',          division_id: 2, rating: 68, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""], esFilial: true },
+  { id: 's25', nombre: 'CD Leganés FS',          division_id: 2, rating: 66, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's26', nombre: 'Sala 5 Martorell',       division_id: 2, rating: 66, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's27', nombre: 'Burela FS',              division_id: 2, rating: 65, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's28', nombre: 'Levante UD FS',          division_id: 2, rating: 65, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's29', nombre: 'Melistar Futsal',        division_id: 2, rating: 64, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's30', nombre: 'Avanza Jaén',            division_id: 2, rating: 64, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's31', nombre: 'Unión África Ceutí',     division_id: 2, rating: 63, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 's32', nombre: 'CD Tafa FS',             division_id: 2, rating: 60, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
 ]
 
 /* ============ ENGINE ============ */
@@ -436,14 +565,12 @@ function getInitials(name) {
 }
 
 function formatMoney(amount) {
-  const sign = amount >= 0 ? '' : '-'
-  return `${sign}€${Math.abs(amount).toLocaleString()}`
+  const fmt = Math.abs(amount).toLocaleString('es-ES', { useGrouping: true })
+  return amount >= 0 ? `${fmt} €` : `-${fmt} €`
 }
 
 function formatValue(val) {
-  if (val >= 1000000) return `€${(val / 1000000).toFixed(1)}M`
-  if (val >= 1000) return `€${(val / 1000).toFixed(1)}K`
-  return `€${val}`
+  return `${val.toLocaleString('es-ES', { useGrouping: true })} €`
 }
 
 function formatTimestamp(isoString) {
@@ -468,7 +595,7 @@ function setSaves(saves) { localStorage.setItem(STORAGE_KEY, JSON.stringify(save
 function saveGame() {
   const saves = getSaves()
   const idx = saves.findIndex(s => s.id === state.gameId)
-  const matchday = state.currentMatchday || 1
+  const matchday = state.stats.wins + state.stats.draws + state.stats.losses + 1
   const data = {
     id: state.gameId, name: `${state.coach} - ${state.team}`, coach: state.coach, team: state.team, teamId: state.teamId, teamLogo: state.teamLogo,
     countryId: state.countryId, leagueId: state.leagueId,
@@ -545,22 +672,12 @@ function getFixtureForUser(matchday) {
   return state.fixtures.find(f => f.matchday === matchday && (f.home === state.teamId || f.away === state.teamId))
 }
 
-function getNextUnplayedFixture() {
-  return state.fixtures
-    .filter(f => (f.home === state.teamId || f.away === state.teamId) && !f.played)
-    .sort((a, b) => a.matchday - b.matchday)[0] || null
-}
-
-function syncCurrentMatchday() {
-  const nextFixture = getNextUnplayedFixture()
-  state.currentMatchday = nextFixture ? nextFixture.matchday : state.totalMatchdays + 1
-  return nextFixture
-}
-
 function getTeamName(id) {
   if (id === state.teamId) return state.team
   let t = state.leagueTeams.find(x => x.teamId === id)
   if (t) return t.name
+  const db = baseDatosEquipos.find(e => e.id === id)
+  if (db) return db.nombre
   for (const c of COUNTRIES) {
     for (const l of c.leagues) {
       t = l.teams.find(x => x.id === id)
@@ -581,9 +698,23 @@ function getTeamLogo(id) {
   return ''
 }
 
+function getTeamRating(id) {
+  if (id === state.teamId) return Math.round(avgSkill(state.players))
+  const t = baseDatosEquipos.find(e => e.id === id)
+  return t ? t.rating : 70
+}
+
 function getTeamObj(id) {
   if (id === state.teamId) return { name: state.team, players: state.players, teamId: state.teamId }
-  return state.leagueTeams.find(x => x.teamId === id)
+  let t = state.leagueTeams.find(x => x.teamId === id)
+  if (t) return t
+  for (const c of COUNTRIES) {
+    for (const l of c.leagues) {
+      const team = l.teams.find(x => x.id === id)
+      if (team) return { name: team.name, players: [], teamId: team.id, staff: team.staff }
+    }
+  }
+  return null
 }
 
 function autoSimulateOtherMatch(homeId, awayId) {
@@ -698,12 +829,23 @@ function renderHome() {
   if (!container) return
   const standings = updateLeagueStandings()
   const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
-  const fixture = getNextUnplayedFixture()
+  const fixture = state.fixtures.find(f => f.played === false && (f.home === state.teamId || f.away === state.teamId))
   const rivalId = fixture ? (fixture.home === state.teamId ? fixture.away : fixture.home) : null
   const rivalName = rivalId ? getTeamName(rivalId) : '—'
   const isHome = fixture ? fixture.home === state.teamId : false
   const rivalPos = rivalId ? (standings.findIndex(s => s.teamId === rivalId) + 1) : '—'
   const rivalLogo = rivalId ? getTeamLogo(rivalId) : ''
+  const nextMatchday = fixture ? fixture.matchday : state.currentMatchday
+  const last5 = state.fixtures
+    .filter(f => f.played && (f.home === state.teamId || f.away === state.teamId))
+    .sort((a, b) => b.matchday - a.matchday)
+    .slice(0, 5)
+    .map(f => {
+      const us = f.home === state.teamId ? f.homeScore : f.awayScore
+      const them = f.home === state.teamId ? f.awayScore : f.homeScore
+      return us > them ? 'V' : us < them ? 'D' : 'E'
+    })
+  const injured = state.players.filter(p => p.injury)
   const isPlayoffs = state.playoffs && state.playoffs.fixtures && state.playoffs.fixtures.length > 0
   const roundNames = { QF: 'Cuartos de final', SF: 'Semifinal', F: 'Final' }
   container.innerHTML = `
@@ -716,6 +858,10 @@ function renderHome() {
         <div class="home-stat"><span class="home-stat-icon">👥</span><span>${state.players.length}/${MAX_SQUAD}</span></div>
         <div class="home-stat"><span class="home-stat-icon">📊</span><span>${state.stats.wins}V ${state.stats.draws}E ${state.stats.losses}D</span></div>
       </div>
+      <div class="home-form-row">
+        ${last5.length > 0 ? last5.map(r => `<span class="home-form-dot forma-${r === 'V' ? 'v' : r === 'E' ? 'e' : 'd'}"></span>`).join('') : '<span class="home-form-dot"></span><span class="home-form-dot"></span><span class="home-form-dot"></span><span class="home-form-dot"></span><span class="home-form-dot"></span>'}
+      </div>
+      <div class="home-injury-text">🚑 Bajas para hoy: ${injured.length > 0 ? injured.map(p => p.name).join(', ') : 'Ninguna'}</div>
     </div>
     ${fixture ? `
     <div class="home-card home-match">
@@ -735,7 +881,7 @@ function renderHome() {
       </div>
       ${isPlayoffs
         ? `<div class="home-matchday-label">${roundNames[state.playoffs.round] || 'Eliminatoria'}</div>`
-        : `<div class="home-matchday-label">Jornada ${fixture.matchday} de ${state.totalMatchdays} · ${fixture.horario || ''}</div>`
+        : `<div class="home-matchday-label">Jornada ${nextMatchday} de ${state.totalMatchdays} · ${fixture.horario || ''}</div>`
       }
       <div class="home-match-location">${isHome ? '🏠 Local' : '✈️ Visitante'}</div>
       <button class="btn-primary" id="btn-home-play">▶ IR AL PARTIDO</button>
@@ -752,6 +898,21 @@ function renderClub() {
   if (logoEl) {
     logoEl.innerHTML = state.teamLogo ? `<img class="team-logo" src="${state.teamLogo}" alt="${state.team}">` : ''
   }
+  /* Team info card */
+  const standings = updateLeagueStandings()
+  const pos = standings.findIndex(s => s.teamId === state.teamId) + 1
+  document.getElementById('club-team-info').innerHTML = `
+    <div class="team-info-card" style="display:flex;justify-content:space-around;padding:8px 0;margin-bottom:8px">
+      <div style="text-align:center">
+        <div class="finance-label" style="margin-bottom:2px">Posición en liga</div>
+        <div class="finance-balance">${pos}º</div>
+      </div>
+      <div style="text-align:center">
+        <div class="finance-label" style="margin-bottom:2px">Rating del equipo</div>
+        <div class="finance-balance">${getTeamRating(state.teamId)}</div>
+      </div>
+    </div>`
+
   document.getElementById('club-squad-content').classList.add('hidden')
   document.getElementById('club-tactics-content').classList.add('hidden')
   document.querySelectorAll('#view-club .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.subtab === state.clubSubTab))
@@ -1191,7 +1352,7 @@ function aplicarDesgaste(player, drainMult) {
   const base = drainMult || 3
   const extraMap = { portero: -1, ala: 1 }
   const extra = extraMap[player.position] || 0
-  player.energy = Math.max(0, player.energy - (base + extra + randInt(-1, 1)))
+  player.energy = Math.round(Math.max(0, player.energy - (base + extra + randInt(-1, 1))))
   player.minutosEnPista = (player.minutosEnPista || 0) + 1
 }
 
@@ -1303,7 +1464,6 @@ let parteActual = 1
 let faltasLocal = 0
 let faltasVisitante = 0
 let matchPaused = false
-let currentMatchContext = null
 const matchData = { homeScore: 0, awayScore: 0, homeFouls: 0, awayFouls: 0, rivalName: '' }
 
 function irAlPartido() {
@@ -1321,7 +1481,6 @@ function irAlPartido() {
   document.getElementById('match-players').innerHTML = ''
   document.getElementById('btn-start-match').style.display = 'block'
   document.getElementById('btn-end-match').style.display = 'none'
-  document.getElementById('match-result-area').classList.add('hidden')
 }
 
 function empezarPartido() {
@@ -1422,7 +1581,7 @@ function empezarPartido() {
       } else {
         addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
         btn.style.display = 'none'
-        completeCurrentMatch()
+        document.getElementById('btn-end-match').style.display = 'block'
       }
     }
   }, 40)
@@ -1498,10 +1657,12 @@ function startMatchFromLeague(rivalId, fixture) {
   irAlPartido()
 
   const isHome = fixture.home === state.teamId
-  currentMatchContext = { isHome, fixture, rival }
 
   /* Botón Finalizar */
-  document.getElementById('btn-end-match').onclick = completeCurrentMatch
+  document.getElementById('btn-end-match').onclick = () => {
+    if (intervaloCrono) { clearInterval(intervaloCrono); intervaloCrono = null }
+    finishMatch(isHome, fixture, rival)
+  }
 
   renderPlayerRatings()
 }
@@ -1761,19 +1922,7 @@ function resumeMatchTimer() {
   empezarPartido()
 }
 
-function completeCurrentMatch() {
-  if (intervaloCrono) {
-    clearInterval(intervaloCrono)
-    intervaloCrono = null
-  }
-  if (!currentMatchContext) return
-  const { isHome, fixture, rival } = currentMatchContext
-  currentMatchContext = null
-  finishMatch(isHome, fixture, rival)
-}
-
 function finishMatch(isHome, fixture, rival) {
-  const playedMatchday = fixture.matchday
   const userScore = isHome ? matchData.homeScore : matchData.awayScore
   const rivalScore = isHome ? matchData.awayScore : matchData.homeScore
 
@@ -1788,11 +1937,11 @@ function finishMatch(isHome, fixture, rival) {
   else if (userScore === rivalScore) { reward = 300; state.stats.draws++ }
   else { reward = -200; state.stats.losses++ }
   state.finances.balance += reward
-  state.finances.history.push({ reason: `J${playedMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
+  state.finances.history.push({ reason: `J${state.currentMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
   
 
   /* Post-match recovery: calculate days until next match */
-  const nextFixture = getNextUnplayedFixture()
+  const nextFixture = getFixtureForUser(state.currentMatchday + 1)
   let recoveryMult = 1.0
   if (nextFixture && nextFixture.date) {
     const curDate = new Date(fixture.date + 'T12:00:00')
@@ -1814,7 +1963,7 @@ function finishMatch(isHome, fixture, rival) {
     if (!p.matchHistory) p.matchHistory = []
     const rating = Math.round(5 + (p._yellowThisMatch ? -0.5 : 0) + (p._redThisMatch ? -2 : 0) + ((p.goals || 0) > 0 ? 2 : 0) + ((p.assists || 0) > 0 ? 1 : 0) + Math.random() * 2)
     p.matchHistory.push({
-      matchday: playedMatchday,
+      matchday: state.currentMatchday,
       rival: rival.name,
       minutes: p.minutosEnPista || 0,
       rating: Math.min(10, Math.max(1, rating)),
@@ -1828,7 +1977,7 @@ function finishMatch(isHome, fixture, rival) {
   })
 
   /* Auto-simulate other matches */
-  const otherFixtures = state.fixtures.filter(f => f.matchday === playedMatchday && f.played === false)
+  const otherFixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday && f.played === false)
   for (const f of otherFixtures) {
     const result = autoSimulateOtherMatch(f.home, f.away)
     f.homeScore = result.homeScore
@@ -1837,8 +1986,7 @@ function finishMatch(isHome, fixture, rival) {
   }
 
   updateLeagueStandings()
-  syncCurrentMatchday()
-  showMatchdayResults(playedMatchday, userScore, rivalScore, rival.name)
+  showMatchdayResults(userScore, rivalScore, rival.name)
   autoSave()
 }
 
@@ -1873,16 +2021,19 @@ function resetSeason() {
   renderLeague()
 }
 
-function showMatchdayResults(matchday, userScore, rivalScore, rivalName) {
+function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('btn-end-match').style.display = 'none'
 
-  /* Show match result screen first */
-  document.getElementById('result-home-display').textContent = matchData.homeScore
-  document.getElementById('result-away-display').textContent = matchData.awayScore
-  document.getElementById('match-result-area').classList.remove('hidden')
+  /* Refresh league table with updated standings before showing results */
+  renderLeague()
 
-  /* Pre-build league results content so it is ready when user navigates to liga */
-  const fixtures = state.fixtures.filter(f => f.matchday === matchday)
+  /* Go directly to league results view */
+  document.getElementById('view-match').classList.remove('active')
+  document.getElementById('view-league').classList.add('active')
+  document.getElementById('bottom-nav').style.display = ''
+  document.getElementById('btn-header-menu').style.display = ''
+
+  const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
   const list = document.getElementById('league-results-list')
   list.innerHTML = fixtures.map(f => {
     const homeName = getTeamName(f.home)
@@ -1904,26 +2055,17 @@ function showMatchdayResults(matchday, userScore, rivalScore, rivalName) {
   const standings = updateLeagueStandings()
   const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
   document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
-
-  /* "Volver a Liga" button: navigate to league view with updated standings and matchday results */
-  document.getElementById('btn-match-back').onclick = () => {
-    document.getElementById('match-result-area').classList.add('hidden')
-    document.getElementById('view-match').classList.remove('active')
-    document.getElementById('view-league').classList.add('active')
-    document.getElementById('bottom-nav').style.display = ''
-    document.getElementById('btn-header-menu').style.display = ''
-    renderLeague()
-    document.getElementById('league-results-wrap').classList.remove('hidden')
-  }
+  document.getElementById('league-results-wrap').classList.remove('hidden')
 
   document.getElementById('btn-advance-matchday').onclick = () => {
-    if (matchday >= state.totalMatchdays) {
+    if (state.currentMatchday >= 30) {
       const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
       let msg = `📊 Temporada finalizada. Posición: ${pos}º`
       if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
       else if (pos <= 8) msg += '\n🏆 ¡Clasificado al Playoff por el título!'
       alert(msg)
     }
+    state.currentMatchday++
     for (const p of state.players) {
       if (!p.injury) continue
       p.injury.remaining--
@@ -1931,7 +2073,6 @@ function showMatchdayResults(matchday, userScore, rivalScore, rivalName) {
     }
     document.getElementById('league-results-wrap').classList.add('hidden')
     renderLeague()
-    autoSave()
   }
 }
 
@@ -2422,7 +2563,6 @@ function startGame() {
   document.getElementById('menu-screen').classList.add('hidden')
   document.getElementById('game-screen').classList.remove('hidden')
   loadTactics()
-  syncCurrentMatchday()
   setupNavigation()
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
   document.querySelector('[data-tab="home"]').classList.add('active')
@@ -2470,12 +2610,94 @@ function showBrowser(step) {
     title.textContent = selectedLeague.name
     content.innerHTML = selectedLeague.teams.map(t => {
       const logoHtml = t.logo ? `<img class="team-logo" src="${t.logo}" style="width:24px;height:24px;margin-right:8px">` : ''
-      return `<div class="menu-list-item" data-id="${t.id}">${logoHtml}<span class="menu-item-text">${t.name}</span><span class="menu-item-arrow">›</span></div>`
+      return `<div class="menu-list-item" data-id="${t.id}">${logoHtml}<span class="menu-item-text">${t.name}</span><span class="team-preview-btn">VER PLANTILLA</span><span class="menu-item-arrow">›</span></div>`
     }).join('')
     content.querySelectorAll('.menu-list-item').forEach(el => {
       el.onclick = () => { selectedTeam = selectedLeague.teams.find(t => t.id === el.dataset.id); showCoachInput() }
     })
+    content.querySelectorAll('.team-preview-btn').forEach(el => {
+      el.onclick = (e) => {
+        e.stopPropagation()
+        const parentId = el.closest('.menu-list-item').dataset.id
+        showTeamPreview(parentId)
+      }
+    })
   }
+}
+
+function showTeamPreview(teamId) {
+  console.log('[PREVIEW] teamId:', teamId)
+  let team = null
+  for (const c of COUNTRIES) {
+    for (const l of c.leagues) {
+      const t = l.teams.find(x => x.id === teamId)
+      if (t) { team = t; break }
+    }
+    if (team) break
+  }
+  if (!team) return
+
+  const db = baseDatosEquipos.find(e => e.id === teamId)
+  const rating = db ? db.rating : 70
+  const realSquad = REAL_SQUADS[teamId] || []
+  const staff = team.staff || []
+  const logo = team.logo || ''
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      ${logo ? `<img src="${logo}" style="width:32px;height:32px">` : ''}
+      <div>
+        <div style="font-size:18px;font-weight:700">${team.name}</div>
+        <div style="font-size:13px;color:var(--text-muted)">Rating: ${rating}</div>
+      </div>
+    </div>`
+
+  if (staff.length > 0) {
+    html += `<div class="tactics-subsection-label">Staff técnico (${staff.length})</div>`
+    const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+    staff.forEach(s => {
+      const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
+      const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
+      html += `<div class="staff-card staff-card-team"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality || ''}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+    })
+  }
+
+  if (realSquad.length > 0) {
+    html += `<div class="tactics-subsection-label">PLANTILLA (${realSquad.length})</div><div class="squad-grid">`
+    const ordered = [...realSquad].sort((a, b) => POS_ORDER.indexOf(a.position) - POS_ORDER.indexOf(b.position) || a.number - b.number)
+    ordered.forEach(p => {
+      const pos = POSITIONS[p.position]
+      const initials = getInitials(p.name)
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+      const val = p.value || calcValue(p.skill)
+      html += `<div class="player-card">
+        <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
+        <div class="player-info">
+          <div class="player-row1">
+            <span class="player-name">${p.name}</span>
+            <span class="player-stat-num">${p.age ? p.age + 'y' : '-'}</span>
+            <span class="player-stat-num">${formatValue(val)}</span>
+            <span class="player-rating-num">${p.skill}</span>
+          </div>
+          <div class="player-row2">
+            <span class="player-position" style="background:${pos.color}">${pos.label}</span>
+            <span class="player-foot">${p.foot || 'DER'}</span>
+            <span class="player-nation">${p.nationality}</span>
+          </div>
+        </div>
+      </div>`
+    })
+    html += `</div>`
+  } else {
+    html += `<div style="text-align:center;padding:20px;color:var(--text-muted)">🖥️ Plantilla generada por CPU</div>`
+  }
+
+  document.getElementById('team-preview-content').innerHTML = html
+  document.getElementById('team-preview-modal').classList.add('open')
+  selectedTeam = team
+  document.getElementById('tp-choose').onclick = () => { document.getElementById('team-preview-modal').classList.remove('open'); showCoachInput() }
+  document.getElementById('tp-close').onclick = () => { document.getElementById('team-preview-modal').classList.remove('open') }
+  document.getElementById('team-preview-modal').onclick = (e) => { if (e.target === e.currentTarget) document.getElementById('team-preview-modal').classList.remove('open') }
 }
 
 function showCoachInput() {
@@ -2640,13 +2862,13 @@ function renderCalendar() {
       const isHome = f.home === state.teamId
       const fd = getSeasonDate(f.matchday)
       const result = f.played ? `${f.homeScore} - ${f.awayScore}` : '—'
-      let outcomeClass = ''
+      let resultClass = ''
       if (f.played) {
-        const userGoals = isHome ? f.homeScore : f.awayScore
-        const oppGoals = isHome ? f.awayScore : f.homeScore
-        if (userGoals > oppGoals) outcomeClass = ' win'
-        else if (userGoals < oppGoals) outcomeClass = ' loss'
-        else outcomeClass = ' draw'
+        const userScore = isHome ? f.homeScore : f.awayScore
+        const rivalScore = isHome ? f.awayScore : f.homeScore
+        if (userScore > rivalScore) resultClass = ' cal-win'
+        else if (userScore < rivalScore) resultClass = ' cal-loss'
+        else resultClass = ' cal-draw'
       }
       gridHtml += `<div class="cal-match-item">
         <img class="cal-match-logo" src="${rivalLogo || ''}" alt="">
@@ -2654,7 +2876,7 @@ function renderCalendar() {
           <div class="cal-match-rival">J${f.matchday} · ${rivalName}</div>
           <div class="cal-match-meta">${String(fd.getDate()).padStart(2,'0')}/${String(fd.getMonth()+1).padStart(2,'0')} · ${f.horario || ''} ${isHome ? '🏠' : '✈️'}</div>
         </div>
-        <div class="cal-match-result${f.played ? ' played' : ''}${outcomeClass}">${result}</div>
+        <div class="cal-match-result${f.played ? ' played' : ''}${resultClass}">${result}</div>
       </div>`
     })
     gridHtml += `</div>`
@@ -2681,7 +2903,6 @@ function renderCalendar() {
 
 /* ============ TEAM INFO ============ */
 function showTeamInfo(teamId) {
-  if (teamId === state.teamId) return
   const team = getTeamObj(teamId)
   if (!team) return
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
@@ -2689,6 +2910,7 @@ function showTeamInfo(teamId) {
   const standings = updateLeagueStandings()
   const pos = standings.findIndex(s => s.teamId === teamId) + 1
   const logo = getTeamLogo(teamId)
+  const posDisplay = pos > 0 ? `${pos}º` : (team.players.length > 0 ? '—' : 'Otra liga')
   let html = `
     <div class="view-header">
       <div class="view-header-left">
@@ -2700,11 +2922,11 @@ function showTeamInfo(teamId) {
     <div class="team-info-card" style="display:flex;justify-content:space-around;padding:12px 0">
       <div style="text-align:center">
         <div class="finance-label" style="margin-bottom:4px">Posición en liga</div>
-        <div class="finance-balance">${pos}º</div>
+        <div class="finance-balance">${posDisplay}</div>
       </div>
       <div style="text-align:center">
         <div class="finance-label" style="margin-bottom:4px">Rating del equipo</div>
-        <div class="finance-balance">${Math.round(avgSkill(team.players))}</div>
+        <div class="finance-balance">${getTeamRating(teamId)}</div>
       </div>
     </div>
     ${team.staff && team.staff.length > 0 ? `<div class="tactics-subsection-label">Staff técnico (${team.staff.length})</div>${team.staff.map(s => {
@@ -2715,7 +2937,8 @@ function showTeamInfo(teamId) {
     }).join('')}` : ''}
     <div class="tactics-subsection-label">PLANTILLA (${team.players.length})</div>
     <div class="squad-grid">`
-  team.players.forEach(p => {
+  const orderedPlayers = [...team.players].sort((a, b) => POS_ORDER.indexOf(a.position) - POS_ORDER.indexOf(b.position) || a.number - b.number)
+  orderedPlayers.forEach(p => {
     const pos = POSITIONS[p.position]
     const initials = getInitials(p.name)
     const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`

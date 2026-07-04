@@ -184,6 +184,28 @@ html, body {
   font-size: 16px;
 }
 
+.home-form-row {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 6px;
+}
+.home-form-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ccc;
+}
+.forma-v { background: #28a745; }
+.forma-e { background: #f59e0b; }
+.forma-d { background: #dc3545; }
+.home-injury-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: center;
+}
+
 .home-match {
   text-align: center;
 }
@@ -410,9 +432,9 @@ html, body {
 }
 
 .cal-match-result.played { color: var(--text); }
-.cal-match-result.win  { color: #22c55e; }
-.cal-match-result.loss { color: #ef4444; }
-.cal-match-result.draw { color: #f97316; }
+.cal-match-result.cal-win { color: #28a745; font-weight: 700; }
+.cal-match-result.cal-draw { color: #f59e0b; font-weight: 700; }
+.cal-match-result.cal-loss { color: #dc3545; font-weight: 700; }
 
 .cal-back-btn {
   width: 100%;
@@ -1282,6 +1304,22 @@ html, body {
   font-size: 14px;
 }
 
+.team-preview-btn {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.08);
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.team-preview-btn:active {
+  background: rgba(37, 99, 235, 0.16);
+}
+
 /* Coach Input */
 .coach-section {
   padding: 20px 16px;
@@ -1780,45 +1818,14 @@ html, body {
   color: var(--text-muted);
 }
 
-.league-pos.p1 { color: #F59E0B; }
-.league-pos.p2 { color: #9CA3AF; }
-.league-pos.p3 { color: #D97706; }
-
 .zona-playoff {
   background: #d4edda !important;
-}
-.zona-playoff .league-pos {
-  border: 2px solid rgba(40, 167, 69, 0.5);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 .zona-permanencia {
   background: #fff !important;
 }
-.zona-permanencia .league-pos {
-  border: 2px solid rgba(108, 117, 125, 0.3);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 .zona-descenso {
   background: #f8d7da !important;
-}
-.zona-descenso .league-pos {
-  border: 2px solid rgba(220, 53, 69, 0.5);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* ───────── MATCHDAY CARD ───────── */
