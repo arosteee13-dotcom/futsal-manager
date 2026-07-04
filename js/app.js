@@ -201,84 +201,131 @@ function calcTacticMultiplier(formation, gamePlan) {
 }
 
 class MatchEngine {
-  constructor(homePlayers, tactic, awaySkill, homeName, awayName) {
+  constructor(homePlayers, tactic, awaySkill, homeName, awayName, isHome) {
     this.awaySkill = awaySkill
     this.homeScore = 0
     this.awayScore = 0
-    this.minute = 0
+    this.gameSeconds = 0
+    this.half = 1
     this.finished = false
+    this.paused = false
     this.events = []
-    this._timer = null
+    this._interval = null
+    this._goalPauseTimer = null
     this.onEvent = null
+    this.onClockUpdate = null
+    this.onHalfTime = null
     this.onFinish = null
     this.tacticMult = calcTacticMultiplier(tactic.formation, tactic.gamePlan)
     this.gamePlan = GAME_PLANS[tactic.gamePlan] || GAME_PLANS.juegoCuatro
     this.homeName = homeName || 'Tu Equipo'
     this.awayName = awayName || 'Rival'
+    this.homeFactor = isHome !== false ? 1.05 : 1.0
   }
-  start() { this._tick() }
-  _tick() {
+
+  iniciarCronometro() {
+    if (this._interval) return
+    this.paused = false
+    this._tickReel()
+    this._interval = setInterval(() => this._tickReel(), 1000)
+  }
+
+  _tickReel() {
     if (this.finished) return
-    this.minute++
-    if (this.minute > 40) { this._finish(); return }
+    for (let s = 0; s < 15; s++) {
+      if (this.paused || this.finished) break
+      this._tickSecond()
+    }
+    this._updateClock()
+  }
 
-    /* Desgaste con drain del plan activo */
+  _tickSecond() {
+    this.gameSeconds++
+    const MAX_SEC = 1200
+
+    if (this.half === 1 && this.gameSeconds >= MAX_SEC) {
+      this.gameSeconds = MAX_SEC
+      this._halfTime()
+      return
+    }
+    if (this.half === 2 && this.gameSeconds >= MAX_SEC) {
+      this.gameSeconds = MAX_SEC
+      this._finish()
+      return
+    }
+
+    /* Desgaste escalado a segundos */
     const enPista = state.players.filter(p => p.enPista)
-    enPista.forEach(p => aplicarDesgaste(p, this.gamePlan.drain))
+    enPista.forEach(p => aplicarDesgaste(p, this.gamePlan.drain / 60))
 
-    const lesionado = simularLesion()
-    if (lesionado) {
-      lesionado.enPista = false
-      if (this.onEvent) this.onEvent({ text: `🚑 Lesión: ${lesionado.name} no puede continuar`, type: 'injury' }, this.homeScore, this.awayScore, this.minute)
+    /* Lesión escalada */
+    if (Math.random() < 0.025 / 60) {
+      const candidatos = enPista.filter(p => !p.injury)
+      if (candidatos.length > 0) {
+        const lesionado = pickRandom(candidatos)
+        const inj = pickRandom(INJURIES)
+        lesionado.injury = { type: inj.type, description: inj.description, duration: inj.duration, remaining: inj.duration, recoveryEnergy: inj.recoveryEnergy }
+        lesionado.energy = 0
+        lesionado.enPista = false
+        if (this.onEvent) this.onEvent({ text: `🚑 Lesión: ${lesionado.name} — ${inj.description}`, type: 'injury' })
+      }
     }
 
     /* Cambios automáticos */
     const cambios = gestionarCambios()
     for (const c of cambios) {
-      if (this.onEvent) this.onEvent({ text: `🔄 Sale: ${c.sale.name} (ENE:${c.sale.energy}) → Entra: ${c.entra.name} (ENE:${c.entra.energy})`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
+      if (this.onEvent) this.onEvent({ text: `🔄 Sale: ${c.sale.name} (ENE:${c.sale.energy}) → Entra: ${c.entra.name} (ENE:${c.entra.energy})`, type: 'sub' })
     }
 
-    /* Tarjetas */
-    for (const p of state.players.filter(x => x.enPista)) {
-      if (Math.random() < 0.008 && !p._yellowThisMatch) {
+    /* Tarjetas escaladas a segundo */
+    for (const p of enPista) {
+      if (Math.random() < 0.008 / 60 && !p._yellowThisMatch) {
         p.yellowCards = (p.yellowCards || 0) + 1
         p._yellowThisMatch = true
-        if (this.onEvent) this.onEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
-        if (Math.random() < 0.2) { p.redCards = (p.redCards || 0) + 1; p._redThisMatch = true; p.enPista = false; if (this.onEvent) this.onEvent({ text: `🟥 Roja: ${p.name} - Expulsado`, type: 'injury' }, this.homeScore, this.awayScore, this.minute) }
-      }
-    }
-
-    /* Simular minuto */
-    const event = this._simulateMinute()
-    if (event) {
-      this.events.push(event)
-      if (event.type === 'homeGoal') { this.homeScore++; const g = pickRandom(state.players.filter(x => x.enPista)); if(g){g._goalsInMatch=(g._goalsInMatch||0)+1;g.goals=(g.goals||0)+1} }
-      else if (event.type === 'awayGoal') { this.awayScore++ }
-      /* Asistencia: 35% de probabilidad cuando hay gol */
-      if ((event.type === 'homeGoal' || event.type === 'awayGoal') && Math.random() < 0.35 && event.type === 'homeGoal') {
-        const teamPlayers = state.players.filter(x => x.enPista && (!x._assistThisMatch || Math.random() < 0.3))
-        const assister = pickRandom(teamPlayers)
-        if (assister) {
-          assister.assists = (assister.assists || 0) + 1
-          assister._assistThisMatch = true
-          if (this.onEvent) this.onEvent({ text: `🅰️ Asistencia: ${assister.name}`, type: 'sub' }, this.homeScore, this.awayScore, this.minute)
+        if (this.onEvent) this.onEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'sub' })
+        if (Math.random() < 0.2) {
+          p.redCards = (p.redCards || 0) + 1
+          p._redThisMatch = true
+          p.enPista = false
+          if (this.onEvent) this.onEvent({ text: `🟥 Roja: ${p.name} — Expulsado`, type: 'injury' })
         }
       }
-      if (this.onEvent) this.onEvent(event, this.homeScore, this.awayScore, this.minute)
     }
 
-    this._timer = setTimeout(() => this._tick(), 1400)
+    /* Evento del juego */
+    const event = this._simulateSecond()
+    if (event) {
+      this.events.push(event)
+      if (event.type === 'homeGoal') {
+        this.homeScore++
+        const g = pickRandom(enPista)
+        if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 }
+        /* Asistencia */
+        if (Math.random() < 0.35) {
+          const ass = pickRandom(enPista.filter(x => x.id !== g?.id))
+          if (ass) { ass.assists = (ass.assists || 0) + 1; if (this.onEvent) this.onEvent({ text: `🅰️ Asistencia: ${ass.name}`, type: 'sub' }) }
+        }
+        /* Pausa por gol 2 segundos reales */
+        this.paused = true
+        if (this._goalPauseTimer) clearTimeout(this._goalPauseTimer)
+        this._goalPauseTimer = setTimeout(() => { this.paused = false }, 2000)
+      } else if (event.type === 'awayGoal') { this.awayScore++ }
+      if (this.onEvent) this.onEvent(event)
+    }
   }
-  _simulateMinute() {
+
+  _simulateSecond() {
     const enPista = state.players.filter(p => p.enPista)
     if (enPista.length === 0) return null
     const homeSkill = enPista.reduce((s, p) => s + getHabilidadEfectiva(p), 0) / enPista.length * this.tacticMult
     const homeEnergyAVG = enPista.reduce((s, p) => s + p.energy, 0) / enPista.length / 100
 
-    const homeChance = homeSkill * (0.5 + homeEnergyAVG * 0.3) * this.gamePlan.attack
+    const homeChance = homeSkill * (0.5 + homeEnergyAVG * 0.3) * this.gamePlan.attack * this.homeFactor
     const awayChance = this.awaySkill * 0.5 * this.gamePlan.defense
     const totalChance = homeChance + awayChance
-    if (Math.random() > 0.42 * this.gamePlan.events) return null
+
+    /* Probabilidad de evento escalada a segundo: 42%/60 ≈ 0.7% por segundo */
+    if (Math.random() > (0.42 / 60) * this.gamePlan.events) return null
     const roll = Math.random() * totalChance
     const isHomeAttack = roll < homeChance
     const teamName = isHomeAttack ? this.homeName : this.awayName
@@ -295,14 +342,40 @@ class MatchEngine {
     const t = pickRandom(EVENTS_POOL.miss)
     return { text: t.text(teamName), type: 'miss', team: teamName }
   }
+
+  _updateClock() {
+    if (!this.onClockUpdate) return
+    const sec = this.gameSeconds
+    const mm = String(Math.floor(sec / 60)).padStart(2, '0')
+    const ss = String(sec % 60).padStart(2, '0')
+    this.onClockUpdate(`${this.half}T ${mm}:${ss}`)
+  }
+
+  _halfTime() {
+    this.paused = true
+    if (this._interval) { clearInterval(this._interval); this._interval = null }
+    if (this.onHalfTime) this.onHalfTime()
+  }
+
+  iniciarSegundaParte() {
+    if (this.half !== 1) return
+    this.half = 2
+    this.gameSeconds = 0
+    this.paused = false
+    this.iniciarCronometro()
+  }
+
   _finish() {
     this.finished = true
-    if (this._timer) clearTimeout(this._timer)
+    if (this._interval) { clearInterval(this._interval); this._interval = null }
+    if (this._goalPauseTimer) clearTimeout(this._goalPauseTimer)
     if (this.onFinish) this.onFinish()
   }
+
   stop() {
     this.finished = true
-    if (this._timer) clearTimeout(this._timer)
+    if (this._interval) { clearInterval(this._interval); this._interval = null }
+    if (this._goalPauseTimer) clearTimeout(this._goalPauseTimer)
   }
 }
 
@@ -424,8 +497,8 @@ function generateFixtures(teamIds) {
   const m = ids.length
   for (let r = 0; r < rounds; r++) {
     for (let i = 0; i < m / 2; i++) {
-      const home = ids[i]
-      const away = ids[m - 1 - i]
+      const home = (r % 2 === 0) ? ids[i] : ids[m - 1 - i]
+      const away = (r % 2 === 0) ? ids[m - 1 - i] : ids[i]
       if (home !== null && away !== null)
         fixtures.push({ matchday: r + 1, home, away, homeScore: null, awayScore: null, played: false })
     }
@@ -471,7 +544,7 @@ function autoSimulateOtherMatch(homeId, awayId) {
   const home = getTeamObj(homeId)
   const away = getTeamObj(awayId)
   if (!home || !away) return { homeScore: 0, awayScore: 0 }
-  const homeSkill = avgSkill(home.players) * randInt(80, 120) / 100
+  const homeSkill = avgSkill(home.players) * randInt(80, 120) / 100 * 1.05
   const awaySkill = avgSkill(away.players) * randInt(80, 120) / 100
   let homeScore = 0, awayScore = 0
   for (let m = 0; m < 40; m++) {
@@ -602,14 +675,14 @@ function renderHome() {
       </div>
       ${isPlayoffs
         ? `<div class="home-matchday-label">${roundNames[state.playoffs.round] || 'Eliminatoria'}</div>`
-        : `<div class="home-matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays}</div>`
+        : `<div class="home-matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays} · ${fixture.horario || ''}</div>`
       }
       <div class="home-match-location">${isHome ? '🏠 Local' : '✈️ Visitante'}</div>
       <button class="btn-primary" id="btn-home-play">▶ JUGAR PARTIDO</button>
     </div>` : '<div class="home-card home-match"><div class="home-section-title">🏆 Temporada completada</div></div>'}
   `
   const playBtn = document.getElementById('btn-home-play')
-  if (playBtn) playBtn.onclick = () => renderTab('league')
+  if (playBtn) playBtn.onclick = () => startMatchFromLeague(rivalId, fixture)
 }
 
 function renderClub() {
@@ -1170,7 +1243,7 @@ function renderLeague() {
     <div class="league-matchday-card">
       <div class="matchday-label">Jornada ${state.currentMatchday} de ${state.totalMatchdays}</div>
       <div class="matchday-rival">🆚 ${rivalName}</div>
-      <div class="matchday-location">${location}</div>
+      <div class="matchday-location">${location} · ${fixture.horario || ''}</div>
       <button class="btn-primary" id="btn-play-match">▶ JUGAR PARTIDO</button>
     </div>
   `
@@ -1184,37 +1257,43 @@ function startMatchFromLeague(rivalId, fixture) {
   const rival = getTeamObj(rivalId)
   if (!rival) return
 
-  if (!state.convocatoriaValidada) {
-    alert('Debes validar la convocatoria antes del partido. Ve a Club > Convocatoria.')
-    return
-  }
-
   /* Set starting five on court */
+  const five = state.startingFive.length > 0 ? state.startingFive : state.tacticsSlots.filter(Boolean)
   state.players.forEach(p => { p.enPista = false })
-  state.startingFive.forEach(id => {
+  five.forEach(id => {
     const p = state.players.find(x => x.id === id)
     if (p) p.enPista = true
   })
 
-  document.getElementById('league-matchday-wrap').classList.add('hidden')
-  document.getElementById('league-results-wrap').classList.add('hidden')
-  document.getElementById('match-live').classList.remove('hidden')
+  document.getElementById('view-league').classList.remove('active')
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
+  document.getElementById('view-match').classList.add('active')
+  document.getElementById('bottom-nav').style.display = 'none'
+  document.getElementById('btn-header-menu').style.display = 'none'
+  document.getElementById('match-result-area').classList.add('hidden')
   document.getElementById('score-home').textContent = '0'
   document.getElementById('score-away').textContent = '0'
   document.getElementById('match-clock').textContent = '00:00'
   document.getElementById('match-feed').innerHTML = ''
-  document.getElementById('btn-end-match').classList.add('hidden')
+  document.getElementById('btn-end-match').style.display = 'none'
+  document.getElementById('match-home-name').textContent = state.team
+  document.getElementById('match-away-name').textContent = rival.name
+  document.getElementById('match-home-logo').src = state.teamLogo || ''
+  document.getElementById('match-away-logo').src = getTeamLogo(rivalId) || ''
 
   const isHome = fixture.home === state.teamId
   const awaySkill = avgSkill(rival.players)
-  engine = new MatchEngine(state.players, state.tactic, awaySkill, state.team, rival.name)
+  engine = new MatchEngine(state.players, state.tactic, awaySkill, state.team, rival.name, isHome)
 
-  engine.onEvent = (event, homeScore, awayScore, minute) => {
-    document.getElementById('score-home').textContent = isHome ? homeScore : awayScore
-    document.getElementById('score-away').textContent = isHome ? awayScore : homeScore
-    document.getElementById('match-clock').textContent = formatTime(minute)
-    addFeedEvent(event, minute)
-    if (minute === 20) addFeedEvent({ text: '— DESCANSO —', type: 'break' }, minute)
+  engine.onClockUpdate = (clockStr) => {
+    document.getElementById('match-clock').textContent = clockStr
+    document.getElementById('score-home').textContent = isHome ? engine.homeScore : engine.awayScore
+    document.getElementById('score-away').textContent = isHome ? engine.awayScore : engine.homeScore
+    renderPlayerRatings()
+  }
+
+  engine.onEvent = (event) => {
+    addFeedEvent(event)
   }
 
   /* Game plan selector */
@@ -1230,16 +1309,23 @@ function startMatchFromLeague(rivalId, fixture) {
     tactic.gamePlan = e.target.value
     if (engine) engine.gamePlan = GAME_PLANS[tactic.gamePlan]
     document.getElementById('match-gameplan-desc').textContent = GAME_PLANS[tactic.gamePlan].desc
-    addFeedEvent({ text: `🔄 Cambio táctico: ${GAME_PLANS[tactic.gamePlan].label}`, type: 'sub' }, engine ? engine.minute : 1)
+    addFeedEvent({ text: `🔄 Cambio táctico: ${GAME_PLANS[tactic.gamePlan].label}`, type: 'sub' })
   }
 
   /* Starting lineup announcement */
   const titularesStr = state.startingFive.map(id => { const p = state.players.find(x => x.id === id); return p ? `${p.name} (${POSITIONS[p.position].label})` : '' }).join(', ')
-  addFeedEvent({ text: `🏁 Once titular: ${titularesStr}`, type: 'break' }, 1)
+  addFeedEvent({ text: `🏁 Once titular: ${titularesStr}`, type: 'break' })
+
+  engine.onHalfTime = () => {
+    addFeedEvent({ text: '— DESCANSO —', type: 'break' })
+    document.getElementById('btn-half-time').classList.remove('hidden')
+    document.getElementById('btn-end-match').style.display = 'none'
+  }
 
   engine.onFinish = () => {
-    addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' }, 40)
-    document.getElementById('btn-end-match').classList.remove('hidden')
+    addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
+    document.getElementById('btn-end-match').style.display = 'block'
+    document.getElementById('btn-half-time').classList.add('hidden')
   }
 
   document.getElementById('btn-end-match').onclick = () => {
@@ -1247,17 +1333,36 @@ function startMatchFromLeague(rivalId, fixture) {
     finishMatch(isHome, fixture, rival)
   }
 
-  engine.start()
+  document.getElementById('btn-half-time').onclick = () => {
+    document.getElementById('btn-half-time').classList.add('hidden')
+    if (engine) engine.iniciarSegundaParte()
+  }
+
+  document.getElementById('btn-tactica').onclick = () => {
+    document.getElementById('view-match').classList.remove('active')
+    document.getElementById('view-club').classList.add('active')
+    document.getElementById('bottom-nav').style.display = ''
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
+    document.querySelector('[data-tab="club"]').classList.add('active')
+    state.clubSubTab = 'tactics'
+    renderClub()
+  }
+
+  renderPlayerRatings()
+  engine.iniciarCronometro()
 }
 
-function addFeedEvent(event, minute) {
+function addFeedEvent(event) {
   const feed = document.getElementById('match-feed')
   const el = document.createElement('div')
   if (event.type === 'break') {
     el.className = 'feed-event minute'
     el.textContent = event.text
   } else {
-    const time = formatTime(minute)
+    const sec = engine ? engine.gameSeconds : 0
+    const mm = String(Math.floor(sec / 60)).padStart(2, '0')
+    const ss = String(sec % 60).padStart(2, '0')
+    const time = `${engine ? engine.half + 'T' : '1T'} ${mm}:${ss}`
     let extra = ''
     if (event.type === 'homeGoal' || event.type === 'awayGoal') extra = ' goal'
     else if (event.type === 'sub') extra = ' sub'
@@ -1267,6 +1372,22 @@ function addFeedEvent(event, minute) {
   }
   feed.appendChild(el)
   feed.scrollTop = feed.scrollHeight
+}
+
+function renderPlayerRatings() {
+  const container = document.getElementById('match-players')
+  if (!container) return
+  const enPista = state.players.filter(p => p.enPista)
+  container.innerHTML = enPista.map(p => {
+    const pos = POSITIONS[p.position]
+    const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+    return `<div class="match-player-item">
+      <div class="match-player-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
+      <span class="match-player-name">${p.name}</span>
+      <span class="match-player-ene" style="color:${getEneColor(p.energy)}">${p.energy}</span>
+      <span class="match-player-rating">${'★'.repeat(Math.max(1, Math.round(getHabilidadEfectiva(p) / 20)))}</span>
+    </div>`
+  }).join('')
 }
 
 function finishMatch(isHome, fixture, rival) {
@@ -1287,13 +1408,21 @@ function finishMatch(isHome, fixture, rival) {
   state.finances.history.push({ reason: `J${state.currentMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
   
 
-  /* Post-match recovery: restore some energy for next matchday */
+  /* Post-match recovery: calculate days until next match */
+  const nextFixture = getFixtureForUser(state.currentMatchday + 1)
+  let recoveryMult = 1.0
+  if (nextFixture && nextFixture.date) {
+    const curDate = new Date(fixture.date + 'T12:00:00')
+    const nxtDate = new Date(nextFixture.date + 'T12:00:00')
+    const days = Math.round((nxtDate - curDate) / (1000 * 60 * 60 * 24))
+    if (days <= 4) recoveryMult = 0.5
+  }
   state.players.forEach(p => {
     p.enPista = false
     p.minutosEnPista = 0
     p.convocado = false
     p.titular = false
-    p.energy = Math.min(100, p.energy + randInt(15, 30))
+    p.energy = Math.min(100, p.energy + Math.round(randInt(15, 30) * recoveryMult))
   })
   state.convocatoriaValidada = false
 
@@ -1361,42 +1490,51 @@ function resetSeason() {
 }
 
 function showMatchdayResults(userScore, rivalScore, rivalName) {
-  document.getElementById('match-live').classList.add('hidden')
-  document.getElementById('league-results-wrap').classList.remove('hidden')
+  /* Show result card in match view */
+  document.getElementById('btn-end-match').style.display = 'none'
+  document.getElementById('match-result-area').classList.remove('hidden')
+  document.getElementById('result-home-display').textContent = userScore
+  document.getElementById('result-away-display').textContent = rivalScore
 
-  const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
-  const list = document.getElementById('league-results-list')
-  list.innerHTML = fixtures.map(f => {
-    const homeName = getTeamName(f.home)
-    const awayName = getTeamName(f.away)
-    const isUserMatch = f.home === state.teamId || f.away === state.teamId
-    return `
-      <div class="results-item ${isUserMatch ? 'results-item-user' : ''}">
-        <span class="results-team right">${homeName}</span>
-        <span class="results-score">${f.homeScore} - ${f.awayScore}</span>
-        <span class="results-team">${awayName}</span>
-      </div>
-    `
-  }).join('')
+  document.getElementById('btn-match-back').onclick = () => {
+    document.getElementById('view-match').classList.remove('active')
+    document.getElementById('view-league').classList.add('active')
+    document.getElementById('bottom-nav').style.display = ''
+    document.getElementById('btn-header-menu').style.display = ''
+    document.getElementById('match-result-area').classList.add('hidden')
 
-  const standings = updateLeagueStandings()
-  const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
-  document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
+    const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
+    const list = document.getElementById('league-results-list')
+    list.innerHTML = fixtures.map(f => {
+      const homeName = getTeamName(f.home)
+      const awayName = getTeamName(f.away)
+      const isUserMatch = f.home === state.teamId || f.away === state.teamId
+      return `
+        <div class="results-item ${isUserMatch ? 'results-item-user' : ''}">
+          <span class="results-team right">${homeName}</span>
+          <span class="results-score">${f.homeScore} - ${f.awayScore}</span>
+          <span class="results-team">${awayName}</span>
+        </div>
+      `
+    }).join('')
 
-  document.getElementById('btn-advance-matchday').onclick = () => {
-    state.currentMatchday++
-    /* Avanzar recuperación de lesiones */
-    for (const p of state.players) {
-      if (!p.injury) continue
-      p.injury.remaining--
-      if (p.injury.remaining <= 0) {
-        p.energy = p.injury.recoveryEnergy
-        p.injury = null
+    const standings = updateLeagueStandings()
+    const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
+    document.getElementById('league-standings-change').innerHTML = `Tu equipo ocupa el <strong>${userPos}º</strong> puesto`
+    document.getElementById('league-results-wrap').classList.remove('hidden')
+    document.getElementById('league-matchday-wrap').classList.add('hidden')
+
+    document.getElementById('btn-advance-matchday').onclick = () => {
+      state.currentMatchday++
+      for (const p of state.players) {
+        if (!p.injury) continue
+        p.injury.remaining--
+        if (p.injury.remaining <= 0) { p.energy = p.injury.recoveryEnergy; p.injury = null }
       }
+      document.getElementById('league-results-wrap').classList.add('hidden')
+      document.getElementById('league-matchday-wrap').classList.remove('hidden')
+      renderLeague()
     }
-    document.getElementById('league-results-wrap').classList.add('hidden')
-    document.getElementById('league-matchday-wrap').classList.remove('hidden')
-    renderLeague()
   }
 }
 
@@ -1766,6 +1904,61 @@ function newGame(coach) {
     ? Math.max(...state.fixtures.map(f => f.matchday)) : 0
   state.currentMatchday = 1
 
+  /* Assign dates and schedules */
+  const WEEKEND_DAYS = [
+    { day: 5, label: 'Viernes 20:00' },
+    { day: 6, label: 'Sábado 18:00' },
+    { day: 0, label: 'Domingo 12:00' },
+  ]
+  const MIDWEEK_MD = [7, 14, 21, 28]
+  state.fixtures.forEach(f => {
+    const d = new Date(2026, 8, 1)
+    let offset = (f.matchday - 1) * 8
+    if (f.matchday > 15) offset += 21
+    if (f.matchday > 23) offset += 14
+    d.setDate(d.getDate() + offset)
+    if (MIDWEEK_MD.includes(f.matchday)) {
+      const diff = (5 - d.getDay() + 7) % 7
+      d.setDate(d.getDate() + diff)
+      f.horario = 'Viernes 20:00'
+    } else {
+      const weighted = [WEEKEND_DAYS[0],WEEKEND_DAYS[0],WEEKEND_DAYS[0],WEEKEND_DAYS[0],WEEKEND_DAYS[0],...Array(25).fill(WEEKEND_DAYS[1]),...Array(20).fill(WEEKEND_DAYS[2])]
+      const slot = pickRandom(weighted)
+      const diff = (slot.day - d.getDay() + 7) % 7
+      d.setDate(d.getDate() + diff)
+      f.horario = slot.label
+    }
+    f.date = d.toISOString().slice(0, 10)
+  })
+  /* Validate minimum 8 days between matchdays */
+  for (let md = 1; md < state.totalMatchdays; md++) {
+    const cur = state.fixtures.filter(f => f.matchday === md && (f.home === state.teamId || f.away === state.teamId))
+    const nxt = state.fixtures.filter(f => f.matchday === md + 1 && (f.home === state.teamId || f.away === state.teamId))
+    if (cur.length === 0 || nxt.length === 0) continue
+    const curDate = new Date(cur[0].date + 'T12:00:00')
+    const nxtDate = new Date(nxt[0].date + 'T12:00:00')
+    const diff = Math.round((nxtDate - curDate) / (1000 * 60 * 60 * 24))
+    if (diff < 8) {
+      nxtDate.setDate(nxtDate.getDate() + (8 - diff))
+      const nd = nxtDate.getDay()
+      if (nd >= 1 && nd <= 4) nxtDate.setDate(nxtDate.getDate() + ((5 - nd + 7) % 7))
+      const newDate = nxtDate.toISOString().slice(0, 10)
+      state.fixtures.filter(f => f.matchday === md + 1).forEach(f => { f.date = newDate })
+    }
+  }
+
+  /* Sync horario with actual day after validation */
+  const DAY_LABELS = { 5: 'Viernes', 6: 'Sábado', 0: 'Domingo' }
+  state.fixtures.filter(f => f.matchday <= state.totalMatchdays).forEach(f => {
+    if (!f.horario) return
+    const d = new Date(f.date + 'T12:00:00')
+    const label = DAY_LABELS[d.getDay()]
+    if (label && !f.horario.startsWith(label)) {
+      const parts = f.horario.split(' ')
+      f.horario = `${label} ${parts.slice(1).join(' ') || '20:00'}`
+    }
+  })
+
   autoAssignSquad()
 
   startGame()
@@ -1923,6 +2116,131 @@ function showLoadMenu() {
   })
 }
 
+/* ============ CALENDAR ============ */
+const MONTHS_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const DAYS_ES = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+
+function getCalMatchIcon(md) {
+  const f = state.fixtures.find(x => x.matchday === md && (x.home === state.teamId || x.away === state.teamId))
+  if (!f) return ''
+  const rivalId = f.home === state.teamId ? f.away : f.home
+  const isHome = f.home === state.teamId
+  const logo = getTeamLogo(rivalId)
+  const homeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+  const awaySvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l-3 5h2v4l-4 3 1 5 4-3v4l2 2 2-2v-4l4 3 1-5-4-3V7h2z"/></svg>'
+  return `<span class="cal-day-icon">${logo ? `<img class="cal-day-logo" src="${logo}">` : ''}<span class="cal-day-loc">${isHome ? homeSvg : awaySvg}</span></span>`
+}
+
+function getSeasonDate(matchday) {
+  const f = state.fixtures.find(x => x.matchday === matchday)
+  if (f && f.date) return new Date(f.date + 'T12:00:00')
+  const d = new Date(2026, 8, 1)
+  d.setDate(d.getDate() + (matchday - 1) * 7)
+  return d
+}
+
+let calMonthOffset = 0
+
+function showCalendar() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
+  const view = document.getElementById('view-calendar')
+  if (view) view.classList.add('active')
+  calMonthOffset = 0
+  renderCalendar()
+}
+
+function renderCalendar() {
+  const container = document.getElementById('calendar-content')
+  if (!container) return
+
+  /* Current month from offset */
+  const baseDate = new Date(2026, 8 + calMonthOffset, 1)
+  const year = baseDate.getFullYear()
+  const month = baseDate.getMonth()
+  const monthName = MONTHS_ES[month]
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const firstDay = new Date(year, month, 1).getDay()
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1
+
+  /* Build grid */
+  let gridHtml = `<div class="cal-header">
+    <button class="cal-nav-btn" id="cal-prev">◀</button>
+    <span class="cal-month-title">${monthName} ${year}</span>
+    <button class="cal-nav-btn" id="cal-next">▶</button>
+  </div>
+  <div class="cal-grid">`
+
+  DAYS_ES.forEach(d => { gridHtml += `<div class="cal-day-header">${d}</div>` })
+
+  for (let i = 0; i < startOffset; i++) {
+    gridHtml += `<div class="cal-day empty"></div>`
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day)
+    const found = state.fixtures.find(f => {
+      if (f.matchday > state.totalMatchdays) return false
+      const fd = getSeasonDate(f.matchday)
+      return fd.getDate() === day && fd.getMonth() === month && fd.getFullYear() === year
+    })
+    const matchday = found ? found.matchday : 0
+    const hasMatch = matchday >= 1 && matchday <= state.totalMatchdays
+    gridHtml += `<div class="cal-day${hasMatch ? ' match-day' : ''}"${hasMatch ? ` data-md="${matchday}"` : ''}>
+      <span class="cal-day-num">${day}</span>
+      ${hasMatch ? getCalMatchIcon(matchday) : ''}
+    </div>`
+  }
+  gridHtml += `</div>`
+
+  /* Matches this month */
+  const monthFixtures = state.fixtures.filter(f => {
+    if (f.matchday > state.totalMatchdays) return false
+    const fd = getSeasonDate(f.matchday)
+    return fd.getMonth() === month && fd.getFullYear() === year
+  })
+
+  if (monthFixtures.length > 0) {
+    gridHtml += `<div class="cal-match-list">`
+    monthFixtures.sort((a, b) => a.matchday - b.matchday).forEach(f => {
+      const isUser = f.home === state.teamId || f.away === state.teamId
+      if (!isUser) return
+      const rivalId = f.home === state.teamId ? f.away : f.home
+      const rivalName = getTeamName(rivalId)
+      const rivalLogo = getTeamLogo(rivalId)
+      const isHome = f.home === state.teamId
+      const fd = getSeasonDate(f.matchday)
+      const result = f.played ? `${f.homeScore} - ${f.awayScore}` : '—'
+      gridHtml += `<div class="cal-match-item">
+        <img class="cal-match-logo" src="${rivalLogo || ''}" alt="">
+        <div class="cal-match-info">
+          <div class="cal-match-rival">J${f.matchday} · ${rivalName}</div>
+          <div class="cal-match-meta">${String(fd.getDate()).padStart(2,'0')}/${String(fd.getMonth()+1).padStart(2,'0')} · ${f.horario || ''} ${isHome ? '🏠' : '✈️'}</div>
+        </div>
+        <div class="cal-match-result${f.played ? ' played' : ''}">${result}</div>
+      </div>`
+    })
+    gridHtml += `</div>`
+  } else {
+    gridHtml += '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px">Sin partidos este mes</div>'
+  }
+
+  gridHtml += `<button class="cal-back-btn" id="cal-back">← Volver</button>`
+
+  container.innerHTML = gridHtml
+
+  /* Events */
+  document.getElementById('cal-prev').onclick = () => { calMonthOffset--; renderCalendar() }
+  document.getElementById('cal-next').onclick = () => { calMonthOffset++; renderCalendar() }
+  document.getElementById('cal-back').onclick = () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
+    document.querySelector('[data-tab="home"]').classList.add('active')
+    renderTab('home')
+  }
+  document.querySelectorAll('.cal-day.match-day').forEach(el => {
+    el.onclick = () => { document.getElementById('cal-back').click(); /* placeholder */ }
+  })
+}
+
 /* ============ MENU DROPDOWN ============ */
 function showSideMenu() {
   const dd = document.getElementById('header-dropdown')
@@ -1967,8 +2285,12 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
       setTimeout(() => {
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>'
       }, 1500)
+    } else if (action === 'inbox') {
+      hideSideMenu()
+      alert('📬 Bandeja de entrada — Próximamente')
     } else if (action === 'calendar') {
-      alert('📅 Calendario — Próximamente')
+      hideSideMenu()
+      showCalendar()
     } else if (action === 'history') {
       alert('📊 Historial — Próximamente')
     } else if (action === 'settings') {

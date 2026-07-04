@@ -80,6 +80,13 @@
           <img class="dd-team-logo" id="dd-team-logo" src="" alt="">
           <span class="dd-team-name" id="dd-team-name"></span>
         </div>
+        <div class="dropdown-item" data-action="inbox">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+            <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/>
+          </svg>
+          Bandeja de entrada
+        </div>
         <div class="dropdown-item" data-action="calendar">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -148,25 +155,6 @@
           <div id="league-content">
             <div id="league-table-wrap"></div>
             <div id="league-matchday-wrap"></div>
-            <div id="match-live" class="hidden">
-              <div class="scoreboard">
-                <div class="score-team">
-                  <span class="score-name">Tu Equipo</span>
-                  <span class="score-value" id="score-home">0</span>
-                </div>
-                <div class="score-clock">
-                  <span class="clock-icon">⚽</span>
-                  <span class="clock-time" id="match-clock">00:00</span>
-                </div>
-                <div class="score-team">
-                  <span class="score-name">Rival</span>
-                  <span class="score-value" id="score-away">0</span>
-                </div>
-              </div>
-              <div class="match-planes" id="match-planes"></div>
-              <div class="match-feed" id="match-feed"></div>
-              <button class="btn-secondary hidden" id="btn-end-match">Finalizar</button>
-            </div>
             <div id="league-results-wrap" class="hidden">
               <h3 class="results-title">Resultados Jornada</h3>
               <div id="league-results-list" class="results-list"></div>
@@ -182,6 +170,11 @@
             <h2>General</h2>
           </div>
           <div id="home-content"></div>
+        </section>
+
+        <!-- CALENDARIO -->
+        <section id="view-calendar" class="view">
+          <div id="calendar-content"></div>
         </section>
 
         <!-- MERCADO -->
@@ -209,6 +202,45 @@
             <span class="finance-balance" id="finance-balance">€5,000</span>
           </div>
           <div class="finance-history" id="finance-history"></div>
+        </section>
+
+        <!-- PARTIDO -->
+        <section id="view-match" class="view">
+          <div class="scoreboard">
+            <div class="score-team">
+              <img class="score-logo" id="match-home-logo" src="" alt="">
+              <span class="score-name" id="match-home-name">Local</span>
+              <span class="score-value" id="score-home">0</span>
+            </div>
+            <div class="score-clock">
+              <span class="clock-icon">⏱️</span>
+              <span class="clock-time" id="match-clock">00:00</span>
+            </div>
+            <div class="score-team">
+              <img class="score-logo" id="match-away-logo" src="" alt="">
+              <span class="score-name" id="match-away-name">Visitante</span>
+              <span class="score-value" id="score-away">0</span>
+            </div>
+          </div>
+          <div class="match-planes" id="match-planes"></div>
+          <div class="match-feed" id="match-feed"></div>
+          <div class="match-players" id="match-players"></div>
+          <button class="btn-primary" id="btn-half-time" style="display:none">▶ SEGUNDA PARTE</button>
+          <div class="match-actions">
+            <button class="btn-primary" id="btn-tactica">📋 TÁCTICA</button>
+            <button class="btn-secondary" id="btn-end-match" style="display:none">Finalizar</button>
+          </div>
+          <div id="match-result-area" class="hidden">
+            <div class="result-card">
+              <h3 class="results-title">Resultado Final</h3>
+              <div class="result-score">
+                <span id="result-home-display">0</span>
+                <span class="result-divider">-</span>
+                <span id="result-away-display">0</span>
+              </div>
+              <button class="btn-primary" id="btn-match-back">Volver a Liga</button>
+            </div>
+          </div>
         </section>
 
       </main>
