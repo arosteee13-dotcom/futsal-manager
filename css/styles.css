@@ -1794,6 +1794,56 @@ html, body {
   font-size: 14px;
 }
 
+#menu-screen .menu-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-top: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px 6px 0 0;
+}
+
+#menu-screen .menu-group-header:active {
+  background: rgba(255,255,255,0.06);
+}
+
+#menu-screen .menu-group-toggle {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+#menu-screen .menu-group-count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+#menu-screen .menu-group-body {
+  display: none;
+}
+
+#menu-screen .menu-group-body.open {
+  display: block;
+}
+
+#menu-screen .menu-group-body .menu-list-item {
+  padding-left: 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+#menu-screen .menu-group-body .menu-list-item:last-child {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
 #menu-screen .team-preview-btn {
   cursor: pointer;
   font-size: 11px;
