@@ -123,6 +123,26 @@ html, body {
   color: var(--text);
 }
 
+.view-header .btn-back {
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #60A5FA;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+.view-header .btn-back:active {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--accent);
+}
+
 .team-logo {
   width: 28px;
   height: 28px;
@@ -2943,6 +2963,21 @@ html, body {
   flex-shrink: 0;
   width: 310px;
   height: 45px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.05);
+  color: #94A3B8;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal-close:active {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ───────── TACTICS / SLOT PITCH ───────── */

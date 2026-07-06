@@ -832,7 +832,10 @@ function renderHome() {
   if (!container) return
   const standings = updateLeagueStandings()
   const userPos = standings.findIndex(s => s.teamId === state.teamId) + 1
-  const fixture = state.fixtures.find(f => f.played === false && (f.home === state.teamId || f.away === state.teamId))
+  const isPlayoffs = state.playoffs && state.playoffs.fixtures && state.playoffs.fixtures.length > 0
+  const fixture = isPlayoffs
+    ? state.playoffs.fixtures.find(f => !f.played && (f.home === state.teamId || f.away === state.teamId))
+    : state.fixtures.find(f => f.played === false && (f.home === state.teamId || f.away === state.teamId))
   const rivalId = fixture ? (fixture.home === state.teamId ? fixture.away : fixture.home) : null
   const rivalName = rivalId ? getTeamName(rivalId) : '—'
   const isHome = fixture ? fixture.home === state.teamId : false
@@ -849,7 +852,6 @@ function renderHome() {
       return us > them ? 'V' : us < them ? 'D' : 'E'
     })
   const injured = state.players.filter(p => p.injury)
-  const isPlayoffs = state.playoffs && state.playoffs.fixtures && state.playoffs.fixtures.length > 0
   const roundNames = { QF: 'Cuartos de final', SF: 'Semifinal', F: 'Final' }
   container.innerHTML = `
     <div class="home-card">
@@ -2025,6 +2027,30 @@ function finishMatch(isHome, fixture, rival) {
   fixture.awayScore = isHome ? matchData.awayScore : matchData.homeScore
   fixture.played = true
 
+  /* Playoff match handling */
+  const isPlayoff = state.playoffs && state.playoffs.fixtures && state.playoffs.fixtures.some(f => f === fixture)
+  if (isPlayoff) {
+    /* Auto-simulate other playoff fixtures in this round */
+    for (const f of state.playoffs.fixtures) {
+      if (f === fixture || f.played) continue
+      const result = autoSimulateOtherMatch(f.home, f.away)
+      f.homeScore = result.homeScore
+      f.awayScore = result.awayScore
+      f.played = true
+    }
+    /* Update rewards */
+    if (userScore > rivalScore) { reward = 1500; state.stats.wins++ }
+    else if (userScore === rivalScore) { reward = 500; state.stats.draws++ }
+    else { reward = 0; state.stats.losses++ }
+    state.finances.balance += reward
+    state.finances.history.push({ reason: `${state.playoffs.round === 'F' ? 'Final' : state.playoffs.round === 'SF' ? 'Semifinal' : 'Cuartos'} playoff vs ${rival.name}`, amount: reward })
+    avanzarRondaPlayoff()
+    updateLeagueStandings()
+    showMatchdayResults(userScore, rivalScore, rival.name)
+    autoSave()
+    return
+  }
+
   /* Finance */
   let reward
   if (userScore > rivalScore) { reward = 800; state.stats.wins++ }
@@ -2118,6 +2144,114 @@ function resetSeason() {
   renderLeague()
 }
 
+/* ============ FIN DE TEMPORADA ============ */
+function getLeagueFromId(leagueId) {
+  for (const c of COUNTRIES) {
+    const league = c.leagues.find(l => l.id === leagueId)
+    if (league) return league
+  }
+  return null
+}
+
+function procesarFinTemporada() {
+  const standings = updateLeagueStandings()
+  const pos = standings.findIndex(s => s.teamId === state.teamId) + 1
+  const enPrimera = state.leagueId === 'lnfs1'
+  let cambioDivision = false
+
+  if (enPrimera && pos >= 15) {
+    state.leagueId = 'lnfs2'
+    cambioDivision = true
+  } else if (!enPrimera && pos <= 2) {
+    state.leagueId = 'lnfs1'
+    cambioDivision = true
+  }
+
+  let msg = `📊 Temporada finalizada. Posición: ${pos}º`
+  if (cambioDivision && enPrimera) msg += '\n⚠️ DESCENSO a Segunda División'
+  else if (cambioDivision) msg += '\n🎉 ¡ASCENSO a Primera División!'
+  else msg += '\nPermanencia en la categoría'
+
+  const league = getLeagueFromId(state.leagueId)
+  const allTeams = league ? league.teams : []
+  state.leagueTeams = allTeams.filter(t => t.id !== state.teamId).map(t => {
+    const existing = state.leagueTeams.find(x => x.teamId === t.id)
+    return {
+      teamId: t.id, name: t.name,
+      players: existing ? existing.players.map(p => ({ ...p, energy: 100, injury: null, goals: 0, matches: 0 }))
+        : (REAL_SQUADS[t.id] || []).map(p => ({ ...p, value: calcValue(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, energy: 100, goals: 0, matches: 0 })),
+      staff: t.staff || existing?.staff || [],
+    }
+  })
+  state.fixtures = generateFixtures([state.teamId, ...state.leagueTeams.map(t => t.teamId)])
+  state.totalMatchdays = Math.max(...state.fixtures.map(f => f.matchday))
+  state.currentMatchday = 1
+  state.stats = { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 }
+  state.playoffs = null
+  state.players.forEach(p => { p.energy = 100; p.injury = null; p.goals = 0; p.matches = 0 })
+  document.getElementById('league-results-wrap').classList.add('hidden')
+  renderLeague()
+  saveGame()
+  addNotification('general', msg, `Nueva temporada en ${enPrimera ? 'Segunda' : 'Primera'} División`)
+  setTimeout(() => alert(msg), 100)
+}
+
+function iniciarPlayoffs(teamIds) {
+  state.playoffs = {
+    round: 'QF',
+    fixtures: [
+      { round: 'QF', home: teamIds[0], away: teamIds[7], homeScore: null, awayScore: null, played: false },
+      { round: 'QF', home: teamIds[3], away: teamIds[4], homeScore: null, awayScore: null, played: false },
+      { round: 'QF', home: teamIds[1], away: teamIds[6], homeScore: null, awayScore: null, played: false },
+      { round: 'QF', home: teamIds[2], away: teamIds[5], homeScore: null, awayScore: null, played: false },
+    ],
+  }
+  const msg = `🏆 ¡CLASIFICADO al Playoff! Posición: ${teamIds.indexOf(state.teamId) + 1}º\nRonda: Cuartos de final`
+  addNotification('match', msg, 'Eliminatorias por el título')
+  document.getElementById('league-results-wrap').classList.add('hidden')
+  renderLeague()
+  saveGame()
+  setTimeout(() => alert(msg), 100)
+}
+
+function avanzarRondaPlayoff() {
+  const pf = state.playoffs
+  const allPlayed = pf.fixtures.every(f => f.played)
+  if (!allPlayed) return
+
+  const winners = pf.fixtures.map(f => (f.homeScore > f.awayScore ? f.home : f.away))
+
+  if (pf.round === 'QF') {
+    pf.round = 'SF'
+    pf.fixtures = [
+      { round: 'SF', home: winners[0], away: winners[3], homeScore: null, awayScore: null, played: false },
+      { round: 'SF', home: winners[1], away: winners[2], homeScore: null, awayScore: null, played: false },
+    ]
+  } else if (pf.round === 'SF') {
+    pf.round = 'F'
+    pf.fixtures = [
+      { round: 'F', home: winners[0], away: winners[1], homeScore: null, awayScore: null, played: false },
+    ]
+  } else if (pf.round === 'F') {
+    const campeon = winners[0]
+    const subcampeon = winners[0] === pf.fixtures[0].home ? pf.fixtures[0].away : pf.fixtures[0].home
+    const esCampeon = campeon === state.teamId
+    const msg = `🏆 ${esCampeon ? '¡CAMPEÓN!' : 'Subcampeón'} — ${esCampeon ? 'Ganaste el título de liga' : 'El campeón es ' + getTeamName(campeon)}`
+    addNotification('match', msg, 'Playoff finalizado')
+    state.playoffs = null
+    setTimeout(() => { alert(msg); procesarFinTemporada() }, 100)
+    return
+  }
+  saveGame()
+}
+
+function getPlayoffRival() {
+  if (!state.playoffs) return null
+  const f = state.playoffs.fixtures.find(x => (x.home === state.teamId || x.away === state.teamId) && !x.played)
+  return f ? (f.home === state.teamId ? f.away : f.home) : null
+}
+
+/* ============ MATCHDAY RESULTS ============ */
 function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('btn-end-match').style.display = 'none'
 
@@ -2156,14 +2290,25 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('league-results-wrap').classList.remove('hidden')
 
   document.getElementById('btn-advance-matchday').onclick = () => {
+    if (state.playoffs) {
+      /* In playoffs: just return to league view */
+      document.getElementById('league-results-wrap').classList.add('hidden')
+      renderLeague()
+      return
+    }
     showLoading('Simulando jornada...')
     setTimeout(() => {
-      if (state.currentMatchday >= 30) {
-        const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
-        let msg = `📊 Temporada finalizada. Posición: ${pos}º`
-        if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
-        else if (pos <= 8) msg += '\n🏆 ¡Clasificado al Playoff por el título!'
-        alert(msg)
+      if (state.currentMatchday >= state.totalMatchdays) {
+        const standings = updateLeagueStandings()
+        const pos = standings.findIndex(s => s.teamId === state.teamId) + 1
+        if (state.leagueId === 'lnfs1' && pos <= 8 && !state.playoffs) {
+          hideLoading()
+          iniciarPlayoffs(standings.slice(0, 8).map(s => s.teamId))
+          return
+        }
+        hideLoading()
+        procesarFinTemporada()
+        return
       }
       state.currentMatchday++
       for (const p of state.players) {
