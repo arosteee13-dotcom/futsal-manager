@@ -343,22 +343,25 @@
     <!-- PLAYER MODAL -->
     <div id="player-modal" class="modal-overlay">
       <div class="modal-content">
-        <div class="modal-scroll">
+        <div class="modal-scroll" style="gap:0">
           <div class="modal-avatar-wrap" id="modal-avatar-wrap">
             <div class="player-avatar modal-avatar" id="modal-avatar"></div>
           </div>
           <div class="modal-name" id="modal-name"></div>
           <div class="modal-nationality" id="modal-nationality"></div>
-          <div class="modal-meta" id="modal-meta" style="font-size:13px;color:var(--text-secondary);margin-top:2px"></div>
+          <div class="modal-meta" id="modal-meta"></div>
           <div class="modal-position" id="modal-position"></div>
+          <div class="modal-injury" id="modal-injury" style="display:none"></div>
           <div class="modal-stats-row">
             <div class="modal-stat">
               <span class="modal-stat-label">HAB</span>
               <span class="modal-stat-value" id="modal-skill"></span>
+              <div class="modal-stat-bar"><div class="modal-stat-fill" id="modal-skill-fill"></div></div>
             </div>
             <div class="modal-stat">
               <span class="modal-stat-label">ENE</span>
               <span class="modal-stat-value" id="modal-energy"></span>
+              <div class="modal-stat-bar"><div class="modal-stat-fill" id="modal-energy-fill"></div></div>
             </div>
             <div class="modal-stat">
               <span class="modal-stat-label">VALOR</span>
@@ -366,12 +369,12 @@
             </div>
           </div>
           <div class="modal-season-stats">
-            <span>PJ: <strong id="modal-pj">0</strong></span>
-            <span>G: <strong id="modal-g">0</strong></span>
-            <span>A: <strong id="modal-a">0</strong></span>
-            <span>TA: <strong id="modal-ta">0</strong></span>
-            <span>TR: <strong id="modal-tr">0</strong></span>
-            <span>MVP: <strong id="modal-mvp">0</strong></span>
+            <div class="modal-sstat"><span class="modal-sstat-icon">⚽</span><span class="modal-sstat-val" id="modal-g">0</span><span class="modal-sstat-lbl">Goles</span></div>
+            <div class="modal-sstat"><span class="modal-sstat-icon">🎯</span><span class="modal-sstat-val" id="modal-a">0</span><span class="modal-sstat-lbl">Asist.</span></div>
+            <div class="modal-sstat"><span class="modal-sstat-icon" style="color:#F59E0B">🟨</span><span class="modal-sstat-val" id="modal-ta">0</span><span class="modal-sstat-lbl">Amar.</span></div>
+            <div class="modal-sstat"><span class="modal-sstat-icon" style="color:#EF4444">🟥</span><span class="modal-sstat-val" id="modal-tr">0</span><span class="modal-sstat-lbl">Roja</span></div>
+            <div class="modal-sstat"><span class="modal-sstat-icon">🏆</span><span class="modal-sstat-val" id="modal-mvp">0</span><span class="modal-sstat-lbl">MVP</span></div>
+            <div class="modal-sstat"><span class="modal-sstat-icon">📊</span><span class="modal-sstat-val" id="modal-pj">0</span><span class="modal-sstat-lbl">Part.</span></div>
           </div>
           <div class="modal-history-title">Últimos partidos</div>
           <div id="modal-history"></div>
@@ -453,9 +456,45 @@
 
   <!-- INBOX MODAL -->
   <div id="inbox-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-scroll" id="inbox-list" style="align-items:stretch;gap:6px"></div>
-      <button class="btn-secondary modal-close" id="inbox-close" style="margin:0 20px 16px;flex-shrink:0">← VOLVER</button>
+    <div class="modal-content" style="position:absolute;inset:0;max-width:100%;width:100%;height:100%;max-height:100%;border-radius:0;background:#0F172A">
+      <div class="inbox-header">
+        <div class="inbox-header-title">
+          <svg class="inbox-header-icon" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+          <h2>Bandeja de entrada</h2>
+          <span class="inbox-header-count" id="inbox-count">0</span>
+        </div>
+        <button class="inbox-close" id="inbox-close-btn">✕</button>
+      </div>
+      <div class="inbox-list" id="inbox-list"></div>
+      <div class="inbox-detail" id="inbox-detail" style="display:none">
+        <div class="inbox-detail-header">
+          <button class="inbox-detail-back" id="inbox-detail-back">← Volver</button>
+        </div>
+        <div class="inbox-detail-body" id="inbox-detail-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal-content" style="position:absolute;inset:0;max-width:100%;width:100%;height:auto;max-height:100%;border-radius:16px 16px 0 0;background:#0F172A;top:auto;bottom:0;padding-bottom:env(safe-area-inset-bottom)">
+      <div class="settings-handle"></div>
+      <div class="settings-header">
+        <h2 style="font-size:18px;font-weight:700;color:#F1F5F9;font-family:var(--font-display)">Ajustes</h2>
+        <button class="inbox-close" id="settings-close-btn">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-group">
+          <div class="settings-group-title">SONIDO</div>
+          <label class="settings-row">
+            <span class="settings-label">Efectos de sonido</span>
+            <div class="settings-toggle">
+              <input type="checkbox" id="settings-sound-toggle">
+              <span class="settings-slider"></span>
+            </div>
+          </label>
+        </div>
+      </div>
     </div>
   </div>
 

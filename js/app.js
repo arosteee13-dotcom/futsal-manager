@@ -559,6 +559,7 @@ const state = {
   reserveIds: [],
   selectedPlayerId: null,
   inbox: [],
+  soundEnabled: true,
 }
 
 /* ============ HELPERS ============ */
@@ -609,6 +610,7 @@ function saveGame() {
     reserveIds: state.reserveIds,
     staff: state.staff,
     inbox: state.inbox,
+    soundEnabled: state.soundEnabled,
   }
   if (idx >= 0) saves[idx] = data; else saves.unshift(data)
   setSaves(saves)
@@ -2460,6 +2462,14 @@ function openPlayerModal(player, mode) {
   const avatarEl = document.getElementById('modal-avatar')
   avatarEl.textContent = player.avatar ? '' : getInitials(player.name)
   avatarEl.style.background = player.avatar ? `url(${player.avatar}) center/cover, ${pos.color}` : pos.color
+  /* Avatar glow with position color */
+  const wrap = document.getElementById('modal-avatar-wrap')
+  wrap.style.setProperty('--glow-color', pos.color)
+  wrap.style.setProperty('--glow-color-op', pos.color.replace(')', ', 0.3)').replace('var(--color-', '--color-'))
+  /* Handle var() colors for glow */
+  if (pos.color.startsWith('var')) {
+    wrap.style.borderColor = 'transparent'
+  }
   document.getElementById('modal-name').textContent = player.name
   document.getElementById('modal-nationality').textContent = `${player.nationality || '🇪🇸 España'}`
   document.getElementById('modal-meta').textContent = `${player.age || '-'} años · ${player.foot || 'DER'}`
@@ -2467,7 +2477,9 @@ function openPlayerModal(player, mode) {
   posBadge.textContent = pos.label
   posBadge.style.background = pos.color
   document.getElementById('modal-skill').textContent = player.skill
+  document.getElementById('modal-skill-fill').style.width = player.skill + '%'
   document.getElementById('modal-energy').textContent = player.energy
+  document.getElementById('modal-energy-fill').style.width = player.energy + '%'
   document.getElementById('modal-value').textContent = formatMoney(player.value)
   document.getElementById('modal-pj').textContent = player.matches || 0
   document.getElementById('modal-g').textContent = player.goals || 0
@@ -2476,22 +2488,34 @@ function openPlayerModal(player, mode) {
   document.getElementById('modal-tr').textContent = player.redCards || 0
   document.getElementById('modal-mvp').textContent = player.mvp || 0
 
+  /* Injury */
+  const injuryEl = document.getElementById('modal-injury')
+  if (player.injury) {
+    injuryEl.style.display = 'block'
+    injuryEl.innerHTML = `🩹 Lesión: ${player.injury.description} (${player.injury.remaining} jornada${player.injury.remaining > 1 ? 's' : ''} restante${player.injury.remaining > 1 ? 's' : ''})`
+  } else {
+    injuryEl.style.display = 'none'
+  }
+
   /* Match history */
   const historyEl = document.getElementById('modal-history')
   if (historyEl) {
     const hist = (player.matchHistory || []).slice(-8).reverse()
     historyEl.innerHTML = hist.length === 0
-      ? '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px">Sin partidos jugados</div>'
+      ? '<div class="hist-empty">Sin partidos jugados</div>'
       : hist.map(m => {
           const acts = []
           if (m.goals > 0) acts.push(`⚽${m.goals}`)
           if (m.yellow) acts.push('🟨')
           if (m.red) acts.push('🟥')
+          let rClass = 'rating-mid'
+          if (m.rating >= 8) rClass = 'rating-high'
+          else if (m.rating <= 4) rClass = 'rating-low'
           return `<div class="hist-item">
             <span class="hist-matchday">J${m.matchday}</span>
             <span class="hist-rival">vs ${m.rival}</span>
-            <span class="hist-minutes">${m.minutes}\'</span>
-            <span class="hist-rating">${'★'.repeat(Math.max(1, Math.round(m.rating / 2)))} ${m.rating}</span>
+            <span class="hist-minutes">${m.minutes}'</span>
+            <span class="hist-rating ${rClass}">${'★'.repeat(Math.max(1, Math.round(m.rating / 2)))} ${m.rating}</span>
             <span class="hist-actions">${acts.join(' ') || ''}</span>
           </div>`
         }).join('')
@@ -2785,7 +2809,7 @@ function newGame(coach) {
 
   autoAssignSquad()
 
-  addNotification('general', `🏆 Nueva temporada con ${selectedTeam.name}`, `Liga ${league.name} · Entrenador: ${coach}`)
+  addNotification('general', `🏆 Bienvenido, ${coach}!`, `${coach} asume el banquillo del ${selectedTeam.name} en la ${league.name}`)
   startGame()
 }
 
@@ -2813,6 +2837,7 @@ function loadGame(id) {
   state.reserveIds = data.reserveIds || []
   state.staff = data.staff || []
   state.inbox = data.inbox || []
+  state.soundEnabled = data.soundEnabled !== false
   startGame()
 }
 
@@ -3290,39 +3315,80 @@ function renderInbox() {
     list.innerHTML = '<div class="inbox-empty">📭 No hay notificaciones</div>'
     return
   }
-  const types = {
-    match: { icon: '⚽', label: 'Partido' },
-    injury: { icon: '🩹', label: 'Lesión' },
-    transfer: { icon: '💰', label: 'Fichaje' },
-    general: { icon: '📌', label: 'General' },
+  const senderLabels = {
+    match: { label: 'Resultado', icon: '⚽' },
+    injury: { label: 'Servicio Médico', icon: '🩹' },
+    transfer: { label: 'Mercado', icon: '💰' },
+    general: { label: 'Notificación', icon: '📌' },
   }
   list.innerHTML = state.inbox.map(n => {
-    const t = types[n.type] || types.general
+    const t = senderLabels[n.type] || senderLabels.general
+    const date = new Date(n.createdAt)
+    const dateStr = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })
+    const timeStr = String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0')
     return `<div class="inbox-item${n.read ? '' : ' unread'}" data-inbox-id="${n.id}">
-      <span class="inbox-icon">${t.icon}</span>
-      <div class="inbox-content">
-        <div class="inbox-title">${n.title}</div>
-        ${n.body ? '<div class="inbox-body">' + n.body + '</div>' : ''}
-        <div class="inbox-meta">J${n.matchday} · ${new Date(n.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}</div>
+      <div class="inbox-avatar ${n.type}">${t.icon}</div>
+      <div class="inbox-body">
+        <div class="inbox-row1">
+          <span class="inbox-sender">${t.label}</span>
+          <span class="inbox-date">${dateStr} ${timeStr}</span>
+        </div>
+        <div class="inbox-subject">${n.title}</div>
+        ${n.body ? '<div class="inbox-preview">' + n.body + '</div>' : ''}
       </div>
     </div>`
   }).join('')
-  /* Mark as read on click */
   list.querySelectorAll('.inbox-item').forEach(el => {
     el.onclick = () => {
       const id = parseFloat(el.dataset.inboxId)
       const n = state.inbox.find(x => x.id === id)
-      if (n) n.read = true
-      el.classList.remove('unread')
+      if (!n) return
+      n.read = true
       updateInboxBadge()
+      showInboxDetail(n)
     }
   })
+}
+
+function showInboxDetail(n) {
+  document.getElementById('inbox-list').style.display = 'none'
+  const detail = document.getElementById('inbox-detail')
+  detail.style.display = 'flex'
+  const senderLabels = {
+    match: { label: 'Resultado', icon: '⚽' },
+    injury: { label: 'Servicio Médico', icon: '🩹' },
+    transfer: { label: 'Mercado', icon: '💰' },
+    general: { label: 'Notificación', icon: '📌' },
+  }
+  const t = senderLabels[n.type] || senderLabels.general
+  const date = new Date(n.createdAt)
+  const dateStr = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+  const timeStr = String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0')
+  const estado = n.read ? '✅ Leído' : '📬 No leído'
+  document.getElementById('inbox-detail-body').innerHTML = `
+    <div class="inbox-detail-type">
+      <div class="inbox-detail-type-icon ${n.type}">${t.icon}</div>
+      <span class="inbox-detail-type-label">${t.label}</span>
+    </div>
+    <div class="inbox-detail-title">${n.title}</div>
+    <div class="inbox-detail-meta">Jornada ${n.matchday} · ${dateStr} · ${timeStr} · ${estado}</div>
+    <div class="inbox-detail-text">${n.body || 'Sin contenido adicional'}</div>
+  `
+}
+
+function hideInboxDetail() {
+  document.getElementById('inbox-detail').style.display = 'none'
+  document.getElementById('inbox-list').style.display = ''
+  renderInbox()
 }
 
 function showInboxModal() {
   const modal = document.getElementById('inbox-modal')
   if (!modal) return
+  hideInboxDetail()
   renderInbox()
+  const countEl = document.getElementById('inbox-count')
+  if (countEl) countEl.textContent = state.inbox ? state.inbox.length : 0
   modal.classList.add('open')
 }
 
@@ -3364,7 +3430,8 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     } else if (action === 'history') {
       alert('📊 Historial — Próximamente')
     } else if (action === 'settings') {
-      alert('⚙️ Ajustes — Próximamente')
+      hideSideMenu()
+      showSettingsModal()
     }
   }
 })
@@ -3392,6 +3459,7 @@ function playBeep(freq, duration, type, volume) {
 }
 
 function playSound(name) {
+  if (state.soundEnabled === false) return
   switch (name) {
     case 'click': playBeep(800, 0.05, 'sine', 0.04); break
     case 'whistle': playBeep(600, 0.3, 'square', 0.05); break
@@ -3399,6 +3467,15 @@ function playSound(name) {
     case 'card': playBeep(300, 0.15, 'sawtooth', 0.03); break
     case 'error': playBeep(200, 0.2, 'square', 0.04); break
   }
+}
+
+/* ============ SETTINGS ============ */
+function showSettingsModal() {
+  const modal = document.getElementById('settings-modal')
+  if (!modal) return
+  const toggle = document.getElementById('settings-sound-toggle')
+  if (toggle) toggle.checked = state.soundEnabled !== false
+  modal.classList.add('open')
 }
 
 /* ============ PARTICLES ============ */
@@ -3475,7 +3552,16 @@ document.getElementById('btn-load-game').onclick = showLoadMenu
 document.getElementById('btn-browser-back').onclick = handleBrowserBack
 document.getElementById('btn-load-cancel').onclick = showMainMenu
 document.getElementById('btn-tactica').onclick = abrirTacticasModal
-document.getElementById('inbox-close').onclick = () => document.getElementById('inbox-modal').classList.remove('open')
-document.getElementById('inbox-modal').onclick = (e) => { if (e.target === e.currentTarget) document.getElementById('inbox-modal').classList.remove('open') }
+document.getElementById('inbox-close-btn').onclick = () => { hideInboxDetail(); document.getElementById('inbox-modal').classList.remove('open') }
+document.getElementById('inbox-detail-back').onclick = hideInboxDetail
+document.getElementById('inbox-modal').onclick = (e) => { if (e.target === e.currentTarget) { hideInboxDetail(); document.getElementById('inbox-modal').classList.remove('open') } }
+document.getElementById('settings-close-btn').onclick = () => document.getElementById('settings-modal').classList.remove('open')
+document.getElementById('settings-modal').onclick = (e) => { if (e.target === e.currentTarget) document.getElementById('settings-modal').classList.remove('open') }
+document.getElementById('settings-sound-toggle').onchange = (e) => {
+  state.soundEnabled = e.target.checked
+  if (state.soundEnabled) {
+    playSound('click')
+  }
+}
 
 showMainMenu()
