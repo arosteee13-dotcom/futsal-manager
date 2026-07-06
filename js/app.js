@@ -16,6 +16,8 @@ const FORMATIONS = {
   '1-2-1': { label: '1-2-1', roles: ['portero', 'cierre', 'ala', 'pivot'], multiplier: 1.0 },
   '2-2': { label: '2-2', roles: ['portero', 'cierre', 'cierre', 'ala'], multiplier: 0.9 },
   '1-1-2': { label: '1-1-2', roles: ['portero', 'cierre', 'ala', 'ala'], multiplier: 1.1 },
+  '2-1-1': { label: '2-1-1', roles: ['portero', 'cierre', 'cierre', 'pivot'], multiplier: 0.95 },
+  '3-1': { label: '3-1', roles: ['portero', 'cierre', 'cierre', 'pivot'], multiplier: 0.85 },
 }
 
 const GAME_PLANS = {
@@ -127,25 +129,33 @@ function generateStaff(teamName, countryId) {
   ]
 }
 
-function generateCpuSquad(teamId) {
+function generateCpuSquad(teamId, countryId, teamRating) {
+  const cid = countryId || 'es'
+  const minS = Math.max(30, (teamRating || 70) - 15)
+  const maxS = Math.min(99, (teamRating || 70) + 10)
+  const nat = NATIONALITIES[cid] || NATIONALITIES.es
+  const firstPool = STAFF_FIRST[cid] || STAFF_FIRST.es
+  const surPool = SURNAMES_BY_COUNTRY[cid] || SURNAMES_BY_COUNTRY.es
   const players = []
   let pid = 1
   const countPerPos = { portero: 2, cierre: 2, ala: 4, pivot: 2 }
   for (const pos of POS_ORDER) {
-    const pool = NAME_POOLS[pos]
     const count = countPerPos[pos]
     for (let i = 0; i < count; i++) {
-      const name = pickRandom(pool)
-      const skill = randInt(55, 90)
+      const first = pickRandom(firstPool)
+      const sur = pickRandom(surPool)
+      const name = `${first} ${sur}`
+      const skill = randInt(minS, maxS)
       const value = calcValue(skill)
       players.push({
         id: `${teamId}-cpu-${pid++}`,
         name, position: pos, skill,
         energy: randInt(70, 100), number: pid,
-        nationality: '🇪🇸 España',
+        nationality: nat.label,
         goals: 0, matches: 0,
         value, transferListed: false, transferPrice: 0, loanListed: false, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [],
         wage: calcWage(skill),
+        avatar: NOPHOTO,
         enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']),
       })
     }
@@ -297,15 +307,557 @@ const COUNTRIES = [
               career: [{ team: 'CD Tafa FS', from: '01/07/2024', to: 'Actualidad', matches: 20, won: 6, drawn: 4, lost: 10 }]
             }] },
         ] },
+      { id: 'l2b1', name: '2ª División B - Grupo 1',
+        teams: [
+          { id: 'b1-01', name: '5 Coruña FS',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/142488.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-02', name: 'Albense',                    logo: 'https://cdn.resfu.com/img_data/escudos/medium/4187.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-03', name: 'Atlético Benavente FS',      logo: 'https://cdn.resfu.com/img_data/escudos/medium/8172.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-04', name: 'CD Lugo Sala',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/142489.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-05', name: 'CD Tierno Galván',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/54732.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-06', name: 'Concello de Begonte FS',    logo: 'https://cdn.resfu.com/img_data/escudos/medium/142490.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-07', name: 'Deportivo Laviana',          logo: 'https://cdn.resfu.com/img_data/escudos/medium/58214.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-08', name: 'FS Salamanca',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/54731.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-09', name: 'Guardo',                    logo: 'https://cdn.resfu.com/img_data/escudos/medium/22237.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-10', name: 'IES Coruxo',                logo: 'https://cdn.resfu.com/img_data/escudos/medium/142500.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-11', name: 'Leis Pontevedra',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/8443.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-12', name: 'Noia Portus Apostoli B',    logo: 'https://cdn.resfu.com/img_data/escudos/medium/142504.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-13', name: 'O Esteo FS',                logo: 'https://cdn.resfu.com/img_data/escudos/medium/8337.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-14', name: 'River Zamora FS',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/142450.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-15', name: 'SD Xove',                   logo: 'https://cdn.resfu.com/img_data/escudos/medium/8344.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b1-16', name: 'Vilalba FS',                logo: 'https://cdn.resfu.com/img_data/escudos/medium/69625.jpg?size=120x&lossy=1', rating: 50 },
+        ] },
+      { id: 'l2b2', name: '2ª División B - Grupo 2',
+        teams: [
+          { id: 'b2-01', name: 'AD San Juan B',             logo: 'https://cdn.resfu.com/img_data/escudos/medium/142429.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-02', name: 'Antiguoko KE',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/7662.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-03', name: 'CD Anaitasuna',             logo: 'https://cdn.resfu.com/img_data/escudos/medium/142426.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-04', name: 'CD San Cristóbal Núñez',    logo: 'https://cdn.resfu.com/img_data/escudos/medium/151878.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-05', name: 'CDU Loeches FS',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/1577.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-06', name: 'EMD Cadrete',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/108714.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-07', name: 'Entrerríos Automatización', logo: 'https://cdn.resfu.com/img_data/escudos/medium/30767.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-08', name: 'FS Albelda',                logo: 'https://cdn.resfu.com/img_data/escudos/medium/30797.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-09', name: 'Lauburu KE Ibarra',         logo: 'https://cdn.resfu.com/img_data/escudos/medium/3185.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-10', name: 'Otxartabe CD',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/112053.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-11', name: 'Picassent FS',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/52795.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-12', name: 'Pinseque AD',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/8014.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-13', name: 'Sala Quinto CD',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/8184.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-14', name: 'Tauste FS',                 logo: 'https://cdn.resfu.com/img_data/escudos/medium/8192.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-15', name: 'Villa de Ribafrecha',       logo: 'https://cdn.resfu.com/img_data/escudos/medium/142451.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b2-16', name: 'Zierbena CDF',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/8016.jpg?size=120x&lossy=1', rating: 50 },
+        ] },
+      { id: 'l2b3', name: '2ª División B - Grupo 3',
+        teams: [
+          { id: 'b3-01', name: 'AE Les Corts FS',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/69615.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-02', name: 'Bisontes Castellón FS',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/96993.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-03', name: 'Canet FS',                  logo: 'https://cdn.resfu.com/img_data/escudos/medium/3132.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-04', name: 'CCR Castelldefels',         logo: 'https://cdn.resfu.com/img_data/escudos/medium/30819.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-05', name: 'CFS Ibi',                   logo: 'https://cdn.resfu.com/img_data/escudos/medium/108209.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-06', name: 'CFS Montesión',             logo: 'https://cdn.resfu.com/img_data/escudos/medium/8319.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-07', name: 'Club Manresa FS',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/8031.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-08', name: 'Colegio El Pilar Valencia', logo: 'https://cdn.resfu.com/img_data/escudos/medium/144063.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-09', name: 'Futsal Gestoría Luis Mataró', logo: 'https://cdn.resfu.com/img_data/escudos/medium/69596.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-10', name: 'Futsal Lleida',             logo: 'https://cdn.resfu.com/img_data/escudos/medium/107589.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-11', name: 'Hospitalet Bellsport',      logo: 'https://cdn.resfu.com/img_data/escudos/medium/3142.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-12', name: 'Industrias Santa Coloma B', logo: 'https://cdn.resfu.com/img_data/escudos/medium/112057.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-13', name: 'Natació Sabadell',          logo: 'https://cdn.resfu.com/img_data/escudos/medium/69616.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-14', name: 'Palma Futsal B',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/164425.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-15', name: 'Sant Quirze Vallès FS',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/152573.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b3-16', name: 'Ye Faky FS',                logo: 'https://cdn.resfu.com/img_data/escudos/medium/8259.jpg?size=120x&lossy=1', rating: 50 },
+        ] },
+      { id: 'l2b4', name: '2ª División B - Grupo 4',
+        teams: [
+          { id: 'b4-01', name: 'AD Alcorcón FS',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/8095.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-02', name: 'Asociación Jerez Futsal',   logo: 'https://cdn.resfu.com/img_data/escudos/medium/41229.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-03', name: 'Bargas CD',                 logo: 'https://cdn.resfu.com/img_data/escudos/medium/30742.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-04', name: 'CD Albacete FS',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/108202.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-05', name: 'Ciudad de Torrejón',        logo: 'https://cdn.resfu.com/img_data/escudos/medium/142440.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-06', name: 'Inter Movistar FS B',       logo: 'https://cdn.resfu.com/img_data/escudos/medium/103891.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-07', name: 'Cobisa FS',                 logo: 'https://cdn.resfu.com/img_data/escudos/medium/30617.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-08', name: 'Dehesa Villalba',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/142432.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-09', name: 'FS El Álamo',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/8108.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-10', name: 'FS Talavera',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/11122.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-11', name: 'FS Vivocuenca',             logo: 'https://cdn.resfu.com/img_data/escudos/medium/139130.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-12', name: 'Grupo López Bolaños',       logo: 'https://cdn.resfu.com/img_data/escudos/medium/30828.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-13', name: 'La Nucía FS',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/108866.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-14', name: 'Moral FS',                  logo: 'https://cdn.resfu.com/img_data/escudos/medium/139135.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-15', name: 'Rivas Futsal',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/8099.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b4-16', name: 'Unión Tres Cantos',         logo: 'https://cdn.resfu.com/img_data/escudos/medium/3174.jpg?size=120x&lossy=1', rating: 50 },
+        ] },
+      { id: 'l2b5', name: '2ª División B - Grupo 5',
+        teams: [
+          { id: 'b5-01', name: 'Alcalá de Guadaira FS',    logo: 'https://cdn.resfu.com/img_data/escudos/medium/4239.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-02', name: 'Atlético Mengíbar FS',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/22230.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-03', name: 'Blanca FS',                logo: 'https://cdn.resfu.com/img_data/escudos/medium/8231.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-04', name: 'Bujalance FS',             logo: 'https://cdn.resfu.com/img_data/escudos/medium/4159.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-05', name: 'CFS Pinatar',              logo: 'https://cdn.resfu.com/img_data/escudos/medium/112063.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-06', name: 'Córdoba Patrimonio B',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/144585.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-07', name: 'ElPozo Ciudad de Murcia',  logo: 'https://cdn.resfu.com/img_data/escudos/medium/3105.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-08', name: 'Granada FS',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/139554.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-09', name: 'Imperio Los Rosales FS',   logo: 'https://cdn.resfu.com/img_data/escudos/medium/168150.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-10', name: 'Jumilla FS',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/3112.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-11', name: 'Malacitano Futsal',        logo: 'https://cdn.resfu.com/img_data/escudos/medium/153127.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-12', name: 'Málaga CR B FS',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/112998.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-13', name: 'Nueva Era Melilla FS',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/145099.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-14', name: 'UD Alchoyano FS',          logo: 'https://cdn.resfu.com/img_data/escudos/medium/8287.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-15', name: 'Virgili de Cádiz',         logo: 'https://cdn.resfu.com/img_data/escudos/medium/69690.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b5-16', name: 'Xerez Toyota Nimauto',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/41261.jpg?size=120x&lossy=1', rating: 50 },
+        ] },
+      { id: 'l2b6', name: '2ª División B - Grupo 6',
+        teams: [
+          { id: 'b6-01', name: 'AD Duggi Futsal',          logo: 'https://cdn.resfu.com/img_data/escudos/medium/8058.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-02', name: 'Aguas de Teror',           logo: 'https://cdn.resfu.com/img_data/escudos/medium/5421.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-03', name: 'Agüimes',                  logo: 'https://cdn.resfu.com/img_data/escudos/medium/3206.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-04', name: 'Basilea FS',               logo: 'https://cdn.resfu.com/img_data/escudos/medium/153431.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-05', name: 'CD Salesianos Tenerife',   logo: 'https://cdn.resfu.com/img_data/escudos/medium/111245.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-06', name: 'CFS Chinguaro',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/30966.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-07', name: 'CFS Costa Sur',            logo: 'https://cdn.resfu.com/img_data/escudos/medium/8215.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-08', name: 'Cisneros',                 logo: 'https://cdn.resfu.com/img_data/escudos/medium/145286.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-09', name: 'Colegios Arenas Int.',     logo: 'https://cdn.resfu.com/img_data/escudos/medium/164450.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-10', name: 'Doctoral Ludeservicios',   logo: 'https://cdn.resfu.com/img_data/escudos/medium/3207.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-11', name: 'Gran Canaria FS',          logo: 'https://cdn.resfu.com/img_data/escudos/medium/22224.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-12', name: 'Isla Larga Futsal',        logo: 'https://cdn.resfu.com/img_data/escudos/medium/8205.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-13', name: 'La Salle San Ildefonso',   logo: 'https://cdn.resfu.com/img_data/escudos/medium/164449.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-14', name: 'Las Cuevecitas FS',         logo: 'https://cdn.resfu.com/img_data/escudos/medium/8055.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-15', name: 'Malta 97',                 logo: 'https://cdn.resfu.com/img_data/escudos/medium/4251.jpg?size=120x&lossy=1', rating: 50 },
+          { id: 'b6-16', name: 'Tenerife Iberia Toscal',   logo: 'https://cdn.resfu.com/img_data/escudos/medium/89603.jpg?size=120x&lossy=1', rating: 50 },
+        ] },
+
+      // ─── 3ª División Nacional (division_id: 5) ───
+      { id: 'l3g1', name: '3ª División Nacional - Grupo 1 — Cataluña',
+        teams: [
+          { id: 'g1-01', name: 'Montsant FS',              logo: 'https://cdn.resfu.com/img_data/equipos/69597.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-02', name: 'Olimpic Floresta FS',       logo: 'https://cdn.resfu.com/img_data/equipos/8084.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-03', name: 'Rubí FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/8376.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-04', name: 'Sant Joan de Vilassar',     logo: 'https://cdn.resfu.com/img_data/equipos/107584.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-05', name: 'La Unión Santa Coloma',     logo: 'https://cdn.resfu.com/img_data/equipos/11118.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-06', name: 'Arenys de Munt',            logo: 'https://cdn.resfu.com/img_data/equipos/69603.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-07', name: 'Sant Quirze Vallès FS',     logo: 'https://cdn.resfu.com/img_data/equipos/152573.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-08', name: 'Futsal Marlex Mataró B',    logo: 'https://cdn.resfu.com/img_data/equipos/139140.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-09', name: 'Gràcia FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/69607.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-10', name: 'Estel Vallseca A',          logo: 'https://cdn.resfu.com/img_data/equipos/21996.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-11', name: 'Cn Caldes FS Futsal',       logo: 'https://cdn.resfu.com/img_data/equipos/8077.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-12', name: 'Castellar FS',              logo: 'https://cdn.resfu.com/img_data/equipos/152574.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-13', name: 'EFS Prosperitat',           logo: 'https://cdn.resfu.com/img_data/equipos/40998.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-14', name: 'Parets FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/152575.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-15', name: 'FS Montcada Futsal',        logo: 'https://cdn.resfu.com/img_data/equipos/8078.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g1-16', name: 'Vacarisses A',              logo: 'https://cdn.resfu.com/img_data/equipos/74941.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g2', name: '3ª División Nacional - Grupo 2 — Cataluña',
+        teams: [
+          { id: 'g2-01', name: 'AE Les Corts FS',             logo: 'https://cdn.resfu.com/img_data/equipos/69615.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-02', name: 'Salou FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/8028.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-03', name: 'Futsal Lleida',               logo: 'https://cdn.resfu.com/img_data/equipos/107589.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-04', name: 'Sant Sadurní',                logo: 'https://cdn.resfu.com/img_data/equipos/74935.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-05', name: 'FS Linyola',                  logo: 'https://cdn.resfu.com/img_data/equipos/69619.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-06', name: 'Eixample Diferòptics',        logo: 'https://cdn.resfu.com/img_data/equipos/41029.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-07', name: 'Athletic Vilatorrada A',      logo: 'https://cdn.resfu.com/img_data/equipos/41096.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-08', name: 'Balaguer Comtat d\'Urgell',   logo: 'https://cdn.resfu.com/img_data/equipos/41107.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-09', name: 'SD Espanyol',                 logo: 'https://cdn.resfu.com/img_data/equipos/152576.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-10', name: 'ENFAF',                       logo: 'https://cdn.resfu.com/img_data/equipos/99535.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-11', name: 'Molins 99',                   logo: 'https://cdn.resfu.com/img_data/equipos/69613.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-12', name: 'Tecnovit Alforja',            logo: 'https://cdn.resfu.com/img_data/equipos/22013.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-13', name: 'Esparreguera CFS',            logo: 'https://cdn.resfu.com/img_data/equipos/8082.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-14', name: 'Monistrol',                   logo: 'https://cdn.resfu.com/img_data/equipos/8088.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-15', name: 'Huracans La Selva',           logo: 'https://cdn.resfu.com/img_data/equipos/107199.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g2-16', name: 'CEFS Santpedor',              logo: 'https://cdn.resfu.com/img_data/equipos/84032.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g3', name: '3ª División Nacional - Grupo 3 — Com. de Madrid',
+        teams: [
+          { id: 'g3-01', name: 'Leganés FS B',               logo: 'https://cdn.resfu.com/img_data/equipos/143460.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-02', name: 'FS El Álamo',                logo: 'https://cdn.resfu.com/img_data/equipos/8108.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-03', name: 'Ciudad de Móstoles B',       logo: 'https://cdn.resfu.com/img_data/equipos/142430.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-04', name: 'San Lorenzo Abantos',        logo: 'https://cdn.resfu.com/img_data/equipos/152501.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-05', name: 'Silver Novanca FS',          logo: 'https://cdn.resfu.com/img_data/equipos/11132.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-06', name: 'Spínola Chamartín',          logo: 'https://cdn.resfu.com/img_data/equipos/142441.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-07', name: 'ADC Villalba',               logo: 'https://cdn.resfu.com/img_data/equipos/143459.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-08', name: 'Rozas de Pto. Real',        logo: 'https://cdn.resfu.com/img_data/equipos/143456.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-09', name: 'Artilleros Moratalaz',       logo: 'https://cdn.resfu.com/img_data/equipos/142688.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-10', name: 'Elemental Amistad 94',       logo: 'https://cdn.resfu.com/img_data/equipos/142436.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-11', name: 'Ciudad Villa de Vallecas',   logo: 'https://cdn.resfu.com/img_data/equipos/142443.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-12', name: 'FS Diagonal',                logo: 'https://cdn.resfu.com/img_data/equipos/143458.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-13', name: 'Agustiniano',                logo: 'https://cdn.resfu.com/img_data/equipos/152500.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g3-14', name: 'Pinto FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/142437.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g4', name: '3ª División Nacional - Grupo 4 — Com. de Madrid',
+        teams: [
+          { id: 'g4-01', name: 'Ciudad de Torrejón',            logo: 'https://cdn.resfu.com/img_data/equipos/142440.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-02', name: 'Obispo Perelló',                logo: 'https://cdn.resfu.com/img_data/equipos/143462.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-03', name: 'AA Pilaristas Flex Futsal',     logo: 'https://cdn.resfu.com/img_data/equipos/8045.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-04', name: 'Atl. Loeches',                  logo: 'https://cdn.resfu.com/img_data/equipos/152499.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-05', name: 'Torrejón Sala Five-Play',       logo: 'https://cdn.resfu.com/img_data/equipos/22227.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-06', name: 'Deporcoslada FS',               logo: 'https://cdn.resfu.com/img_data/equipos/142442.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-07', name: 'CDE Casco Antiguo',             logo: 'https://cdn.resfu.com/img_data/equipos/8113.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-08', name: 'CDE Mejorada',                  logo: 'https://cdn.resfu.com/img_data/equipos/103887.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-09', name: 'Calasancio FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/152497.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-10', name: 'Lope de Vega',                  logo: 'https://cdn.resfu.com/img_data/equipos/142445.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-11', name: 'EFS Colmenar Viejo',            logo: 'https://cdn.resfu.com/img_data/equipos/8112.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-12', name: 'Rivas Atlantis',                logo: 'https://cdn.resfu.com/img_data/equipos/152498.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-13', name: 'CGR Distrito III',              logo: 'https://cdn.resfu.com/img_data/equipos/5197.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g4-14', name: 'Villa de Algete',               logo: 'https://cdn.resfu.com/img_data/equipos/143461.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g5', name: '3ª División Nacional - Grupo 5 — Asturias',
+        teams: [
+          { id: 'g5-01', name: 'Racing de Mieres',          logo: 'https://cdn.resfu.com/img_data/equipos/58222.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-02', name: 'San Cucao FS',              logo: 'https://cdn.resfu.com/img_data/equipos/138575.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-03', name: 'Arenas de Manzaneda',       logo: 'https://cdn.resfu.com/img_data/equipos/69925.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-04', name: 'Concejo Valdés FS',         logo: 'https://cdn.resfu.com/img_data/equipos/58234.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-05', name: 'Gijón Playas',              logo: 'https://cdn.resfu.com/img_data/equipos/58198.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-06', name: 'FS Boal 1999',              logo: 'https://cdn.resfu.com/img_data/equipos/108237.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-07', name: 'El Franco',                 logo: 'https://cdn.resfu.com/img_data/equipos/58239.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-08', name: 'Plaza Najosa',              logo: 'https://cdn.resfu.com/img_data/equipos/58257.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-09', name: 'Rodiles FS',                logo: 'https://cdn.resfu.com/img_data/equipos/153255.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-10', name: 'Puente Legends',            logo: 'https://cdn.resfu.com/img_data/equipos/99041.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-11', name: 'CD Boliches',               logo: 'https://cdn.resfu.com/img_data/equipos/58236.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g5-12', name: 'Gijón Perchera',            logo: 'https://cdn.resfu.com/img_data/equipos/153254.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g6', name: '3ª División Nacional - Grupo 6 — País Vasco',
+        teams: [
+          { id: 'g6-01', name: 'Antiguoko KE',                logo: 'https://cdn.resfu.com/img_data/equipos/7662.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-02', name: 'Aurrera de Vitoria FS',       logo: 'https://cdn.resfu.com/img_data/equipos/22240.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-03', name: 'Gernikako Lagunak',           logo: 'https://cdn.resfu.com/img_data/equipos/143430.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-04', name: 'Laskorain KE Futsal',         logo: 'https://cdn.resfu.com/img_data/equipos/8006.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-05', name: 'Mahastiak Labastida FS',      logo: 'https://cdn.resfu.com/img_data/equipos/22241.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-06', name: 'Mondrate CD',                 logo: 'https://cdn.resfu.com/img_data/equipos/143428.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-07', name: 'Tolosala AFKE',               logo: 'https://cdn.resfu.com/img_data/equipos/140995.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-08', name: 'Elorrietako CD Aerolink',     logo: 'https://cdn.resfu.com/img_data/equipos/139152.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-09', name: 'Jarrilleros',                 logo: 'https://cdn.resfu.com/img_data/equipos/143429.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-10', name: 'Eskoriatza',                  logo: 'https://cdn.resfu.com/img_data/equipos/139150.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-11', name: 'Goierri',                     logo: 'https://cdn.resfu.com/img_data/equipos/153257.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-12', name: 'Kukuyaga',                    logo: 'https://cdn.resfu.com/img_data/equipos/121539.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-13', name: 'Leioa Ibaraki',               logo: 'https://cdn.resfu.com/img_data/equipos/153256.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-14', name: 'CD Gora',                     logo: 'https://cdn.resfu.com/img_data/equipos/138577.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-15', name: 'Lagun Onak GDKO',             logo: 'https://cdn.resfu.com/img_data/equipos/140992.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g6-16', name: 'Batzarre',                    logo: 'https://cdn.resfu.com/img_data/equipos/139151.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g7', name: '3ª División Nacional - Grupo 7 — Navarra',
+        teams: [
+          { id: 'g7-01', name: 'Cintruénigo FS',            logo: 'https://cdn.resfu.com/img_data/equipos/142424.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-02', name: 'Gazte Berriak Ansoain',     logo: 'https://cdn.resfu.com/img_data/equipos/8161.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-03', name: 'CD Universidad de Navarra', logo: 'https://cdn.resfu.com/img_data/equipos/8160.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-04', name: 'AD San Juan B',             logo: 'https://cdn.resfu.com/img_data/equipos/142429.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-05', name: 'Ablitas FS',                logo: 'https://cdn.resfu.com/img_data/equipos/142420.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-06', name: 'Kirol Sport',               logo: 'https://cdn.resfu.com/img_data/equipos/8018.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-07', name: 'Aralar Mendi',              logo: 'https://cdn.resfu.com/img_data/equipos/142428.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-08', name: 'Ibararte B FS',             logo: 'https://cdn.resfu.com/img_data/equipos/142427.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-09', name: 'CD Olite',                  logo: 'https://cdn.resfu.com/img_data/equipos/142425.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-10', name: 'CD Anaitasuna B',           logo: 'https://cdn.resfu.com/img_data/equipos/143668.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g7-11', name: 'CD Tafa B',                 logo: 'https://cdn.resfu.com/img_data/equipos/143667.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g8', name: '3ª División Nacional - Grupo 8 — Galicia',
+        teams: [
+          { id: 'g8-01', name: 'SD Xove',                   logo: 'https://cdn.resfu.com/img_data/equipos/8344.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-02', name: 'Stellae FS - Padrón',       logo: 'https://cdn.resfu.com/img_data/equipos/142501.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-03', name: 'Pazos de Borbén FS',        logo: 'https://cdn.resfu.com/img_data/equipos/8396.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-04', name: 'GRI Carballino FS',         logo: 'https://cdn.resfu.com/img_data/equipos/108235.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-05', name: 'UV Ventorrillo',            logo: 'https://cdn.resfu.com/img_data/equipos/8340.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-06', name: 'ED Vigo 2015',              logo: 'https://cdn.resfu.com/img_data/equipos/142506.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-07', name: 'Culleredo FS',              logo: 'https://cdn.resfu.com/img_data/equipos/108229.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-08', name: 'Noia Portus B',             logo: 'https://cdn.resfu.com/img_data/equipos/142504.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-09', name: 'Cidade de Narón',           logo: 'https://cdn.resfu.com/img_data/equipos/7981.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-10', name: '5 Coruña FS',               logo: 'https://cdn.resfu.com/img_data/equipos/142488.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-11', name: 'Outeiro de Rei',            logo: 'https://cdn.resfu.com/img_data/equipos/142492.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-12', name: 'Guitiriz FS',               logo: 'https://cdn.resfu.com/img_data/equipos/153258.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-13', name: 'Praias de Barreiros',       logo: 'https://cdn.resfu.com/img_data/equipos/142494.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-14', name: 'Concello de Begonte FS',    logo: 'https://cdn.resfu.com/img_data/equipos/142490.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-15', name: 'Redondela FS',              logo: 'https://cdn.resfu.com/img_data/equipos/153259.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g8-16', name: 'Beade MVMB Copefri',        logo: 'https://cdn.resfu.com/img_data/equipos/142505.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g9', name: '3ª División Nacional - Grupo 9 — C. y León',
+        teams: [
+          { id: 'g9-01', name: 'Intersala Zamora',              logo: 'https://cdn.resfu.com/img_data/equipos/142449.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-02', name: 'CD San Cristóbal Núñez',        logo: 'https://cdn.resfu.com/img_data/equipos/151878.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-03', name: 'Tierra Castellana',             logo: 'https://cdn.resfu.com/img_data/equipos/108885.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-04', name: 'Vadillos CF',                   logo: 'https://cdn.resfu.com/img_data/equipos/151880.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-05', name: 'CD Tres Columnas',              logo: 'https://cdn.resfu.com/img_data/equipos/8177.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-06', name: 'Alhambra de Guijuelo Futsal',   logo: 'https://cdn.resfu.com/img_data/equipos/8168.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-07', name: 'River Zamora FS',               logo: 'https://cdn.resfu.com/img_data/equipos/142450.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-08', name: 'Cistierna',                     logo: 'https://cdn.resfu.com/img_data/equipos/7969.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-09', name: 'CD Tierno Galván',              logo: 'https://cdn.resfu.com/img_data/equipos/54732.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-10', name: 'FS Cuéllar Cojalba Futsal',     logo: 'https://cdn.resfu.com/img_data/equipos/8179.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-11', name: 'FS Salamanca Reina Kilama B',   logo: 'https://cdn.resfu.com/img_data/equipos/151879.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-12', name: 'Domotec León FS',               logo: 'https://cdn.resfu.com/img_data/equipos/138574.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-13', name: 'El Espinar Arlequín',           logo: 'https://cdn.resfu.com/img_data/equipos/69640.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g9-14', name: 'Venta de Baños FS',             logo: 'https://cdn.resfu.com/img_data/equipos/142448.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g10', name: '3ª División Nacional - Grupo 10 — Aragón',
+        teams: [
+          { id: 'g10-01', name: 'Tauste FS',                     logo: 'https://cdn.resfu.com/img_data/equipos/8192.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-02', name: 'CD Paniza FS',                  logo: 'https://cdn.resfu.com/img_data/equipos/153260.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-03', name: 'FS Caspe',                      logo: 'https://cdn.resfu.com/img_data/equipos/69643.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-04', name: 'La Unión Calatayud',            logo: 'https://cdn.resfu.com/img_data/equipos/30772.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-05', name: 'Nuestra Señora del Portal',      logo: 'https://cdn.resfu.com/img_data/equipos/93733.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-06', name: 'Utebo FS',                      logo: 'https://cdn.resfu.com/img_data/equipos/139138.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-07', name: 'Borja FS',                      logo: 'https://cdn.resfu.com/img_data/equipos/139139.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-08', name: 'Sala Quinto CD Futsal',          logo: 'https://cdn.resfu.com/img_data/equipos/8184.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-09', name: 'Wikys Gelsa',                   logo: 'https://cdn.resfu.com/img_data/equipos/40940.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-10', name: 'Boca Hijar',                    logo: 'https://cdn.resfu.com/img_data/equipos/97501.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-11', name: 'Zafán',                         logo: 'https://cdn.resfu.com/img_data/equipos/40966.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-12', name: 'Pirineos Sagrado Corazón',      logo: 'https://cdn.resfu.com/img_data/equipos/97528.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-13', name: 'Seat Peña La Murga',            logo: 'https://cdn.resfu.com/img_data/equipos/69649.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-14', name: 'Villa de Mallén',               logo: 'https://cdn.resfu.com/img_data/equipos/29583.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-15', name: 'Ainzón',                        logo: 'https://cdn.resfu.com/img_data/equipos/29579.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g10-16', name: 'Exea',                          logo: 'https://cdn.resfu.com/img_data/equipos/69644.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g11', name: '3ª División Nacional - Grupo 11 — Las Palmas',
+        teams: [
+          { id: 'g11-01', name: 'Malta 97',                      logo: 'https://cdn.resfu.com/img_data/equipos/4251.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-02', name: 'Tricán Lanzarote FS',           logo: 'https://cdn.resfu.com/img_data/equipos/22248.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-03', name: 'Costa Mogán',                   logo: 'https://cdn.resfu.com/img_data/equipos/112166.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-04', name: 'CD Olirón',                     logo: 'https://cdn.resfu.com/img_data/equipos/4253.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-05', name: 'La Cuevita Artenara',           logo: 'https://cdn.resfu.com/img_data/equipos/22250.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-06', name: 'Isla Larga Futsal',             logo: 'https://cdn.resfu.com/img_data/equipos/8205.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-07', name: 'Arsenal VSB',                   logo: 'https://cdn.resfu.com/img_data/equipos/144594.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-08', name: 'Basilea FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/153431.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-09', name: 'FS Bugedo',                     logo: 'https://cdn.resfu.com/img_data/equipos/121825.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-10', name: 'Valsefutsal',                   logo: 'https://cdn.resfu.com/img_data/equipos/142517.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-11', name: 'Aguas de Teror B',              logo: 'https://cdn.resfu.com/img_data/equipos/144592.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-12', name: 'MaspaSala',                     logo: 'https://cdn.resfu.com/img_data/equipos/142516.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-13', name: 'Cruce de Arinaga',              logo: 'https://cdn.resfu.com/img_data/equipos/22249.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g11-14', name: 'CFS Artevirgo',                 logo: 'https://cdn.resfu.com/img_data/equipos/142523.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g12', name: '3ª División Nacional - Grupo 12 — Tenerife',
+        teams: [
+          { id: 'g12-01', name: 'Cisneros',                      logo: 'https://cdn.resfu.com/img_data/equipos/145286.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-02', name: 'CFS Costa Sur',                 logo: 'https://cdn.resfu.com/img_data/equipos/8215.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-03', name: 'Juv. Los Pinos',                logo: 'https://cdn.resfu.com/img_data/equipos/142525.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-04', name: 'CD Maxorata',                   logo: 'https://cdn.resfu.com/img_data/equipos/27465.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-05', name: 'Sta. Cruz Ucanca',              logo: 'https://cdn.resfu.com/img_data/equipos/142527.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-06', name: 'Realejos FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/142612.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-07', name: 'FS La Victoria',                logo: 'https://cdn.resfu.com/img_data/equipos/27469.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-08', name: 'CD Granasur',                   logo: 'https://cdn.resfu.com/img_data/equipos/142529.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-09', name: 'China Igueste FS',              logo: 'https://cdn.resfu.com/img_data/equipos/22245.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-10', name: 'La Zarza',                      logo: 'https://cdn.resfu.com/img_data/equipos/142528.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-11', name: 'Adeje 78',                      logo: 'https://cdn.resfu.com/img_data/equipos/26929.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g12-12', name: 'Niutin Benijos',                logo: 'https://cdn.resfu.com/img_data/equipos/145287.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g13', name: '3ª División Nacional - Grupo 13 — Murcia',
+        teams: [
+          { id: 'g13-01', name: 'CD El Palmar FS',               logo: 'https://cdn.resfu.com/img_data/equipos/8232.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-02', name: 'CFS Pinatar',                   logo: 'https://cdn.resfu.com/img_data/equipos/112063.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-03', name: 'FS Librilla',                   logo: 'https://cdn.resfu.com/img_data/equipos/8223.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-04', name: 'Imperial FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/139555.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-05', name: 'Blanca FS',                     logo: 'https://cdn.resfu.com/img_data/equipos/8231.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-06', name: 'CFS Capuchinos',                logo: 'https://cdn.resfu.com/img_data/equipos/5218.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-07', name: 'CD Mazarrón FS',                logo: 'https://cdn.resfu.com/img_data/equipos/139127.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-08', name: 'FS Sangonera La Verde',         logo: 'https://cdn.resfu.com/img_data/equipos/153261.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-09', name: 'El Niño de Mula',               logo: 'https://cdn.resfu.com/img_data/equipos/153263.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-10', name: 'AD Albatros Yecla',             logo: 'https://cdn.resfu.com/img_data/equipos/8225.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-11', name: 'ED Abanilla-Abrisa',            logo: 'https://cdn.resfu.com/img_data/equipos/108227.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-12', name: 'CD Campos',                     logo: 'https://cdn.resfu.com/img_data/equipos/144059.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-13', name: 'Patrulla Águila San Javier',     logo: 'https://cdn.resfu.com/img_data/equipos/144060.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-14', name: 'CD Puerto',                     logo: 'https://cdn.resfu.com/img_data/equipos/142485.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-15', name: 'Alcantarilla CFS',              logo: 'https://cdn.resfu.com/img_data/equipos/153262.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g13-16', name: 'Ciudad de Lorca',               logo: 'https://cdn.resfu.com/img_data/equipos/108707.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g14', name: '3ª División Nacional - Grupo 14 — C. Valenciana',
+        teams: [
+          { id: 'g14-01', name: 'Valencia FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/69658.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-02', name: 'Colegio El Pilar Valencia',     logo: 'https://cdn.resfu.com/img_data/equipos/144063.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-03', name: 'Alboraya FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/8243.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-04', name: 'Fuensanta FS',                  logo: 'https://cdn.resfu.com/img_data/equipos/108213.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-05', name: 'CFS Burriana',                  logo: 'https://cdn.resfu.com/img_data/equipos/142471.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-06', name: 'CFS Navarti - At. Onda',        logo: 'https://cdn.resfu.com/img_data/equipos/83500.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-07', name: 'Maristas Valencia',             logo: 'https://cdn.resfu.com/img_data/equipos/69653.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-08', name: 'Mislata FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/8242.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-09', name: 'D. Moixent',                    logo: 'https://cdn.resfu.com/img_data/equipos/52840.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-10', name: 'CFS Quart de Poblet',           logo: 'https://cdn.resfu.com/img_data/equipos/108873.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-11', name: 'Segorbe',                       logo: 'https://cdn.resfu.com/img_data/equipos/103876.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-12', name: 'L\'Olleria Club d\'Albaida',   logo: 'https://cdn.resfu.com/img_data/equipos/69654.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-13', name: 'CD Santa Ana',                  logo: 'https://cdn.resfu.com/img_data/equipos/118896.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-14', name: 'L\'Alcora FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/62404.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-15', name: 'Vila Sport FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/142470.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g14-16', name: 'CD Corbera',                    logo: 'https://cdn.resfu.com/img_data/equipos/52803.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g15', name: '3ª División Nacional - Grupo 15 — C. Valenciana',
+        teams: [
+          { id: 'g15-01', name: 'La Nucía',                      logo: 'https://cdn.resfu.com/img_data/equipos/108866.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-02', name: 'CFS Horadada',                  logo: 'https://cdn.resfu.com/img_data/equipos/69663.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-03', name: 'CFS Ibi',                       logo: 'https://cdn.resfu.com/img_data/equipos/108209.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-04', name: 'United Elche',                  logo: 'https://cdn.resfu.com/img_data/equipos/153264.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-05', name: 'Calpe FS',                      logo: 'https://cdn.resfu.com/img_data/equipos/69666.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-06', name: 'Ye Faky',                       logo: 'https://cdn.resfu.com/img_data/equipos/8259.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-07', name: 'Serelles Alcoy',                logo: 'https://cdn.resfu.com/img_data/equipos/69664.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-08', name: 'RC Dinamita-Albatera',          logo: 'https://cdn.resfu.com/img_data/equipos/69662.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-09', name: 'CD La Vila',                    logo: 'https://cdn.resfu.com/img_data/equipos/142474.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-10', name: 'San Vicente-Hércules FS',       logo: 'https://cdn.resfu.com/img_data/equipos/52826.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-11', name: 'L\'Alfàs del Pi FS',           logo: 'https://cdn.resfu.com/img_data/equipos/8253.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-12', name: 'Novelda Unión',                 logo: 'https://cdn.resfu.com/img_data/equipos/153265.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-13', name: 'FS Callosa',                    logo: 'https://cdn.resfu.com/img_data/equipos/8250.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-14', name: 'Publicidad Aspe',               logo: 'https://cdn.resfu.com/img_data/equipos/52824.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-15', name: 'Castalla',                      logo: 'https://cdn.resfu.com/img_data/equipos/52821.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g15-16', name: 'Xaloc Alacant FS',              logo: 'https://cdn.resfu.com/img_data/equipos/8256.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g16', name: '3ª División Nacional - Grupo 16 — C. La Mancha',
+        teams: [
+          { id: 'g16-01', name: 'Sierra San Vicente FS',          logo: 'https://cdn.resfu.com/img_data/equipos/97505.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-02', name: 'Viña Albali Valdepeñas B',       logo: 'https://cdn.resfu.com/img_data/equipos/139133.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-03', name: 'FS Vivocuenca',                  logo: 'https://cdn.resfu.com/img_data/equipos/139130.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-04', name: 'Ciudad de Guadalajara',          logo: 'https://cdn.resfu.com/img_data/equipos/103874.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-05', name: 'Balazote FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/153266.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-06', name: 'EMD Sacedón',                    logo: 'https://cdn.resfu.com/img_data/equipos/69678.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-07', name: 'FS Olías del Rey/Moprisala',     logo: 'https://cdn.resfu.com/img_data/equipos/108208.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-08', name: 'Infantes',                       logo: 'https://cdn.resfu.com/img_data/equipos/69672.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-09', name: 'UDAF Albacete',                  logo: 'https://cdn.resfu.com/img_data/equipos/139131.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-10', name: 'AD Calera FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/8040.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-11', name: 'Azuqueca FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/106537.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-12', name: 'Tembleque FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/108201.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-13', name: 'Atl. Almonacid FS',              logo: 'https://cdn.resfu.com/img_data/equipos/69670.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-14', name: 'EFS Socuéllamos',                logo: 'https://cdn.resfu.com/img_data/equipos/30636.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-15', name: 'CDE Águila FS',                  logo: 'https://cdn.resfu.com/img_data/equipos/5205.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g16-16', name: 'FD Mora FS',                     logo: 'https://cdn.resfu.com/img_data/equipos/139129.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g17', name: '3ª División Nacional - Grupo 17 — Andalucía',
+        teams: [
+          { id: 'g17-01', name: 'Virgili de Cádiz',               logo: 'https://cdn.resfu.com/img_data/equipos/69690.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-02', name: 'CD Deporte y Ocio',              logo: 'https://cdn.resfu.com/img_data/equipos/144584.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-03', name: 'Nevaluz Écija UD',               logo: 'https://cdn.resfu.com/img_data/equipos/95445.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-04', name: 'Decorseneca CD',                 logo: 'https://cdn.resfu.com/img_data/equipos/139951.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-05', name: 'CD Puntos Suspensivos FS',       logo: 'https://cdn.resfu.com/img_data/equipos/41249.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-06', name: 'CD Olímpic de Triana FS',        logo: 'https://cdn.resfu.com/img_data/equipos/8286.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-07', name: 'Boca Juniors FS Priego',         logo: 'https://cdn.resfu.com/img_data/equipos/95433.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-08', name: 'Isleño San Fernando FS',         logo: 'https://cdn.resfu.com/img_data/equipos/83477.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-09', name: 'CD Benalup FS',                  logo: 'https://cdn.resfu.com/img_data/equipos/77574.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-10', name: 'La Palma FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/69691.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-11', name: 'CD Tor del Rey',                 logo: 'https://cdn.resfu.com/img_data/equipos/95442.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-12', name: 'UD Alchoyano FS',                logo: 'https://cdn.resfu.com/img_data/equipos/8287.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-13', name: 'CD Águila de Pedrera FS',        logo: 'https://cdn.resfu.com/img_data/equipos/41257.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-14', name: 'Almonte Balompié',               logo: 'https://cdn.resfu.com/img_data/equipos/69681.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-15', name: 'CD Villalba FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/8281.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g17-16', name: 'CD Tres Calles FS',              logo: 'https://cdn.resfu.com/img_data/equipos/69680.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g18', name: '3ª División Nacional - Grupo 18 — Andalucía',
+        teams: [
+          { id: 'g18-01', name: 'Avanza Jaén Paraíso Int.',       logo: 'https://cdn.resfu.com/img_data/equipos/153125.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-02', name: 'Club Torremolinos',              logo: 'https://cdn.resfu.com/img_data/equipos/69698.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-03', name: 'Bailén 2008',                    logo: 'https://cdn.resfu.com/img_data/equipos/41298.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-04', name: 'Malacitano Futsal',              logo: 'https://cdn.resfu.com/img_data/equipos/153127.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-05', name: 'CD Albolote FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/41333.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-06', name: 'Victoria Kent',                  logo: 'https://cdn.resfu.com/img_data/equipos/8304.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-07', name: 'Málaga CR B FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/112998.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-08', name: 'Poli Ejido',                     logo: 'https://cdn.resfu.com/img_data/equipos/144586.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-09', name: 'Futsal Montevive Alhendín',      logo: 'https://cdn.resfu.com/img_data/equipos/108920.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-10', name: 'CD Gádor',                       logo: 'https://cdn.resfu.com/img_data/equipos/8295.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-11', name: 'CD Tapia FS',                    logo: 'https://cdn.resfu.com/img_data/equipos/95440.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-12', name: 'At. Minero Bedarense',           logo: 'https://cdn.resfu.com/img_data/equipos/153126.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-13', name: 'UD Maracena',                    logo: 'https://cdn.resfu.com/img_data/equipos/41330.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-14', name: 'UD Playas de Málaga FS',         logo: 'https://cdn.resfu.com/img_data/equipos/95439.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-15', name: 'CD Pizarra FS',                  logo: 'https://cdn.resfu.com/img_data/equipos/41338.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g18-16', name: 'Loja',                           logo: 'https://cdn.resfu.com/img_data/equipos/41328.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g19', name: '3ª División Nacional - Grupo 19 — Islas Baleares',
+        teams: [
+          { id: 'g19-01', name: 'Urbanitzacions Grupo Osa',      logo: 'https://cdn.resfu.com/img_data/equipos/139124.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-02', name: 'Muro FS',                        logo: 'https://cdn.resfu.com/img_data/equipos/108197.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-03', name: 'Ibiza FS',                       logo: 'https://cdn.resfu.com/img_data/equipos/139123.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-04', name: 'CFS Montesión',                  logo: 'https://cdn.resfu.com/img_data/equipos/8319.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-05', name: 'SE Alcudia',                     logo: 'https://cdn.resfu.com/img_data/equipos/8308.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-06', name: 'CD Son Oliva',                   logo: 'https://cdn.resfu.com/img_data/equipos/8314.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-07', name: 'Son Ferrer Atlètic',             logo: 'https://cdn.resfu.com/img_data/equipos/30813.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-08', name: 'Alaró FS',                       logo: 'https://cdn.resfu.com/img_data/equipos/8312.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-09', name: 'San Pablo-Eivissa',              logo: 'https://cdn.resfu.com/img_data/equipos/69705.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-10', name: 'CSE Juan de Ávila',              logo: 'https://cdn.resfu.com/img_data/equipos/153267.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g19-11', name: 'Atl. Mercadal',                  logo: 'https://cdn.resfu.com/img_data/equipos/69707.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g20', name: '3ª División Nacional - Grupo 20 — La Rioja',
+        teams: [
+          { id: 'g20-01', name: 'Villa de Ribafrecha',           logo: 'https://cdn.resfu.com/img_data/equipos/142451.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-02', name: 'Rioja Sala',                    logo: 'https://cdn.resfu.com/img_data/equipos/41239.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-03', name: 'Nalda',                         logo: 'https://cdn.resfu.com/img_data/equipos/8334.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-04', name: 'Gracurris',                     logo: 'https://cdn.resfu.com/img_data/equipos/8323.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-05', name: 'FS Agoncillo',                  logo: 'https://cdn.resfu.com/img_data/equipos/8330.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-06', name: 'Vianés',                        logo: 'https://cdn.resfu.com/img_data/equipos/99137.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-07', name: 'Cosmos FS',                     logo: 'https://cdn.resfu.com/img_data/equipos/41240.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-08', name: 'Soto Sala',                     logo: 'https://cdn.resfu.com/img_data/equipos/142452.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-09', name: 'Aldea FS',                      logo: 'https://cdn.resfu.com/img_data/equipos/108196.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-10', name: 'Sparta Harense',                logo: 'https://cdn.resfu.com/img_data/equipos/29616.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-11', name: 'Alesanco',                      logo: 'https://cdn.resfu.com/img_data/equipos/29602.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-12', name: 'Fuenmayor',                     logo: 'https://cdn.resfu.com/img_data/equipos/41238.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g20-13', name: 'AD Lardero',                    logo: 'https://cdn.resfu.com/img_data/equipos/30799.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g21', name: '3ª División Nacional - Grupo 21 — Cantabria',
+        teams: [
+          { id: 'g21-01', name: 'CD La Folia FS',               logo: 'https://cdn.resfu.com/img_data/equipos/97497.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-02', name: 'AD San Miguel Cobo-Lely',      logo: 'https://cdn.resfu.com/img_data/equipos/28951.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-03', name: 'AD Muriedas-Urrutia',          logo: 'https://cdn.resfu.com/img_data/equipos/8389.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-04', name: 'Castro Urdiales',              logo: 'https://cdn.resfu.com/img_data/equipos/4182.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-05', name: 'Herrera Moderno',              logo: 'https://cdn.resfu.com/img_data/equipos/142454.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-06', name: 'El Minchón',                   logo: 'https://cdn.resfu.com/img_data/equipos/69724.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-07', name: 'CD Milinde',                   logo: 'https://cdn.resfu.com/img_data/equipos/105984.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-08', name: 'CD Naval',                     logo: 'https://cdn.resfu.com/img_data/equipos/142456.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-09', name: 'CDE Mar Rock',                 logo: 'https://cdn.resfu.com/img_data/equipos/28943.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g21-10', name: 'SD Nueva Montaña',              logo: 'https://cdn.resfu.com/img_data/equipos/142473.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g23', name: '3ª División Nacional - Grupo 23 — Extremadura',
+        teams: [
+          { id: 'g23-01', name: 'Navalmoral FS',                  logo: 'https://cdn.resfu.com/img_data/equipos/5204.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-02', name: 'AD Granja FS',                   logo: 'https://cdn.resfu.com/img_data/equipos/99441.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-03', name: 'Ciudad de Almendralejo',         logo: 'https://cdn.resfu.com/img_data/equipos/69579.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-04', name: 'CP Deleitosa FS',                logo: 'https://cdn.resfu.com/img_data/equipos/30826.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-05', name: 'ACV Badajoz FS',                 logo: 'https://cdn.resfu.com/img_data/equipos/8359.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-06', name: 'Colegio San José A',             logo: 'https://cdn.resfu.com/img_data/equipos/80399.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-07', name: 'AD Cedillo',                     logo: 'https://cdn.resfu.com/img_data/equipos/99438.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-08', name: 'Publijaime Villa Jaraíz',        logo: 'https://cdn.resfu.com/img_data/equipos/99432.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-09', name: 'Flecha Negra',                   logo: 'https://cdn.resfu.com/img_data/equipos/153270.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-10', name: 'Valdetorres A',                  logo: 'https://cdn.resfu.com/img_data/equipos/80407.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-11', name: 'CD Alfar Salvatierra',           logo: 'https://cdn.resfu.com/img_data/equipos/153268.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-12', name: 'AD El Cruce Torrecillas FS',     logo: 'https://cdn.resfu.com/img_data/equipos/8361.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-13', name: 'CD Montehermoso',                logo: 'https://cdn.resfu.com/img_data/equipos/139121.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-14', name: 'Cáceres Universidad B',          logo: 'https://cdn.resfu.com/img_data/equipos/153269.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-15', name: 'AD Casar de Cáceres',            logo: 'https://cdn.resfu.com/img_data/equipos/69583.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g23-16', name: 'CD Vivares',                     logo: 'https://cdn.resfu.com/img_data/equipos/99444.png?size=120x&lossy=1', rating: 30 },
+        ] },
+      { id: 'l3g24', name: '3ª División Nacional - Grupo 24 — Melilla',
+        teams: [
+          { id: 'g24-01', name: 'Nueva Era Melilla FS',          logo: 'https://cdn.resfu.com/img_data/equipos/145099.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-02', name: 'Boomerang',                      logo: 'https://cdn.resfu.com/img_data/equipos/142633.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-03', name: 'CDE Melistar',                   logo: 'https://cdn.resfu.com/img_data/equipos/142635.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-04', name: 'At. Rusadir',                    logo: 'https://cdn.resfu.com/img_data/equipos/142636.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-05', name: 'PR Madrid',                      logo: 'https://cdn.resfu.com/img_data/equipos/145103.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-06', name: 'CP Real',                        logo: 'https://cdn.resfu.com/img_data/equipos/145101.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-07', name: 'Infobox Melilla',                logo: 'https://cdn.resfu.com/img_data/equipos/145100.png?size=120x&lossy=1', rating: 30 },
+          { id: 'g24-08', name: 'Básico La Salle',                logo: 'https://cdn.resfu.com/img_data/equipos/155315.png?size=120x&lossy=1', rating: 30 },
+        ] },
     ] },
   { id: 'pt', name: 'Portugal', flag: '🇵🇹',
     leagues: [
       { id: 'lpc', name: 'Liga Placard',
         teams: [
-          { id: 'spo', name: 'Sporting CP' },
-          { id: 'ben', name: 'SL Benfica' },
-          { id: 'por', name: 'FC Porto' },
-          { id: 'bra', name: 'SC Braga' },
+          { id: 'ben', name: 'Benfica',   logo: 'https://cdn.resfu.com/img_data/equipos/466.png?size=120x&lossy=1', rating: 82,
+            staff: [{ name: 'Nuno Filipe', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Benfica', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'spo', name: 'Sporting CP', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Sporting_Clube_de_Portugal_2026_cut.png/120px-Sporting_Clube_de_Portugal_2026_cut.png', rating: 81,
+            staff: [{ name: 'João Soares', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Sporting CP', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'bra', name: 'SC Braga',   logo: 'https://cdn.resfu.com/img_data/equipos/2386.png?size=120x&lossy=1', rating: 70,
+            staff: [{ name: 'João Freitas', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'SC Braga', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'leo', name: 'Leões',      logo: 'https://www.ceroacero.es/img/logos/equipas/14914_imgbank_1700050459.png', rating: 68,
+            staff: [{ name: 'Cláudio Moreira', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Leões', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Alfredo Bravo', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Leões', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Gonçalo Canato', nationality: '🇵🇹 Portugal', role: 'goalkeeperCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Leões', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Flávio Fonseca', nationality: '🇵🇹 Portugal', role: 'fitnessCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Leões', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'rio', name: 'Rio Ave',    logo: 'https://cdn.resfu.com/img_data/equipos/2163.png?size=120x&lossy=1', rating: 67 },
+          { id: 'fer', name: 'Ferreira do Zêzere', logo: 'https://cdn-img.staticzz.com/img/logos/equipas/6568_imgbank_1757665877.png', rating: 66,
+            staff: [{ name: 'Cristiano Coelho', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Ferreira do Zêzere', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Gonçalo Nunes', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Ferreira do Zêzere', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Gabriel Santini', nationality: '🇧🇷 Brasil', role: 'fitnessCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Ferreira do Zêzere', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'tor', name: 'Torreense',  logo: 'https://cdn-img.staticzz.com/img/logos/equipas/2178_imgbank_1682588244.png', rating: 65,
+            staff: [{ name: 'Cláudio Martins', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Torreense', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Wilson Ferreira', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Torreense', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Luís Horta', nationality: '🇵🇹 Portugal', role: 'fitnessCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Torreense', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'ele', name: 'Elétrico',   logo: 'https://cdn-img.staticzz.com/img/logos/equipas/3688_imgbank.png', rating: 64,
+            staff: [{ name: 'Jorge Monteiro', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Elétrico FC', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Tiago Rasquete', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Elétrico FC', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Diogo Fialho', nationality: '🇵🇹 Portugal', role: 'fitnessCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Elétrico FC', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'fun', name: 'Fundão',     logo: 'https://cdn-img.staticzz.com/img/logos/equipas/6298_imgbank_1700041680.png', rating: 63,
+            staff: [{ name: 'Nuno Couto', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'AD Fundão', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'João Ribeiro', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'AD Fundão', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Ricardo Fazendeiro', nationality: '🇵🇹 Portugal', role: 'fitnessCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'AD Fundão', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'fam', name: 'Famalicão',  logo: 'https://cdn.resfu.com/img_data/equipos/7017.png?size=120x&lossy=1', rating: 62,
+            staff: [{ name: 'Hugo Oliveira', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'FC Famalicão', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Dino Veloso', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'FC Famalicão', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'Cristina Oliveira', nationality: '🇵🇹 Portugal', role: 'fitnessCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'FC Famalicão', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'lom', name: 'Lombos',     logo: 'https://cdn-img.staticzz.com/img/logos/equipas/16391_imgbank_1700039429.png', rating: 61,
+            staff: [{ name: 'Alcides Lopes', nationality: '🇵🇹 Portugal', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Quinta dos Lombos', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+                    { name: 'André Reis', nationality: '🇵🇹 Portugal', role: 'assistantCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: 'Quinta dos Lombos', from: '01/07/2024', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }] },
+          { id: 'cax', name: 'Caxinas Poca Barca', logo: 'https://www.ceroacero.es/img/logos/equipas/32291_imgbank_1700050220.png', rating: 60 },
         ] },
     ] },
   { id: 'it', name: 'Italia', flag: '🇮🇹',
@@ -377,6 +929,448 @@ const baseDatosEquipos = [
   { id: 's30', nombre: 'Avanza Jaén',            division_id: 2, rating: 64, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
   { id: 's31', nombre: 'Unión África Ceutí',     division_id: 2, rating: 63, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
   { id: 's32', nombre: 'CD Tafa FS',             division_id: 2, rating: 60, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+
+  // ─── Liga Placard Portugal (division_id: 3) ───
+  { id: 'ben', nombre: 'Benfica',                    division_id: 3, rating: 82, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'spo', nombre: 'Sporting CP',                division_id: 3, rating: 81, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'bra', nombre: 'SC Braga',                   division_id: 3, rating: 70, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'leo', nombre: 'Leões',                      division_id: 3, rating: 68, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""], defaultFormation: '2-2' },
+  { id: 'rio', nombre: 'Rio Ave',                    division_id: 3, rating: 67, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'fer', nombre: 'Ferreira do Zêzere',         division_id: 3, rating: 66, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'tor', nombre: 'Torreense',                  division_id: 3, rating: 65, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'ele', nombre: 'Elétrico',                   division_id: 3, rating: 64, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: 'fun', nombre: 'Fundão',                     division_id: 3, rating: 63, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""], defaultFormation: '3-1' },
+  { id: 'fam', nombre: 'Famalicão',                  division_id: 3, rating: 62, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""], defaultFormation: '2-1-1' },
+  { id: 'lom', nombre: 'Lombos',                     division_id: 3, rating: 61, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""], defaultFormation: '2-2' },
+  { id: 'cax', nombre: 'Caxinas Poca Barca',         division_id: 3, rating: 60, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 2ª División B - Grupo 1 (division_id: 4) ───
+  { id: "b1-01", nombre: "5 Coruña FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-02", nombre: "Albense",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-03", nombre: "Atlético Benavente FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-04", nombre: "CD Lugo Sala",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-05", nombre: "CD Tierno Galván",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-06", nombre: "Concello de Begonte FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-07", nombre: "Deportivo Laviana",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-08", nombre: "FS Salamanca",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-09", nombre: "Guardo",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-10", nombre: "IES Coruxo",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-11", nombre: "Leis Pontevedra",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-12", nombre: "Noia Portus Apostoli B",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-13", nombre: "O Esteo FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-14", nombre: "River Zamora FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-15", nombre: "SD Xove",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b1-16", nombre: "Vilalba FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 2ª División B - Grupo 2 (division_id: 4) ───
+  { id: "b2-01", nombre: "AD San Juan B",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-02", nombre: "Antiguoko KE",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-03", nombre: "CD Anaitasuna",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-04", nombre: "CD San Cristóbal Núñez",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-05", nombre: "CDU Loeches FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-06", nombre: "EMD Cadrete",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-07", nombre: "Entrerríos Automatización",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-08", nombre: "FS Albelda",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-09", nombre: "Lauburu KE Ibarra",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-10", nombre: "Otxartabe CD",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-11", nombre: "Picassent FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-12", nombre: "Pinseque AD",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-13", nombre: "Sala Quinto CD",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-14", nombre: "Tauste FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-15", nombre: "Villa de Ribafrecha",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b2-16", nombre: "Zierbena CDF",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 2ª División B - Grupo 3 (division_id: 4) ───
+  { id: "b3-01", nombre: "AE Les Corts FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-02", nombre: "Bisontes Castellón FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-03", nombre: "Canet FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-04", nombre: "CCR Castelldefels",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-05", nombre: "CFS Ibi",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-06", nombre: "CFS Montesión",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-07", nombre: "Club Manresa FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-08", nombre: "Colegio El Pilar Valencia",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-09", nombre: "Futsal Gestoría Luis Mataró",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-10", nombre: "Futsal Lleida",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-11", nombre: "Hospitalet Bellsport",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-12", nombre: "Industrias Santa Coloma B",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-13", nombre: "Natació Sabadell",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-14", nombre: "Palma Futsal B",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-15", nombre: "Sant Quirze Vallès FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b3-16", nombre: "Ye Faky FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 2ª División B - Grupo 4 (division_id: 4) ───
+  { id: "b4-01", nombre: "AD Alcorcón FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-02", nombre: "Asociación Jerez Futsal",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-03", nombre: "Bargas CD",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-04", nombre: "CD Albacete FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-05", nombre: "Ciudad de Torrejón",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-06", nombre: "Inter Movistar FS B",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-07", nombre: "Cobisa FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-08", nombre: "Dehesa Villalba",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-09", nombre: "FS El Álamo",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-10", nombre: "FS Talavera",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-11", nombre: "FS Vivocuenca",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-12", nombre: "Grupo López Bolaños",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-13", nombre: "La Nucía FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-14", nombre: "Moral FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-15", nombre: "Rivas Futsal",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b4-16", nombre: "Unión Tres Cantos",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 2ª División B - Grupo 5 (division_id: 4) ───
+  { id: "b5-01", nombre: "Alcalá de Guadaira FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-02", nombre: "Atlético Mengíbar FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-03", nombre: "Blanca FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-04", nombre: "Bujalance FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-05", nombre: "CFS Pinatar",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-06", nombre: "Córdoba Patrimonio B",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-07", nombre: "ElPozo Ciudad de Murcia",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-08", nombre: "Granada FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-09", nombre: "Imperio Los Rosales FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-10", nombre: "Jumilla FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-11", nombre: "Malacitano Futsal",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-12", nombre: "Málaga CR B FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-13", nombre: "Nueva Era Melilla FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-14", nombre: "UD Alchoyano FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-15", nombre: "Virgili de Cádiz",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b5-16", nombre: "Xerez Toyota Nimauto",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 2ª División B - Grupo 6 (division_id: 4) ───
+  { id: "b6-01", nombre: "AD Duggi Futsal",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-02", nombre: "Aguas de Teror",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-03", nombre: "Agüimes",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-04", nombre: "Basilea FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-05", nombre: "CD Salesianos Tenerife",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-06", nombre: "CFS Chinguaro",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-07", nombre: "CFS Costa Sur",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-08", nombre: "Cisneros",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-09", nombre: "Colegios Arenas Int.",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-10", nombre: "Doctoral Ludeservicios",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-11", nombre: "Gran Canaria FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-12", nombre: "Isla Larga Futsal",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-13", nombre: "La Salle San Ildefonso",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-14", nombre: "Las Cuevecitas FS",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-15", nombre: "Malta 97",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "b6-16", nombre: "Tenerife Iberia Toscal",              division_id: 4, rating: 50, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  // ─── 3ª División Nacional (division_id: 5) ───
+  { id: "g1-01", nombre: "Montsant FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-02", nombre: "Olimpic Floresta FS",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-03", nombre: "Rubí FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-04", nombre: "Sant Joan de Vilassar",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-05", nombre: "La Unión Santa Coloma",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-06", nombre: "Arenys de Munt",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-07", nombre: "Sant Quirze Vallès FS",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-08", nombre: "Futsal Marlex Mataró B",    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-09", nombre: "Gràcia FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-10", nombre: "Estel Vallseca A",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-11", nombre: "Cn Caldes FS Futsal",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-12", nombre: "Castellar FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-13", nombre: "EFS Prosperitat",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-14", nombre: "Parets FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-15", nombre: "FS Montcada Futsal",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g1-16", nombre: "Vacarisses A",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-01", nombre: "AE Les Corts FS",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-02", nombre: "Salou FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-03", nombre: "Futsal Lleida",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-04", nombre: "Sant Sadurní",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-05", nombre: "FS Linyola",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-06", nombre: "Eixample Diferòptics",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-07", nombre: "Athletic Vilatorrada A",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-08", nombre: "Balaguer Comtat d'Urgell",    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-09", nombre: "SD Espanyol",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-10", nombre: "ENFAF",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-11", nombre: "Molins 99",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-12", nombre: "Tecnovit Alforja",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-13", nombre: "Esparreguera CFS",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-14", nombre: "Monistrol",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-15", nombre: "Huracans La Selva",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g2-16", nombre: "CEFS Santpedor",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-01", nombre: "Leganés FS B",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-02", nombre: "FS El Álamo",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-03", nombre: "Ciudad de Móstoles B",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-04", nombre: "San Lorenzo Abantos",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-05", nombre: "Silver Novanca FS",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-06", nombre: "Spínola Chamartín",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-07", nombre: "ADC Villalba",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-08", nombre: "Rozas de Pto. Real",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-09", nombre: "Artilleros Moratalaz",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-10", nombre: "Elemental Amistad 94",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-11", nombre: "Ciudad Villa de Vallecas",   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-12", nombre: "FS Diagonal",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-13", nombre: "Agustiniano",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g3-14", nombre: "Pinto FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-01", nombre: "Ciudad de Torrejón",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-02", nombre: "Obispo Perelló",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-03", nombre: "AA Pilaristas Flex Futsal",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-04", nombre: "Atl. Loeches",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-05", nombre: "Torrejón Sala Five-Play",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-06", nombre: "Deporcoslada FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-07", nombre: "CDE Casco Antiguo",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-08", nombre: "CDE Mejorada",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-09", nombre: "Calasancio FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-10", nombre: "Lope de Vega",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-11", nombre: "EFS Colmenar Viejo",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-12", nombre: "Rivas Atlantis",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-13", nombre: "CGR Distrito III",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g4-14", nombre: "Villa de Algete",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-01", nombre: "Racing de Mieres",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-02", nombre: "San Cucao FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-03", nombre: "Arenas de Manzaneda",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-04", nombre: "Concejo Valdés FS",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-05", nombre: "Gijón Playas",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-06", nombre: "FS Boal 1999",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-07", nombre: "El Franco",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-08", nombre: "Plaza Najosa",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-09", nombre: "Rodiles FS",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-10", nombre: "Puente Legends",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-11", nombre: "CD Boliches",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g5-12", nombre: "Gijón Perchera",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-01", nombre: "Antiguoko KE",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-02", nombre: "Aurrera de Vitoria FS",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-03", nombre: "Gernikako Lagunak",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-04", nombre: "Laskorain KE Futsal",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-05", nombre: "Mahastiak Labastida FS",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-06", nombre: "Mondrate CD",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-07", nombre: "Tolosala AFKE",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-08", nombre: "Elorrietako CD Aerolink",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-09", nombre: "Jarrilleros",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-10", nombre: "Eskoriatza",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-11", nombre: "Goierri",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-12", nombre: "Kukuyaga",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-13", nombre: "Leioa Ibaraki",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-14", nombre: "CD Gora",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-15", nombre: "Lagun Onak GDKO",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g6-16", nombre: "Batzarre",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-01", nombre: "Cintruénigo FS",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-02", nombre: "Gazte Berriak Ansoain",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-03", nombre: "CD Universidad de Navarra", division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-04", nombre: "AD San Juan B",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-05", nombre: "Ablitas FS",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-06", nombre: "Kirol Sport",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-07", nombre: "Aralar Mendi",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-08", nombre: "Ibararte B FS",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-09", nombre: "CD Olite",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-10", nombre: "CD Anaitasuna B",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g7-11", nombre: "CD Tafa B",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-01", nombre: "SD Xove",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-02", nombre: "Stellae FS - Padrón",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-03", nombre: "Pazos de Borbén FS",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-04", nombre: "GRI Carballino FS",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-05", nombre: "UV Ventorrillo",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-06", nombre: "ED Vigo 2015",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-07", nombre: "Culleredo FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-08", nombre: "Noia Portus B",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-09", nombre: "Cidade de Narón",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-10", nombre: "5 Coruña FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-11", nombre: "Outeiro de Rei",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-12", nombre: "Guitiriz FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-13", nombre: "Praias de Barreiros",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-14", nombre: "Concello de Begonte FS",    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-15", nombre: "Redondela FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g8-16", nombre: "Beade MVMB Copefri",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-01", nombre: "Intersala Zamora",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-02", nombre: "CD San Cristóbal Núñez",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-03", nombre: "Tierra Castellana",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-04", nombre: "Vadillos CF",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-05", nombre: "CD Tres Columnas",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-06", nombre: "Alhambra de Guijuelo Futsal",   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-07", nombre: "River Zamora FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-08", nombre: "Cistierna",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-09", nombre: "CD Tierno Galván",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-10", nombre: "FS Cuéllar Cojalba Futsal",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-11", nombre: "FS Salamanca Reina Kilama B",   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-12", nombre: "Domotec León FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-13", nombre: "El Espinar Arlequín",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g9-14", nombre: "Venta de Baños FS",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-01", nombre: "Tauste FS",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-02", nombre: "CD Paniza FS",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-03", nombre: "FS Caspe",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-04", nombre: "La Unión Calatayud",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-05", nombre: "Nuestra Señora del Portal",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-06", nombre: "Utebo FS",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-07", nombre: "Borja FS",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-08", nombre: "Sala Quinto CD Futsal",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-09", nombre: "Wikys Gelsa",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-10", nombre: "Boca Hijar",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-11", nombre: "Zafán",                         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-12", nombre: "Pirineos Sagrado Corazón",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-13", nombre: "Seat Peña La Murga",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-14", nombre: "Villa de Mallén",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-15", nombre: "Ainzón",                        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g10-16", nombre: "Exea",                          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-01", nombre: "Malta 97",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-02", nombre: "Tricán Lanzarote FS",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-03", nombre: "Costa Mogán",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-04", nombre: "CD Olirón",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-05", nombre: "La Cuevita Artenara",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-06", nombre: "Isla Larga Futsal",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-07", nombre: "Arsenal VSB",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-08", nombre: "Basilea FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-09", nombre: "FS Bugedo",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-10", nombre: "Valsefutsal",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-11", nombre: "Aguas de Teror B",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-12", nombre: "MaspaSala",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-13", nombre: "Cruce de Arinaga",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g11-14", nombre: "CFS Artevirgo",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-01", nombre: "Cisneros",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-02", nombre: "CFS Costa Sur",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-03", nombre: "Juv. Los Pinos",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-04", nombre: "CD Maxorata",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-05", nombre: "Sta. Cruz Ucanca",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-06", nombre: "Realejos FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-07", nombre: "FS La Victoria",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-08", nombre: "CD Granasur",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-09", nombre: "China Igueste FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-10", nombre: "La Zarza",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-11", nombre: "Adeje 78",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g12-12", nombre: "Niutin Benijos",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-01", nombre: "CD El Palmar FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-02", nombre: "CFS Pinatar",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-03", nombre: "FS Librilla",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-04", nombre: "Imperial FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-05", nombre: "Blanca FS",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-06", nombre: "CFS Capuchinos",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-07", nombre: "CD Mazarrón FS",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-08", nombre: "FS Sangonera La Verde",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-09", nombre: "El Niño de Mula",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-10", nombre: "AD Albatros Yecla",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-11", nombre: "ED Abanilla-Abrisa",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-12", nombre: "CD Campos",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-13", nombre: "Patrulla Águila San Javier",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-14", nombre: "CD Puerto",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-15", nombre: "Alcantarilla CFS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g13-16", nombre: "Ciudad de Lorca",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-01", nombre: "Valencia FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-02", nombre: "Colegio El Pilar Valencia",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-03", nombre: "Alboraya FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-04", nombre: "Fuensanta FS",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-05", nombre: "CFS Burriana",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-06", nombre: "CFS Navarti - At. Onda",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-07", nombre: "Maristas Valencia",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-08", nombre: "Mislata FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-09", nombre: "D. Moixent",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-10", nombre: "CFS Quart de Poblet",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-11", nombre: "Segorbe",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-12", nombre: "L'Olleria Club d'Albaida",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-13", nombre: "CD Santa Ana",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-14", nombre: "L'Alcora FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-15", nombre: "Vila Sport FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g14-16", nombre: "CD Corbera",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-01", nombre: "La Nucía",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-02", nombre: "CFS Horadada",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-03", nombre: "CFS Ibi",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-04", nombre: "United Elche",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-05", nombre: "Calpe FS",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-06", nombre: "Ye Faky",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-07", nombre: "Serelles Alcoy",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-08", nombre: "RC Dinamita-Albatera",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-09", nombre: "CD La Vila",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-10", nombre: "San Vicente-Hércules FS",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-11", nombre: "L'Alfàs del Pi FS",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-12", nombre: "Novelda Unión",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-13", nombre: "FS Callosa",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-14", nombre: "Publicidad Aspe",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-15", nombre: "Castalla",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g15-16", nombre: "Xaloc Alacant FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-01", nombre: "Sierra San Vicente FS",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-02", nombre: "Viña Albali Valdepeñas B",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-03", nombre: "FS Vivocuenca",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-04", nombre: "Ciudad de Guadalajara",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-05", nombre: "Balazote FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-06", nombre: "EMD Sacedón",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-07", nombre: "FS Olías del Rey/Moprisala",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-08", nombre: "Infantes",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-09", nombre: "UDAF Albacete",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-10", nombre: "AD Calera FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-11", nombre: "Azuqueca FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-12", nombre: "Tembleque FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-13", nombre: "Atl. Almonacid FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-14", nombre: "EFS Socuéllamos",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-15", nombre: "CDE Águila FS",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g16-16", nombre: "FD Mora FS",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-01", nombre: "Virgili de Cádiz",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-02", nombre: "CD Deporte y Ocio",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-03", nombre: "Nevaluz Écija UD",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-04", nombre: "Decorseneca CD",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-05", nombre: "CD Puntos Suspensivos FS",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-06", nombre: "CD Olímpic de Triana FS",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-07", nombre: "Boca Juniors FS Priego",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-08", nombre: "Isleño San Fernando FS",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-09", nombre: "CD Benalup FS",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-10", nombre: "La Palma FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-11", nombre: "CD Tor del Rey",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-12", nombre: "UD Alchoyano FS",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-13", nombre: "CD Águila de Pedrera FS",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-14", nombre: "Almonte Balompié",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-15", nombre: "CD Villalba FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g17-16", nombre: "CD Tres Calles FS",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-01", nombre: "Avanza Jaén Paraíso Int.",       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-02", nombre: "Club Torremolinos",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-03", nombre: "Bailén 2008",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-04", nombre: "Malacitano Futsal",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-05", nombre: "CD Albolote FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-06", nombre: "Victoria Kent",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-07", nombre: "Málaga CR B FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-08", nombre: "Poli Ejido",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-09", nombre: "Futsal Montevive Alhendín",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-10", nombre: "CD Gádor",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-11", nombre: "CD Tapia FS",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-12", nombre: "At. Minero Bedarense",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-13", nombre: "UD Maracena",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-14", nombre: "UD Playas de Málaga FS",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-15", nombre: "CD Pizarra FS",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g18-16", nombre: "Loja",                           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-01", nombre: "Urbanitzacions Grupo Osa",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-02", nombre: "Muro FS",                        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-03", nombre: "Ibiza FS",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-04", nombre: "CFS Montesión",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-05", nombre: "SE Alcudia",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-06", nombre: "CD Son Oliva",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-07", nombre: "Son Ferrer Atlètic",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-08", nombre: "Alaró FS",                       division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-09", nombre: "San Pablo-Eivissa",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-10", nombre: "CSE Juan de Ávila",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g19-11", nombre: "Atl. Mercadal",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-01", nombre: "Villa de Ribafrecha",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-02", nombre: "Rioja Sala",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-03", nombre: "Nalda",                         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-04", nombre: "Gracurris",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-05", nombre: "FS Agoncillo",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-06", nombre: "Vianés",                        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-07", nombre: "Cosmos FS",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-08", nombre: "Soto Sala",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-09", nombre: "Aldea FS",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-10", nombre: "Sparta Harense",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-11", nombre: "Alesanco",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-12", nombre: "Fuenmayor",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g20-13", nombre: "AD Lardero",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-01", nombre: "CD La Folia FS",               division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-02", nombre: "AD San Miguel Cobo-Lely",      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-03", nombre: "AD Muriedas-Urrutia",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-04", nombre: "Castro Urdiales",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-05", nombre: "Herrera Moderno",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-06", nombre: "El Minchón",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-07", nombre: "CD Milinde",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-08", nombre: "CD Naval",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-09", nombre: "CDE Mar Rock",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g21-10", nombre: "SD Nueva Montaña",              division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-01", nombre: "Navalmoral FS",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-02", nombre: "AD Granja FS",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-03", nombre: "Ciudad de Almendralejo",         division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-04", nombre: "CP Deleitosa FS",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-05", nombre: "ACV Badajoz FS",                 division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-06", nombre: "Colegio San José A",             division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-07", nombre: "AD Cedillo",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-08", nombre: "Publijaime Villa Jaraíz",        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-09", nombre: "Flecha Negra",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-10", nombre: "Valdetorres A",                  division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-11", nombre: "CD Alfar Salvatierra",           division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-12", nombre: "AD El Cruce Torrecillas FS",     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-13", nombre: "CD Montehermoso",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-14", nombre: "Cáceres Universidad B",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-15", nombre: "AD Casar de Cáceres",            division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g23-16", nombre: "CD Vivares",                     division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-01", nombre: "Nueva Era Melilla FS",          division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-02", nombre: "Boomerang",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-03", nombre: "CDE Melistar",                   division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-04", nombre: "At. Rusadir",                    division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-05", nombre: "PR Madrid",                      division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-06", nombre: "CP Real",                        division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-07", nombre: "Infobox Melilla",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
+  { id: "g24-08", nombre: "Básico La Salle",                division_id: 5, rating: 30, puntos: 0, gf: 0, gc: 0, forma: ["","","","",""] },
 ]
 
 /* ============ ENGINE ============ */
@@ -774,6 +1768,11 @@ function getTeamRating(id) {
   return t ? t.rating : 70
 }
 
+function getTeamFormation(id) {
+  const t = baseDatosEquipos.find(e => e.id === id)
+  return t?.defaultFormation || '1-2-1'
+}
+
 function getTeamObj(id) {
   if (id === state.teamId) return { name: state.team, players: state.players, teamId: state.teamId, staff: state.staff }
   const filialId = getFilialId(state.teamId)
@@ -786,8 +1785,12 @@ function getTeamObj(id) {
     for (const l of c.leagues) {
       const team = l.teams.find(x => x.id === id)
       if (team) {
-        const squad = REAL_SQUADS[team.id] || []
-        return { name: team.name, players: squad.map(p => ({ ...p })), teamId: team.id, staff: team.staff }
+        if (REAL_SQUADS[team.id]) {
+          return { name: team.name, players: REAL_SQUADS[team.id].map(p => ({ ...p })), teamId: team.id, staff: team.staff }
+        }
+        /* Generate CPU squad on-the-fly for teams without real squads */
+        const generated = generateCpuSquad(team.id, c.id, team.rating || 50)
+        return { name: team.name, players: generated.map(p => ({ ...p })), teamId: team.id, staff: team.staff || [] }
       }
     }
   }
@@ -847,7 +1850,7 @@ function renderSquad(players) {
   const ordered = [...players].sort((a, b) => POS_ORDER.indexOf(a.position) - POS_ORDER.indexOf(b.position) || a.number - b.number)
   document.getElementById('club-player-count').textContent = `${players.length}/${MAX_SQUAD} jugadores`
   let html = ''
-  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entrenador de porteros', fitnessCoach: 'Preparador físico' }
   if (state.staff && state.staff.length > 0) {
     html += `<div class="tactics-subsection-label">Staff técnico (${state.staff.length})</div>`
     state.staff.forEach(s => {
@@ -949,13 +1952,13 @@ function renderHome() {
         <div class="home-team-side">
           <img class="home-team-logo" src="${state.teamLogo || ''}" alt="">
           <div class="home-team-label">${state.team}</div>
-          <div class="home-team-pos">${userPos}º</div>
+          <div class="home-team-pos">${userPos}º · ${getTeamFormation(state.teamId)}</div>
         </div>
         <div class="home-vs">VS</div>
         <div class="home-team-side" style="cursor:pointer" onclick="showTeamInfo('${rivalId}')">
           <img class="home-team-logo" src="${rivalLogo}" alt="">
           <div class="home-team-label">${rivalName}</div>
-          <div class="home-team-pos">${rivalPos}º</div>
+          <div class="home-team-pos">${rivalPos}º · ${getTeamFormation(rivalId)}</div>
         </div>
       </div>
       ${isPlayoffs
@@ -987,8 +1990,12 @@ function renderClub() {
         <div class="finance-balance">${pos}º</div>
       </div>
       <div style="text-align:center">
-        <div class="finance-label" style="margin-bottom:2px">Rating del equipo</div>
+        <div class="finance-label" style="margin-bottom:2px">Rating</div>
         <div class="finance-balance">${getTeamRating(state.teamId)}</div>
+      </div>
+      <div style="text-align:center">
+        <div class="finance-label" style="margin-bottom:2px">Formación</div>
+        <div class="finance-balance">${getTeamFormation(state.teamId)}</div>
       </div>
     </div>`
 
@@ -1524,7 +2531,10 @@ function renderLeague() {
   let tableHtml = `<table class="league-table"><tr><th>#</th><th>Equipo</th><th>PJ</th><th>V</th><th>E</th><th>D</th><th>GF</th><th>GC</th><th>Pts</th></tr>`
   standings.forEach((s, i) => {
     const isUser = isOwnLeague && s.teamId === state.teamId
-    const zonaClass = i < 8 ? 'zona-playoff' : i < 14 ? 'zona-permanencia' : 'zona-descenso'
+    const totalTeams = standings.length
+    const zonaPlayoff = Math.ceil(totalTeams * 0.5)
+    const zonaDescenso = Math.max(1, Math.min(3, Math.floor(totalTeams * 0.2)))
+    const zonaClass = i < zonaPlayoff ? 'zona-playoff' : i < totalTeams - zonaDescenso ? 'zona-permanencia' : 'zona-descenso'
     const logo = s.logo || getTeamLogo(s.teamId)
     const name = s.name || getTeamName(s.teamId)
     tableHtml += `<tr class="${isUser ? 'league-row-user ' : ''}${zonaClass}" data-team-id="${s.teamId}" style="${!isUser ? 'cursor:pointer' : ''}">
@@ -2259,26 +3269,67 @@ function procesarVentasCPU() {
   }
 }
 
-function procesarFinTemporada() {
-  envejecerYProgresar()
-  const standings = updateLeagueStandings()
-  const pos = standings.findIndex(s => s.teamId === state.teamId) + 1
-  const enPrimera = state.leagueId === 'lnfs1'
+function procesarFinTemporada(skipAging, skipStandings) {
+  if (!skipAging) envejecerYProgresar()
   let cambioDivision = false
+  let pos = 0
+  let esPrimera = false, esSegunda = false, esSegundaB = false, esTercera = false
+  let esPlayoffTercera = false
+  let msg = ''
 
-  if (enPrimera && pos >= 15) {
-    state.leagueId = 'lnfs2'
-    cambioDivision = true
-  } else if (!enPrimera && pos <= 2) {
-    state.leagueId = 'lnfs1'
-    cambioDivision = true
+  if (!skipStandings) {
+    const standings = updateLeagueStandings()
+    pos = standings.findIndex(s => s.teamId === state.teamId) + 1
+    esPrimera = state.leagueId === 'lnfs1'
+    esSegunda = state.leagueId === 'lnfs2'
+    esSegundaB = state.leagueId && state.leagueId.startsWith('l2b')
+    esTercera = state.leagueId && state.leagueId.startsWith('l3g')
+
+    if (esPrimera && pos >= 15) {
+      state.leagueId = 'lnfs2'
+      cambioDivision = true
+    } else if (esSegunda && pos <= 2) {
+      state.leagueId = 'lnfs1'
+      cambioDivision = true
+    } else if (esSegunda && pos >= 15) {
+      const gruposB = ['l2b1','l2b2','l2b3','l2b4','l2b5','l2b6']
+      state.leagueId = pickRandom(gruposB)
+      cambioDivision = true
+    } else if (esSegundaB && pos <= 2) {
+      state.leagueId = 'lnfs2'
+      cambioDivision = true
+    } else if (esSegundaB && pos >= 15) {
+      const gruposT = getTerceraGroupIds()
+      state.leagueId = pickRandom(gruposT)
+      cambioDivision = true
+    } else if (esTercera && pos === 1) {
+      esPlayoffTercera = true
+    }
+
+    msg = `📊 Temporada finalizada. Posición: ${pos}º`
+    if (cambioDivision && esPrimera) msg += '\n⚠️ DESCENSO a Segunda División'
+    else if (cambioDivision && esSegunda && pos >= 15) msg += '\n⚠️ DESCENSO a 2ª División B'
+    else if (cambioDivision && esSegunda) msg += '\n🎉 ¡ASCENSO a Primera División!'
+    else if (cambioDivision && esSegundaB && pos <= 2) msg += '\n🎉 ¡ASCENSO a Segunda División!'
+    else if (cambioDivision && esSegundaB) msg += '\n⚠️ DESCENSO a 3ª División Nacional'
+    else if (esPlayoffTercera) msg += '\n🏆 ¡CAMPEÓN DE GRUPO! Accedes a la Fase de Ascenso'
+    else if (esTercera) msg += '\nPermanencia en 3ª División Nacional'
+    else if (esSegundaB) msg += '\nPermanencia en 2ª División B'
+    else msg += '\nPermanencia en la categoría'
   }
 
-  let msg = `📊 Temporada finalizada. Posición: ${pos}º`
-  if (cambioDivision && enPrimera) msg += '\n⚠️ DESCENSO a Segunda División'
-  else if (cambioDivision) msg += '\n🎉 ¡ASCENSO a Primera División!'
-  else msg += '\nPermanencia en la categoría'
+  if (esPlayoffTercera) {
+    /* Tercera champion — enter playoff for promotion to Segunda B */
+    state.players.forEach(p => { p.energy = 100; p.injury = null; p.goals = 0; p.matches = 0 })
+    document.getElementById('league-results-wrap').classList.add('hidden')
+    renderLeague()
+    saveGame()
+    addNotification('match', `🏆 ${msg}`, 'Fase de Ascenso a Segunda División B')
+    setTimeout(() => { alert(msg); iniciarPlayoffTercera() }, 100)
+    return
+  }
 
+  /* Normal season setup or post-playoff setup */
   const league = getLeagueFromId(state.leagueId)
   const allTeams = league ? league.teams : []
   state.leagueTeams = allTeams.filter(t => t.id !== state.teamId).map(t => {
@@ -2299,8 +3350,20 @@ function procesarFinTemporada() {
   document.getElementById('league-results-wrap').classList.add('hidden')
   renderLeague()
   saveGame()
-  addNotification('general', msg, `Nueva temporada en ${enPrimera ? 'Segunda' : 'Primera'} División`)
-  setTimeout(() => alert(msg), 100)
+
+  if (!skipStandings) {
+    addNotification('general', msg, `Nueva temporada en ${state.leagueId.startsWith('l3g') ? '3ª División Nacional' : state.leagueId.startsWith('l2b') ? '2ª División B' : state.leagueId === 'lnfs2' ? 'Segunda División' : state.leagueId === 'lnfs1' ? 'Primera División' : 'la categoría'}`)
+    setTimeout(() => alert(msg), 100)
+  } else {
+    const divName = state.leagueId.startsWith('l3g') ? '3ª División Nacional' : state.leagueId.startsWith('l2b') ? '2ª División B' : state.leagueId === 'lnfs2' ? 'Segunda División' : state.leagueId === 'lnfs1' ? 'Primera División' : 'la categoría'
+    addNotification('general', `📋 Nueva temporada en ${divName}`, `Comienza una nueva campaña en ${divName}`)
+  }
+}
+
+function getTerceraGroupIds() {
+  return ['l3g1','l3g2','l3g3','l3g4','l3g5','l3g6','l3g7','l3g8','l3g9','l3g10',
+          'l3g11','l3g12','l3g13','l3g14','l3g15','l3g16','l3g17','l3g18','l3g19',
+          'l3g20','l3g21','l3g23','l3g24']
 }
 
 function iniciarPlayoffs(teamIds) {
@@ -2323,18 +3386,35 @@ function iniciarPlayoffs(teamIds) {
 
 function avanzarRondaPlayoff() {
   const pf = state.playoffs
+  if (!pf) return
   const allPlayed = pf.fixtures.every(f => f.played)
   if (!allPlayed) return
 
   const winners = pf.fixtures.map(f => (f.homeScore > f.awayScore ? f.home : f.away))
 
-  if (pf.round === 'QF') {
+  if (pf.esTercera && pf.round === 'SF') {
+    /* Tercera: SF done → check promotion, then F */
+    const userFixture = pf.fixtures.find(f => f.home === state.teamId || f.away === state.teamId)
+    if (userFixture) {
+      const userScore = userFixture.home === state.teamId ? userFixture.homeScore : userFixture.awayScore
+      const rivalScore = userFixture.home === state.teamId ? userFixture.awayScore : userFixture.homeScore
+      pf.promoted = userScore > rivalScore
+    }
+    pf.round = 'F'
+    pf.fixtures = [
+      { round: 'F', home: winners[0], away: winners[1], homeScore: null, awayScore: null, played: false },
+    ]
+    if (pf.promoted) {
+      addNotification('match', '🎉 ¡ASCENSO a 2ª División B!', 'Ganaste la semifinal de la Fase de Ascenso')
+      setTimeout(() => alert('🎉 ¡ASCENSO a 2ª División B!\n\nGanaste la semifinal y consigues el ascenso de categoría.'), 200)
+    }
+  } else if (pf.round === 'QF') {
     pf.round = 'SF'
     pf.fixtures = [
       { round: 'SF', home: winners[0], away: winners[3], homeScore: null, awayScore: null, played: false },
       { round: 'SF', home: winners[1], away: winners[2], homeScore: null, awayScore: null, played: false },
     ]
-  } else if (pf.round === 'SF') {
+  } else if (pf.round === 'SF' && !pf.esTercera) {
     pf.round = 'F'
     pf.fixtures = [
       { round: 'F', home: winners[0], away: winners[1], homeScore: null, awayScore: null, played: false },
@@ -2343,12 +3423,57 @@ function avanzarRondaPlayoff() {
     const campeon = winners[0]
     const subcampeon = winners[0] === pf.fixtures[0].home ? pf.fixtures[0].away : pf.fixtures[0].home
     const esCampeon = campeon === state.teamId
-    const msg = `🏆 ${esCampeon ? '¡CAMPEÓN!' : 'Subcampeón'} — ${esCampeon ? 'Ganaste el título de liga' : 'El campeón es ' + getTeamName(campeon)}`
+    const esTercera = pf.esTercera
+    const promovio = pf.promoted
+    const msg = `🏆 ${esCampeon ? '¡CAMPEÓN!' : 'Subcampeón'} — ${esCampeon ? 'Ganaste el título' : 'El campeón es ' + getTeamName(campeon)}`
     addNotification('match', msg, 'Playoff finalizado')
     state.playoffs = null
-    setTimeout(() => { alert(msg); procesarFinTemporada() }, 100)
+    if (esTercera) {
+      /* Tercera playoff complete */
+      if (promovio) {
+        const gruposB = ['l2b1','l2b2','l2b3','l2b4','l2b5','l2b6']
+        state.leagueId = pickRandom(gruposB)
+        setTimeout(() => {
+          alert(`${msg}\n\n${esCampeon ? '¡Ascenso y título!' : 'Ascenso conseguido'}`)
+          procesarFinTemporada(true, true)
+        }, 300)
+      } else {
+        setTimeout(() => {
+          alert(`${msg}\n\nNo lograste el ascenso. Una temporada más en 3ª División.`)
+          procesarFinTemporada(true, true)
+        }, 300)
+      }
+    } else {
+      setTimeout(() => { alert(msg); procesarFinTemporada() }, 100)
+    }
     return
   }
+  saveGame()
+}
+
+function iniciarPlayoffTercera() {
+  const gruposT = getTerceraGroupIds()
+  const otherChampions = []
+  for (const gid of gruposT) {
+    if (gid === state.leagueId) continue
+    const league = getLeagueFromId(gid)
+    if (!league || !league.teams) continue
+    otherChampions.push(pickRandom(league.teams).id)
+  }
+  otherChampions.sort(() => Math.random() - 0.5)
+  const selectedOthers = otherChampions.slice(0, 3)
+
+  state.playoffs = {
+    round: 'SF',
+    fixtures: [
+      { round: 'SF', home: state.teamId, away: selectedOthers[0], homeScore: null, awayScore: null, played: false },
+      { round: 'SF', home: selectedOthers[1], away: selectedOthers[2], homeScore: null, awayScore: null, played: false },
+    ],
+    esTercera: true,
+    promoted: false,
+  }
+  const rivalName = getTeamName(selectedOthers[0])
+  addNotification('match', '🏆 Fase de Ascenso — Semifinal', `Te enfrentas a ${rivalName} por el ascenso a 2ª División B`)
   saveGame()
 }
 
@@ -2580,7 +3705,7 @@ function renderMarketContent() {
       const m = generateStaffMember('— Sin equipo —', cid, role)
       allStaff.push({ ...m, teamName: '— Sin equipo —', teamId: null })
     }
-    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entrenador de porteros', fitnessCoach: 'Preparador físico' }
     const visibleStaff = allStaff.filter(s => !(s.role === 'headCoach' && s.teamId !== null))
     const filtered = search ? visibleStaff.filter(s => s.name.toLowerCase().includes(search)) : visibleStaff
     if (filtered.length === 0) {
@@ -2648,7 +3773,7 @@ function hireStaff(staffMember, team) {
   if (state.staff.some(s => s.role === staffMember.role)) return
   const cost = 2000
   if (state.finances.balance < cost) return
-  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entrenador de porteros', fitnessCoach: 'Preparador físico' }
   state.finances.balance -= cost
   state.finances.history.push({ reason: `Contratación: ${staffMember.name} (${roleLabels[staffMember.role] || staffMember.role})`, amount: -cost })
   if (team) {
@@ -2856,7 +3981,7 @@ function envejecerYProgresar() {
 
 function openStaffModal(staff) {
   const avatar = staff.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
-  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entrenador de porteros', fitnessCoach: 'Preparador físico' }
   const img = document.getElementById('staff-modal-avatar')
   img.src = avatar
   img.onerror = () => { img.src = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1' }
@@ -3054,7 +4179,7 @@ function newGame(coach) {
   state.inbox = []
 
   /* Assign user squad based on selected team */
-  const userSquad = REAL_SQUADS[state.teamId] || FCB_SQUAD
+  const userSquad = REAL_SQUADS[state.teamId] || generateCpuSquad(state.teamId, state.countryId, selectedTeam.rating)
   state.players = userSquad.map(p => ({
     ...p, value: calcValue(p.skill), wage: calcWage(p.skill),
     enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null,
@@ -3077,7 +4202,7 @@ function newGame(coach) {
     const base = REAL_SQUADS[t.id]
     const squad = base
       ? base.map(p => ({ ...p, value: calcValue(p.skill), wage: calcWage(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }))
-      : generateCpuSquad(t.id)
+      : generateCpuSquad(t.id, state.countryId, t.rating)
     const defaultStaff = t.staff || generateStaff(t.name, state.countryId)
     state.leagueTeams.push({ teamId: t.id, name: t.name, players: squad, staff: defaultStaff })
     allTeamIds.push(t.id)
@@ -3275,7 +4400,7 @@ function showTeamPreview(teamId) {
 
   if (staff.length > 0) {
     html += `<div class="tactics-subsection-label">Staff técnico (${staff.length})</div>`
-    const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entrenador de porteros', fitnessCoach: 'Preparador físico' }
     const noface = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
     staff.forEach(s => {
       const avatar = s.avatar || noface
@@ -3546,12 +4671,16 @@ function showTeamInfo(teamId) {
         <div class="finance-balance">${posDisplay}</div>
       </div>
       <div style="text-align:center">
-        <div class="finance-label" style="margin-bottom:4px">Rating del equipo</div>
+        <div class="finance-label" style="margin-bottom:4px">Rating</div>
         <div class="finance-balance">${getTeamRating(teamId)}</div>
+      </div>
+      <div style="text-align:center">
+        <div class="finance-label" style="margin-bottom:4px">Formación</div>
+        <div class="finance-balance">${getTeamFormation(teamId)}</div>
       </div>
     </div>
     ${team.staff && team.staff.length > 0 ? `<div class="tactics-subsection-label">Staff técnico (${team.staff.length})</div>${team.staff.map(s => {
-    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entrenador de porteros', fitnessCoach: 'Preparador físico' }
       const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
       const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
       return `<div class="staff-card staff-card-team" data-staff-name="${s.name}"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role" data-role="${s.role}">${roleLabels[s.role] || s.role}</span></div>`
@@ -3615,6 +4744,22 @@ function showSideMenu() {
   const name = document.getElementById('dd-team-name')
   if (logo) logo.src = state.teamLogo || ''
   if (name) name.textContent = state.team || 'Futsal Manager'
+  /* Filial link */
+  const filialEl = document.getElementById('dropdown-filial')
+  const filialId = getFilialId(state.teamId)
+  if (filialEl) {
+    if (filialId) {
+      filialEl.style.display = 'block'
+      filialEl.innerHTML = `<div class="dropdown-item" id="dd-filial-link">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        ${getTeamName(filialId)}
+        <span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:auto">Filial</span>
+      </div>`
+      document.getElementById('dd-filial-link').onclick = () => { hideSideMenu(); showTeamInfo(filialId) }
+    } else {
+      filialEl.style.display = 'none'
+    }
+  }
   dd.classList.add('open')
   overlay.classList.add('open')
 }
