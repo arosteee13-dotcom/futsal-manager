@@ -558,6 +558,7 @@ const state = {
   benchIds: [],
   reserveIds: [],
   selectedPlayerId: null,
+  inbox: [],
 }
 
 /* ============ HELPERS ============ */
@@ -607,6 +608,7 @@ function saveGame() {
     benchIds: state.benchIds,
     reserveIds: state.reserveIds,
     staff: state.staff,
+    inbox: state.inbox,
   }
   if (idx >= 0) saves[idx] = data; else saves.unshift(data)
   setSaves(saves)
@@ -1392,6 +1394,7 @@ function simularLesion() {
     const inj = pickRandom(INJURIES)
     p.injury = { type: inj.type, description: inj.description, duration: inj.duration, remaining: inj.duration, recoveryEnergy: inj.recoveryEnergy }
     p.energy = 0
+    addNotification('injury', `🩹 Lesión: ${p.name}`, `${inj.description} (${inj.duration} jornada${inj.duration > 1 ? 's' : ''})`)
     return p
   }
   return null
@@ -1466,11 +1469,14 @@ let faltasLocal = 0
 let faltasVisitante = 0
 let matchPaused = false
 const matchData = { homeScore: 0, awayScore: 0, homeFouls: 0, awayFouls: 0, rivalName: '' }
+let matchStats = { homeShots: 0, awayShots: 0, homeYellow: 0, awayYellow: 0, homeRed: 0, awayRed: 0, homeEvents: 0, awayEvents: 0 }
+let posesion = 50
 
 function irAlPartido() {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'))
   document.getElementById('view-match').classList.add('active')
   document.getElementById('bottom-nav').style.display = 'none'
+  document.getElementById('app-header').style.display = 'none'
   document.getElementById('btn-header-menu').style.display = 'none'
   tiempoSegundos = 0
   parteActual = 1
@@ -1488,6 +1494,7 @@ function empezarPartido() {
   const btn = document.getElementById('btn-start-match')
   btn.disabled = true
   btn.innerText = 'JUGANDO...'
+  playSound('whistle')
   if (intervaloCrono) clearInterval(intervaloCrono)
   intervaloCrono = setInterval(() => {
     tiempoSegundos += 1
@@ -1500,16 +1507,38 @@ function empezarPartido() {
 
     /* Tarjetas */
     for (const p of state.players.filter(x => x.enPista)) {
-      if (Math.random() < 0.008 / 60 && !p._yellowThisMatch) {
-        p.yellowCards = (p.yellowCards || 0) + 1; p._yellowThisMatch = true
-        addFeedEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'sub' })
-        if (Math.random() < 0.2) {
+      if (Math.random() < 0.008 / 60) {
+        p._yellowsInThisMatch = (p._yellowsInThisMatch || 0) + 1
+        p.yellowCards = (p.yellowCards || 0) + 1
+        faltasLocal++
+        document.getElementById('fouls-home').textContent = faltasLocal
+          matchStats.homeYellow++; matchStats.homeEvents++
+          playSound('card')
+          if (p._yellowsInThisMatch >= 2) {
           p.redCards = (p.redCards || 0) + 1
           p._redThisMatch = true
           p.enPista = false
-          addFeedEvent({ text: `🟥 Roja: ${p.name} — Expulsado`, type: 'injury' })
+          matchStats.homeRed++
+          addFeedEvent({ text: `🟨🟨 Doble amarilla: ${p.name} — Expulsado`, type: 'red-card' })
+        } else {
+          addFeedEvent({ text: `🟨 Amarilla: ${p.name}`, type: 'yellow-card' })
+          if (Math.random() < 0.2) {
+            p.redCards = (p.redCards || 0) + 1
+            p._redThisMatch = true
+            p.enPista = false
+            matchStats.homeRed++
+            addFeedEvent({ text: `🟥 Roja directa: ${p.name} — Expulsado`, type: 'red-card' })
+          }
         }
       }
+    }
+
+    /* Tarjetas del equipo rival */
+    if (Math.random() < 0.006 / 60) {
+      faltasVisitante++
+      document.getElementById('fouls-away').textContent = faltasVisitante
+      matchStats.awayYellow++; matchStats.awayEvents++
+      addFeedEvent({ text: `🟨 Amarilla: ${matchData.rivalName}`, type: 'yellow-card' })
     }
 
     /* Faltas */
@@ -1518,6 +1547,7 @@ function empezarPartido() {
       if (isHomeFault) {
         faltasLocal++
         document.getElementById('fouls-home').textContent = faltasLocal
+        matchStats.homeEvents++
         const culprit = pickRandom(state.players.filter(p => p.enPista))
         addFeedEvent({ text: `Falta: ${culprit ? culprit.name : state.team}`, type: 'sub' })
         if (faltasLocal <= 5) {
@@ -1527,7 +1557,7 @@ function empezarPartido() {
             addFeedEvent({ text: `⚽ ${matchData.rivalName} (libre directo)`, type: 'awayGoal' })
           }
         } else {
-          addFeedEvent({ text: '🚨 ¡Sexta falta! ¡DOBLE PENALTI en contra!', type: 'sub' })
+          addFeedEvent({ text: '🚨 ¡Sexta falta! ¡DOBLE PENALTI en contra!', type: 'double-penalty' })
           if (Math.random() < 0.7) {
             matchData.awayScore++
             document.getElementById('score-away').textContent = matchData.awayScore
@@ -1537,6 +1567,7 @@ function empezarPartido() {
       } else {
         faltasVisitante++
         document.getElementById('fouls-away').textContent = faltasVisitante
+        matchStats.awayEvents++
         addFeedEvent({ text: `Falta de ${matchData.rivalName}`, type: 'sub' })
         if (faltasVisitante <= 5) {
           if (Math.random() < 0.15) {
@@ -1552,7 +1583,7 @@ function empezarPartido() {
             addFeedEvent({ text: goalText, type: 'homeGoal' })
           }
         } else {
-          addFeedEvent({ text: `🚨 ¡Sexta falta de ${matchData.rivalName}! ¡DOBLE PENALTI a favor!`, type: 'sub' })
+          addFeedEvent({ text: `🚨 ¡Sexta falta de ${matchData.rivalName}! ¡DOBLE PENALTI a favor!`, type: 'double-penalty' })
           if (Math.random() < 0.7) {
             matchData.homeScore++
             document.getElementById('score-home').textContent = matchData.homeScore
@@ -1564,8 +1595,23 @@ function empezarPartido() {
       }
     }
 
+    /* Lesiones */
+    simularLesion()
+
     /* Evento de juego */
     simularEventoPartido()
+
+    /* Posesión dinámica — random walk */
+    const enPista = state.players.filter(p => p.enPista)
+    if (enPista.length > 0) {
+      const homeSkill = enPista.reduce((s, p) => s + getHabilidadEfectiva(p), 0) / enPista.length
+      posesion += (Math.random() - 0.5) * 3
+      posesion += (50 - posesion) * 0.0005
+      posesion += (homeSkill - 70) * 0.005
+      posesion = Math.max(10, Math.min(90, posesion))
+    }
+
+    actualizarStats()
 
     if ((parteActual === 1 && tiempoSegundos >= 1200) || (parteActual === 2 && tiempoSegundos >= 2400)) {
       clearInterval(intervaloCrono)
@@ -1581,6 +1627,7 @@ function empezarPartido() {
         btn.disabled = false
       } else {
         addFeedEvent({ text: '— FINAL DEL PARTIDO —', type: 'break' })
+        playSound('whistle')
         btn.style.display = 'none'
         document.getElementById('btn-end-match').style.display = 'block'
       }
@@ -1600,10 +1647,13 @@ function simularEventoPartido() {
   const isHomeAttack = Math.random() * (homeChance + awayChance) < homeChance
   const teamName = isHomeAttack ? state.team : matchData.rivalName
   const teamSkill = isHomeAttack ? homeSkill : 70
+  if (isHomeAttack) matchStats.homeShots++; else matchStats.awayShots++
   if (Math.random() < (teamSkill / 100) * 0.35) {
     if (isHomeAttack) matchData.homeScore++; else matchData.awayScore++
     document.getElementById('score-home').textContent = matchData.homeScore
     document.getElementById('score-away').textContent = matchData.awayScore
+    animarGol(isHomeAttack ? 'home' : 'away')
+    playSound('goal')
     if (isHomeAttack) {
       const g = pickRandom(enPista); if (g) { g._goalsInMatch = (g._goalsInMatch || 0) + 1; g.goals = (g.goals || 0) + 1 }
       let goalText = `⚽ ${g ? g.name + ' (' + state.team + ')' : state.team}`
@@ -1619,6 +1669,7 @@ function simularEventoPartido() {
 }
 
 function startMatchFromLeague(rivalId, fixture) {
+  showLoading('Preparando el partido...')
   const rival = getTeamObj(rivalId)
   if (!rival) return
   const tactic = state.tactic
@@ -1648,6 +1699,12 @@ function startMatchFromLeague(rivalId, fixture) {
   matchData.rivalName = rival.name
   engine = { homeScore: 0, awayScore: 0 }
 
+  /* Stats tracking */
+  matchStats = { homeShots: 0, awayShots: 0, homeYellow: 0, awayYellow: 0, homeRed: 0, awayRed: 0, homeEvents: 0, awayEvents: 0 }
+  posesion = 50
+  document.getElementById('match-stats').style.display = 'block'
+  actualizarStats()
+
   /* Scoreboard */
   document.getElementById('match-home-name').textContent = state.team
   document.getElementById('match-away-name').textContent = rival.name
@@ -1666,6 +1723,7 @@ function startMatchFromLeague(rivalId, fixture) {
   }
 
   renderPlayerRatings()
+  hideLoading()
 }
 
 function addFeedEvent(event) {
@@ -1683,11 +1741,43 @@ function addFeedEvent(event) {
     if (event.type === 'homeGoal' || event.type === 'awayGoal') extra = ' goal'
     else if (event.type === 'sub') extra = ' sub'
     else if (event.type === 'injury') extra = ' injury'
+    else if (event.type === 'yellow-card') extra = ' yellow-card'
+    else if (event.type === 'red-card') extra = ' red-card'
+    else if (event.type === 'double-penalty') extra = ' double-penalty'
     el.className = `feed-event${extra}`
-    el.innerHTML = `<strong>${time}</strong> ${event.text}`
+    const cleanText = event.text.replace(/[⚽🟨🟥🚨🅰️🩹]/g, '').trim()
+    el.innerHTML = `<strong>${time}</strong> ${cleanText}`
   }
   feed.appendChild(el)
   feed.scrollTop = feed.scrollHeight
+}
+
+function animarGol(equipo) {
+  const el = equipo === 'home' ? document.getElementById('score-home') : document.getElementById('score-away')
+  const board = document.querySelector('.scoreboard')
+  if (el) {
+    el.classList.remove('goal-anim')
+    void el.offsetWidth
+    el.classList.add('goal-anim')
+  }
+  if (board) {
+    board.classList.remove('goal-shake')
+    void board.offsetWidth
+    board.classList.add('goal-shake')
+  }
+}
+
+function actualizarStats() {
+  const posH = Math.round(posesion)
+  document.getElementById('stats-pos-local').textContent = posH + '%'
+  document.getElementById('stats-pos-visit').textContent = (100 - posH) + '%'
+  document.getElementById('stats-fill-pos').style.width = posH + '%'
+  document.getElementById('stats-tir-local').textContent = matchStats.homeShots
+  document.getElementById('stats-tir-visit').textContent = matchStats.awayShots
+  document.getElementById('stats-amar-local').textContent = matchStats.homeYellow
+  document.getElementById('stats-roja-local').textContent = matchStats.homeRed
+  document.getElementById('stats-amar-visit').textContent = matchStats.awayYellow
+  document.getElementById('stats-roja-visit').textContent = matchStats.awayRed
 }
 
 function renderPlayerRatings() {
@@ -1699,9 +1789,12 @@ function renderPlayerRatings() {
   container.innerHTML = enPista.map(p => {
     const pos = POSITIONS[p.position]
     const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+    let cardBadge = ''
+    if (p._redThisMatch) cardBadge = '<span class="card-indicator card-red"></span>'
+    else if (p._yellowsInThisMatch) cardBadge = '<span class="card-indicator card-yellow"></span>'
     return `<div class="match-player-item">
       <div class="match-player-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
-      <span class="match-player-name">${p.name}</span>
+      <span class="match-player-name">${p.name}${cardBadge}</span>
       <span class="match-player-ene" style="color:${getEneColor(p.energy)}">${p.energy}</span>
       <div class="stamina-bar"><div class="stamina-fill" style="width:${p.energy}%;background:${getEneColor(p.energy)}"></div></div>
       <span class="match-player-rating">${'★'.repeat(Math.max(1, Math.round(getHabilidadEfectiva(p) / 20)))}</span>
@@ -1939,7 +2032,10 @@ function finishMatch(isHome, fixture, rival) {
   else { reward = -200; state.stats.losses++ }
   state.finances.balance += reward
   state.finances.history.push({ reason: `J${state.currentMatchday}: ${userScore}-${rivalScore} vs ${rival.name}`, amount: reward })
-  
+
+  /* Inbox notification */
+  const resultLabel = userScore > rivalScore ? 'Victoria' : userScore === rivalScore ? 'Empate' : 'Derrota'
+  addNotification('match', `${resultLabel} ${userScore}-${rivalScore} vs ${rival.name}`, `Jornada ${state.currentMatchday} · ${reward >= 0 ? '+' : ''}${reward} €`)
 
   /* Post-match recovery: calculate days until next match */
   const nextFixture = getFixtureForUser(state.currentMatchday + 1)
@@ -1974,7 +2070,7 @@ function finishMatch(isHome, fixture, rival) {
     })
     p.matches = (p.matches || 0) + 1
     p.goals = (p.goals || 0) + (p._goalsInMatch || 0)
-    delete p._yellowThisMatch; delete p._redThisMatch; delete p._goalsInMatch; delete p._assistThisMatch
+    delete p._yellowsInThisMatch; delete p._redThisMatch; delete p._goalsInMatch; delete p._assistThisMatch
   })
 
   /* Auto-simulate other matches */
@@ -2032,6 +2128,7 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('view-match').classList.remove('active')
   document.getElementById('view-league').classList.add('active')
   document.getElementById('bottom-nav').style.display = ''
+  document.getElementById('app-header').style.display = ''
   document.getElementById('btn-header-menu').style.display = ''
 
   const fixtures = state.fixtures.filter(f => f.matchday === state.currentMatchday)
@@ -2059,21 +2156,30 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
   document.getElementById('league-results-wrap').classList.remove('hidden')
 
   document.getElementById('btn-advance-matchday').onclick = () => {
-    if (state.currentMatchday >= 30) {
-      const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
-      let msg = `📊 Temporada finalizada. Posición: ${pos}º`
-      if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
-      else if (pos <= 8) msg += '\n🏆 ¡Clasificado al Playoff por el título!'
-      alert(msg)
-    }
-    state.currentMatchday++
-    for (const p of state.players) {
-      if (!p.injury) continue
-      p.injury.remaining--
-      if (p.injury.remaining <= 0) { p.energy = p.injury.recoveryEnergy; p.injury = null }
-    }
-    document.getElementById('league-results-wrap').classList.add('hidden')
-    renderLeague()
+    showLoading('Simulando jornada...')
+    setTimeout(() => {
+      if (state.currentMatchday >= 30) {
+        const pos = updateLeagueStandings().findIndex(s => s.teamId === state.teamId) + 1
+        let msg = `📊 Temporada finalizada. Posición: ${pos}º`
+        if (pos >= 15) msg += '\n⚠️ ¡DESCENSO a Segunda División!'
+        else if (pos <= 8) msg += '\n🏆 ¡Clasificado al Playoff por el título!'
+        alert(msg)
+      }
+      state.currentMatchday++
+      for (const p of state.players) {
+        if (!p.injury) continue
+        p.injury.remaining--
+        if (p.injury.remaining <= 0) {
+          const name = p.name
+          p.energy = p.injury.recoveryEnergy
+          p.injury = null
+          addNotification('general', `💪 Recuperado: ${name}`, `Vuelve tras superar su lesión`)
+        }
+      }
+      document.getElementById('league-results-wrap').classList.add('hidden')
+      renderLeague()
+      hideLoading()
+    }, 300)
   }
 }
 
@@ -2199,7 +2305,7 @@ function buyPlayer(player, team) {
   if (idx >= 0) team.players.splice(idx, 1)
   const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [], transferListed: false, transferPrice: 0, loanListed: false, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']) }
   state.players.push(newPlayer)
-  
+  addNotification('transfer', `Fichaje completado: ${player.name}`, `${formatMoney(player.value)} · ${player.nationality}`)
   renderMarketContent()
 }
 
@@ -2359,6 +2465,7 @@ function renderFinances() {
 function setupNavigation() {
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.onclick = () => {
+      playSound('click')
       const tab = btn.dataset.tab
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
@@ -2445,6 +2552,7 @@ function newGame(coach) {
   /* Clear old tactics save */
   try { const all = JSON.parse(localStorage.getItem(TACTICS_KEY)) || {}; delete all[state.gameId]; localStorage.setItem(TACTICS_KEY, JSON.stringify(all)) } catch {}
   state.finances = { balance: 5000, history: [] }
+  state.inbox = []
 
   /* Assign user squad based on selected team */
   const userSquad = REAL_SQUADS[state.teamId] || FCB_SQUAD
@@ -2532,6 +2640,7 @@ function newGame(coach) {
 
   autoAssignSquad()
 
+  addNotification('general', `🏆 Nueva temporada con ${selectedTeam.name}`, `Liga ${league.name} · Entrenador: ${coach}`)
   startGame()
 }
 
@@ -2558,6 +2667,7 @@ function loadGame(id) {
   state.benchIds = data.benchIds || []
   state.reserveIds = data.reserveIds || []
   state.staff = data.staff || []
+  state.inbox = data.inbox || []
   startGame()
 }
 
@@ -2569,7 +2679,7 @@ function startGame() {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
   document.querySelector('[data-tab="home"]').classList.add('active')
   renderTab('home')
-  
+  updateInboxBadge()
 }
 
 /* ============ MENU ============ */
@@ -3005,6 +3115,73 @@ function hideSideMenu() {
   document.getElementById('dropdown-overlay').classList.remove('open')
 }
 
+/* ============ INBOX ============ */
+function addNotification(type, title, body) {
+  if (!state.inbox) state.inbox = []
+  state.inbox.unshift({
+    id: Date.now() + Math.random(),
+    type: type || 'general',
+    title: title || '',
+    body: body || '',
+    matchday: state.currentMatchday || 0,
+    read: false,
+    createdAt: new Date().toISOString(),
+  })
+  updateInboxBadge()
+}
+
+function updateInboxBadge() {
+  const badge = document.getElementById('inbox-badge')
+  if (!badge) return
+  const unread = state.inbox ? state.inbox.filter(n => !n.read).length : 0
+  badge.textContent = unread
+  badge.style.display = unread > 0 ? 'flex' : 'none'
+}
+
+function renderInbox() {
+  const list = document.getElementById('inbox-list')
+  if (!list) return
+  if (!state.inbox || state.inbox.length === 0) {
+    list.innerHTML = '<div class="inbox-empty">📭 No hay notificaciones</div>'
+    return
+  }
+  const types = {
+    match: { icon: '⚽', label: 'Partido' },
+    injury: { icon: '🩹', label: 'Lesión' },
+    transfer: { icon: '💰', label: 'Fichaje' },
+    general: { icon: '📌', label: 'General' },
+  }
+  list.innerHTML = state.inbox.map(n => {
+    const t = types[n.type] || types.general
+    return `<div class="inbox-item${n.read ? '' : ' unread'}" data-inbox-id="${n.id}">
+      <span class="inbox-icon">${t.icon}</span>
+      <div class="inbox-content">
+        <div class="inbox-title">${n.title}</div>
+        ${n.body ? '<div class="inbox-body">' + n.body + '</div>' : ''}
+        <div class="inbox-meta">J${n.matchday} · ${new Date(n.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}</div>
+      </div>
+    </div>`
+  }).join('')
+  /* Mark as read on click */
+  list.querySelectorAll('.inbox-item').forEach(el => {
+    el.onclick = () => {
+      const id = parseFloat(el.dataset.inboxId)
+      const n = state.inbox.find(x => x.id === id)
+      if (n) n.read = true
+      el.classList.remove('unread')
+      updateInboxBadge()
+    }
+  })
+}
+
+function showInboxModal() {
+  const modal = document.getElementById('inbox-modal')
+  if (!modal) return
+  renderInbox()
+  modal.classList.add('open')
+}
+
+/* ============ SIDE MENU EVENTS ============ */
 document.getElementById('btn-header-menu').onclick = (e) => {
   e.stopPropagation()
   if (document.getElementById('header-dropdown').classList.contains('open')) {
@@ -3024,6 +3201,7 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
       saveGame()
       hideSideMenu()
       showMainMenu()
+      initMenuParticles()
     } else if (action === 'save') {
       saveGame()
       hideSideMenu()
@@ -3034,7 +3212,7 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
       }, 1500)
     } else if (action === 'inbox') {
       hideSideMenu()
-      alert('📬 Bandeja de entrada — Próximamente')
+      showInboxModal()
     } else if (action === 'calendar') {
       hideSideMenu()
       showCalendar()
@@ -3046,11 +3224,113 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
   }
 })
 
+/* ============ SOUNDS ============ */
+let audioCtx = null
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  if (audioCtx.state === 'suspended') audioCtx.resume()
+}
+
+function playBeep(freq, duration, type, volume) {
+  try {
+    ensureAudio()
+    const osc = audioCtx.createOscillator()
+    const gain = audioCtx.createGain()
+    osc.connect(gain); gain.connect(audioCtx.destination)
+    osc.type = type || 'sine'
+    osc.frequency.value = freq || 440
+    gain.gain.value = volume || 0.08
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration || 0.15))
+    osc.start(); osc.stop(audioCtx.currentTime + (duration || 0.15))
+  } catch (e) { /* silencio */ }
+}
+
+function playSound(name) {
+  switch (name) {
+    case 'click': playBeep(800, 0.05, 'sine', 0.04); break
+    case 'whistle': playBeep(600, 0.3, 'square', 0.05); break
+    case 'goal': playBeep(523, 0.1, 'square', 0.06); setTimeout(() => { playBeep(659, 0.1, 'square', 0.06); setTimeout(() => playBeep(784, 0.2, 'square', 0.06), 100) }, 100); break
+    case 'card': playBeep(300, 0.15, 'sawtooth', 0.03); break
+    case 'error': playBeep(200, 0.2, 'square', 0.04); break
+  }
+}
+
+/* ============ PARTICLES ============ */
+function initMenuParticles() {
+  const canvas = document.getElementById('menu-particles')
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  let w, h, particles = []
+  const COUNT = 30
+
+  function resize() {
+    const parent = canvas.parentElement
+    w = canvas.width = parent.offsetWidth
+    h = canvas.height = parent.offsetHeight
+  }
+
+  function createParticles() {
+    particles = []
+    for (let i = 0; i < COUNT; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 2 + 1,
+        dx: (Math.random() - 0.5) * 0.3,
+        dy: (Math.random() - 0.5) * 0.3,
+        a: Math.random() * 0.5 + 0.1,
+      })
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h)
+    for (const p of particles) {
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(96, 165, 250, ${p.a})`
+      ctx.fill()
+      p.x += p.dx
+      p.y += p.dy
+      if (p.x < 0) p.x = w
+      if (p.x > w) p.x = 0
+      if (p.y < 0) p.y = h
+      if (p.y > h) p.y = 0
+    }
+    requestAnimationFrame(draw)
+  }
+
+  resize()
+  createParticles()
+  draw()
+  window.addEventListener('resize', () => { resize(); createParticles() })
+}
+
+/* ============ LOADING ============ */
+function showLoading(text) {
+  const overlay = document.getElementById('loading-overlay')
+  if (!overlay) return
+  document.querySelector('.loading-text').textContent = text || 'Cargando...'
+  overlay.style.display = 'flex'
+  overlay.style.opacity = '0'
+  requestAnimationFrame(() => { overlay.style.opacity = '1' })
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loading-overlay')
+  if (!overlay) return
+  overlay.style.opacity = '0'
+  setTimeout(() => { overlay.style.display = 'none' }, 250)
+}
+
 /* ============ INIT ============ */
 document.getElementById('btn-new-game').onclick = () => showBrowser('countries')
 document.getElementById('btn-load-game').onclick = showLoadMenu
 document.getElementById('btn-browser-back').onclick = handleBrowserBack
 document.getElementById('btn-load-cancel').onclick = showMainMenu
 document.getElementById('btn-tactica').onclick = abrirTacticasModal
+document.getElementById('inbox-close').onclick = () => document.getElementById('inbox-modal').classList.remove('open')
+document.getElementById('inbox-modal').onclick = (e) => { if (e.target === e.currentTarget) document.getElementById('inbox-modal').classList.remove('open') }
 
 showMainMenu()

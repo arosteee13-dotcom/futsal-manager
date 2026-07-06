@@ -7,6 +7,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Futsal Manager</title>
   <link rel="stylesheet" href="css/styles.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="apple-touch-icon" href="app_icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="app_icon.png">
 </head>
@@ -15,10 +18,12 @@
 
     <!-- MENU SCREEN -->
     <div id="menu-screen">
+      <canvas id="menu-particles"></canvas>
       <div id="menu-main">
         <div class="menu-hero">
           <img class="menu-logo" src="app_icon.png" alt="Futsal Manager">
           <h1 class="menu-title">Futsal<br>Manager</h1>
+          <span class="menu-subtitle">Fútbol Sala Manager</span>
         </div>
         <div class="menu-buttons">
           <button class="btn-primary menu-btn" id="btn-new-game">Nueva Partida</button>
@@ -86,6 +91,7 @@
             <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/>
           </svg>
           Bandeja de entrada
+          <span class="inbox-badge" id="inbox-badge" style="display:none">0</span>
         </div>
         <div class="dropdown-item" data-action="calendar">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -207,40 +213,64 @@
         <!-- PARTIDO -->
         <section id="view-match" class="view">
           <div class="scoreboard">
-            <div class="score-team">
+            <div class="scoreboard-bg"></div>
+            <div class="score-team score-home">
               <img class="score-logo" id="match-home-logo" src="" alt="">
               <span class="score-name" id="match-home-name">Local</span>
               <span class="score-value" id="score-home">0</span>
             </div>
             <div class="score-clock">
-              <span class="clock-icon">⏱️</span>
               <span class="clock-time" id="cronometro">00:00</span>
+              <span class="clock-label">2º PARTE</span>
             </div>
-            <div class="score-team">
+            <div class="score-team score-away">
               <img class="score-logo" id="match-away-logo" src="" alt="">
               <span class="score-name" id="match-away-name">Visitante</span>
               <span class="score-value" id="score-away">0</span>
             </div>
-          </div>
-          <div class="fouls-bar">
-            <div class="fouls-team">
-              <span class="fouls-label">Faltas</span>
-              <span class="fouls-count" id="fouls-home">0</span>
-              <span class="fouls-sep">/</span>
-              <span class="fouls-limit">5</span>
+            <div class="fouls-bar">
+              <div class="fouls-team">
+                <span class="fouls-count" id="fouls-home">0</span>
+                <span class="fouls-label">Faltas</span>
+              </div>
+              <span class="fouls-vs">/5</span>
+              <div class="fouls-team">
+                <span class="fouls-count" id="fouls-away">0</span>
+                <span class="fouls-label">Faltas</span>
+              </div>
             </div>
-            <span class="fouls-vs">VS</span>
-            <div class="fouls-team">
-              <span class="fouls-label">Faltas</span>
-              <span class="fouls-count" id="fouls-away">0</span>
-              <span class="fouls-sep">/</span>
-              <span class="fouls-limit">5</span>
+          </div>
+          <div id="match-stats" class="match-stats" style="display:none">
+            <div class="stats-header">ESTADÍSTICAS</div>
+            <div class="stats-row">
+              <span class="stats-val" id="stats-pos-local">50%</span>
+              <div class="stats-bar-wrap"><div class="stats-bar"><div class="stats-fill" id="stats-fill-pos" style="width:50%"></div></div></div>
+              <span class="stats-val" id="stats-pos-visit">50%</span>
+              <span class="stats-label">Posesión</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-val" id="stats-tir-local">0</span>
+              <span class="stats-divider">-</span>
+              <span class="stats-val" id="stats-tir-visit">0</span>
+              <span class="stats-label">Tiros</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-val" id="stats-tar-local">
+                <span class="stats-card-dot yellow"></span><span id="stats-amar-local">0</span>
+                <span class="stats-card-dot red"></span><span id="stats-roja-local">0</span>
+              </span>
+              <span class="stats-divider">-</span>
+              <span class="stats-val" id="stats-tar-visit">
+                <span class="stats-card-dot yellow"></span><span id="stats-amar-visit">0</span>
+                <span class="stats-card-dot red"></span><span id="stats-roja-visit">0</span>
+              </span>
+              <span class="stats-label">Tarjetas</span>
             </div>
           </div>
           <div class="match-planes" id="match-planes" style="display:none"></div>
-          <div class="feed-event minute" id="eventos-header">⚡ Eventos</div>
+          <div class="feed-event minute" id="eventos-header"><svg class="evt-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Eventos</div>
           <div class="match-feed" id="log-partido"></div>
-          <div class="feed-event minute" id="quinteto-header">🏁 Quinteto titular</div>
+          <div class="feed-event minute" id="quinteto-header"><svg class="evt-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Quinteto titular</div>
           <div class="match-players" id="match-players"></div>
           <div class="match-bottom-bar">
             <button id="btn-start-match" style="display:none" onclick="empezarPartido()">JUGAR</button>
@@ -404,12 +434,28 @@
     </div>
   </div>
 
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" class="loading-overlay" style="display:none">
+    <div class="loading-spinner">
+      <div class="loading-ring"></div>
+      <span class="loading-text">Cargando...</span>
+    </div>
+  </div>
+
   <!-- TEAM PREVIEW MODAL -->
   <div id="team-preview-modal" class="modal-overlay">
       <div class="modal-content">
       <div class="modal-scroll" id="team-preview-content"></div>
       <button class="btn-primary" id="tp-choose" style="width:calc(100% - 40px);max-width:310px;height:45px;margin:0 auto 8px;display:block">SELECCIONAR</button>
       <button class="modal-close" id="tp-close">VOLVER</button>
+    </div>
+  </div>
+
+  <!-- INBOX MODAL -->
+  <div id="inbox-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-scroll" id="inbox-list" style="align-items:stretch;gap:6px"></div>
+      <button class="btn-secondary modal-close" id="inbox-close" style="margin:0 20px 16px;flex-shrink:0">← VOLVER</button>
     </div>
   </div>
 
