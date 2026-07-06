@@ -1433,6 +1433,12 @@ html, body {
   flex-shrink: 0;
 }
 
+.staff-card-role[data-role="headCoach"] { background: #2563EB; }
+.staff-card-role[data-role="assistantCoach"] { background: #F59E0B; }
+.staff-card-role[data-role="delegate"] { background: #059669; }
+.staff-card-role[data-role="goalkeeperCoach"] { background: #8B5CF6; }
+.staff-card-role[data-role="fitnessCoach"] { background: #DC2626; }
+
 .finance-label {
   display: block;
   font-size: 13px;
@@ -1444,12 +1450,57 @@ html, body {
   font-size: 28px;
   font-weight: 700;
   color: var(--accent);
+  font-family: var(--font-display);
+}
+
+/* Finance summary row */
+.finance-resumen {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.finance-rstat {
+  flex: 1;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 6px;
+}
+
+.finance-rstat-lbl {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.finance-rstat-val {
+  font-size: 16px;
+  font-weight: 700;
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-display);
+}
+
+.finance-rstat-val.positive { color: #10B981; }
+.finance-rstat-val.negative { color: #EF4444; }
+
+.finance-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
 }
 
 .finance-history {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .finance-item {
@@ -2894,6 +2945,11 @@ html, body {
   color: #fff;
 }
 
+.market-card-btn.hire {
+  background: #8B5CF6;
+  color: #fff;
+}
+
 .market-card-btn.disabled {
   background: var(--border);
   color: var(--text-muted);
@@ -3004,79 +3060,96 @@ html, body {
 }
 
 /* ───────── STAFF MODAL ───────── */
-.staff-modal-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--bg-surface);
-}
+#staff-modal .modal-scroll { gap: 0; padding: 16px 20px 8px; }
+#staff-modal .modal-avatar-wrap { margin: 4px 0 12px; }
+#staff-modal .modal-position { letter-spacing: 0.5px; }
 
-.staff-modal-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  margin-top: 4px;
-}
-
-.staff-modal-role {
+#staff-modal .staff-bonus {
+  text-align: center;
+  padding: 8px 12px;
+  margin: 4px 0 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
   font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  margin-top: 2px;
+  color: #E2E8F0;
+  line-height: 1.4;
+  width: 100%;
 }
 
-.staff-career-item {
+#staff-modal .staff-career-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
   font-size: 12px;
   width: 100%;
 }
 
-.staff-career-item:last-child { border-bottom: none; }
+#staff-modal .staff-career-item:last-child { border-bottom: none; }
 
-.staff-career-team {
+#staff-modal .staff-career-item:nth-child(odd) {
+  background: rgba(255,255,255,0.02);
+}
+
+#staff-modal .staff-career-team {
   flex: 1;
   font-weight: 600;
-  color: var(--text);
+  color: #E2E8F0;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.staff-career-dates {
+#staff-modal .staff-career-dates {
   font-size: 10px;
-  color: var(--text-muted);
-  min-width: 70px;
+  color: rgba(255,255,255,0.3);
+  min-width: 65px;
   text-align: center;
 }
 
-.staff-career-record {
-  font-weight: 600;
-  color: var(--text-secondary);
+#staff-modal .staff-career-record {
+  font-weight: 700;
   min-width: 55px;
   text-align: right;
 }
 
-.staff-career-matches {
+#staff-modal .staff-career-record .wins { color: #10B981; }
+#staff-modal .staff-career-record .draws { color: #F59E0B; }
+#staff-modal .staff-career-record .losses { color: #EF4444; }
+
+#staff-modal .staff-career-matches {
   font-size: 10px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.3);
   min-width: 40px;
   text-align: right;
 }
 
-.staff-career-total {
+#staff-modal .staff-career-total {
   text-align: center;
-  padding: 10px;
+  padding: 10px 12px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--text);
-  background: var(--bg-surface);
+  color: #F1F5F9;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--radius-sm);
+  width: 100%;
+  margin: 12px 0 4px;
+}
+
+#staff-modal .modal-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  width: 100%;
+  margin: 0;
 }
 
 /* ───────── TACTICS MODAL ───────── */
@@ -3085,6 +3158,20 @@ html, body {
 #tactics-modal .pitch-grid { width: 100%; height: auto; aspect-ratio: 358/285; padding: 4px; box-sizing: border-box; }
 #tactics-modal .bench-slot-wrap { width: 56px; }
 /* ───────── PLAYER MODAL ───────── */
+#player-modal.modal-overlay {
+  padding: 0;
+}
+
+#player-modal .modal-content {
+  position: absolute;
+  inset: 0;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+
 #player-modal .modal-scroll { gap: 0; }
 
 .modal-avatar-wrap {
@@ -3389,6 +3476,53 @@ html, body {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* ───────── PLAYER MODAL COMPACT ACTIONS ───────── */
+.modal-bottom-actions {
+  width: 100%;
+  padding: 8px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#player-modal .modal-market-actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+}
+
+#player-modal .modal-market-actions button,
+#player-modal .modal-action-btn {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  height: auto;
+  padding: 8px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: auto;
+}
+
+#player-modal .market-input-group {
+  padding: 0;
+  width: 100%;
+}
+
+#player-modal .market-price-input {
+  height: 36px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
 
 /* ───────── TACTICS / SLOT PITCH ───────── */
 .pitch-grid {

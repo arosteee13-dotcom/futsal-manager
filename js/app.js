@@ -42,8 +42,16 @@ const INJURIES = [
   { type: 'ankle',     description: 'Torcedura de tobillo',     duration: 2, recoveryEnergy: 25 },
 ]
 
+const FILIAL_MAP = {
+  '1041': 's24',
+}
+
+function getFilialId(teamId) { return FILIAL_MAP[teamId] || null }
+function getParentTeamId(filialId) { return Object.keys(FILIAL_MAP).find(k => FILIAL_MAP[k] === filialId) || null }
+
 /* FC Barcelona — plantilla real */
 /* Pool de nombres españoles para CPU */
+const NOPHOTO = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
 const NAME_POOLS = {
   portero: ['Álex Ruiz', 'David Molina', 'Jesús Serrano', 'Manuel Blanco', 'Pablo Morales', 'Raúl Gil', 'Sergio Ramos', 'Víctor Navarro'],
   cierre: ['Alberto Torres', 'Carlos Domínguez', 'Daniel Vázquez', 'Fernando Romero', 'Jorge Álvarez', 'Juan Díaz', 'Luis Moreno', 'Miguel Jiménez'],
@@ -52,6 +60,30 @@ const NAME_POOLS = {
 }
 
 const SURNAMES = ['García', 'Rodríguez', 'Martínez', 'López', 'González', 'Hernández', 'Pérez', 'Sánchez', 'Ramírez', 'Moreno', 'Jiménez', 'Ruiz', 'Díaz', 'Álvarez', 'Romero', 'Navarro', 'Torres', 'Domínguez', 'Vázquez', 'Ramos', 'Gil', 'Serrano', 'Blanco', 'Molina', 'Morales']
+
+const STAFF_FIRST = {
+  es: ['Álex', 'Alberto', 'Alejandro', 'Álvaro', 'Andrés', 'Antonio', 'Carlos', 'Daniel', 'David', 'Diego', 'Fernando', 'Francisco', 'Hugo', 'Iván', 'Javier', 'Jorge', 'José', 'Juan', 'Luis', 'Manuel', 'Marc', 'Marcos', 'Miguel', 'Pablo', 'Pau', 'Pedro', 'Rafael', 'Raúl', 'Rubén', 'Sergio', 'Vicente', 'Víctor'],
+  pt: ['João', 'Pedro', 'Rui', 'Carlos', 'José', 'António', 'Manuel', 'Fernando', 'Luís', 'Miguel', 'André', 'Ricardo', 'Paulo', 'Nuno', 'Hugo', 'Tiago', 'Bruno', 'Fábio', 'Diogo', 'Rafael'],
+  it: ['Marco', 'Luca', 'Giuseppe', 'Andrea', 'Paolo', 'Roberto', 'Stefano', 'Francesco', 'Alessandro', 'Fabio', 'Michele', 'Simone', 'Riccardo', 'Daniele', 'Antonio'],
+  br: ['Carlos', 'José', 'Pedro', 'João', 'Antônio', 'Francisco', 'Luís', 'Paulo', 'Roberto', 'Marcos', 'Eduardo', 'Fábio', 'André', 'Diego', 'Rafael', 'Bruno', 'Thiago', 'Gustavo'],
+  ar: ['Juan', 'Diego', 'Pablo', 'Carlos', 'José', 'Martín', 'Luis', 'Gustavo', 'Hernán', 'Mario', 'Sergio', 'Jorge', 'Alejandro', 'Gabriel', 'Leandro', 'Federico', 'Lautaro', 'Matías', 'Nicolás', 'Facundo'],
+}
+
+const SURNAMES_BY_COUNTRY = {
+  es: ['García', 'Rodríguez', 'Martínez', 'López', 'González', 'Hernández', 'Pérez', 'Sánchez', 'Ramírez', 'Moreno', 'Jiménez', 'Ruiz', 'Díaz', 'Álvarez', 'Romero', 'Navarro', 'Torres', 'Domínguez', 'Vázquez', 'Ramos', 'Gil', 'Serrano', 'Blanco', 'Molina', 'Morales'],
+  pt: ['Silva', 'Santos', 'Pereira', 'Costa', 'Sousa', 'Oliveira', 'Rodrigues', 'Martins', 'Fernandes', 'Gonçalves', 'Lopes', 'Marques', 'Almeida', 'Ribeiro', 'Pinto', 'Carvalho', 'Teixeira', 'Moreira', 'Correia', 'Mendes'],
+  it: ['Rossi', 'Bianchi', 'Verdi', 'Russo', 'Ferrari', 'Esposito', 'Romano', 'Gallo', 'Conti', 'Mancini', 'Costa', 'Moretti', 'Fontana', 'Marino', 'Rinaldi', 'Caruso', 'Greco', 'Barbieri', 'Fabbri', 'Martini'],
+  br: ['Silva', 'Santos', 'Oliveira', 'Souza', 'Pereira', 'Lima', 'Costa', 'Almeida', 'Rodrigues', 'Nascimento', 'Araújo', 'Ribeiro', 'Carvalho', 'Gomes', 'Martins', 'Barbosa', 'Rocha', 'Dias', 'Moreira', 'Teixeira'],
+  ar: ['García', 'Rodríguez', 'Martínez', 'López', 'González', 'Fernández', 'Pérez', 'Sánchez', 'Romero', 'Torres', 'Álvarez', 'Díaz', 'Ruiz', 'Moreno', 'Muñoz', 'Sosa', 'Acosta', 'Medina', 'Castillo', 'Giménez'],
+}
+
+const NATIONALITIES = {
+  es: { flag: '🇪🇸', name: 'España', label: '🇪🇸 España' },
+  pt: { flag: '🇵🇹', name: 'Portugal', label: '🇵🇹 Portugal' },
+  it: { flag: '🇮🇹', name: 'Italia', label: '🇮🇹 Italia' },
+  br: { flag: '🇧🇷', name: 'Brasil', label: '🇧🇷 Brasil' },
+  ar: { flag: '🇦🇷', name: 'Argentina', label: '🇦🇷 Argentina' },
+}
 
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)]
@@ -63,6 +95,36 @@ function randInt(min, max) {
 
 function calcValue(skill) {
   return skill * 80 + randInt(0, 2000)
+}
+
+function calcWage(skill) {
+  return skill * 50 + 500
+}
+
+function generateStaffMember(teamName, countryId, role) {
+  const noface = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
+  const nat = NATIONALITIES[countryId] || NATIONALITIES.es
+  const first = pickRandom(STAFF_FIRST[countryId] || STAFF_FIRST.es)
+  const surname = pickRandom(SURNAMES_BY_COUNTRY[countryId] || SURNAMES_BY_COUNTRY.es)
+  const now = new Date().toLocaleDateString('es-ES')
+  return {
+    name: `${first} ${surname}`,
+    nationality: nat.label,
+    role: role || 'headCoach',
+    avatar: noface,
+    career: [{ team: teamName || '—', from: now, to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }],
+  }
+}
+
+function generateStaff(teamName, countryId) {
+  const cid = countryId || 'es'
+  return [
+    generateStaffMember(teamName, cid, 'headCoach'),
+    generateStaffMember(teamName, cid, 'assistantCoach'),
+    generateStaffMember(teamName, cid, 'delegate'),
+    generateStaffMember(teamName, cid, 'goalkeeperCoach'),
+    generateStaffMember(teamName, cid, 'fitnessCoach'),
+  ]
 }
 
 function generateCpuSquad(teamId) {
@@ -83,6 +145,7 @@ function generateCpuSquad(teamId) {
         nationality: '🇪🇸 España',
         goals: 0, matches: 0,
         value, transferListed: false, transferPrice: 0, loanListed: false, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [],
+        wage: calcWage(skill),
         enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']),
       })
     }
@@ -560,6 +623,7 @@ const state = {
   selectedPlayerId: null,
   inbox: [],
   soundEnabled: true,
+  filialSquad: [],
 }
 
 /* ============ HELPERS ============ */
@@ -611,6 +675,7 @@ function saveGame() {
     staff: state.staff,
     inbox: state.inbox,
     soundEnabled: state.soundEnabled,
+    filialSquad: state.filialSquad,
   }
   if (idx >= 0) saves[idx] = data; else saves.unshift(data)
   setSaves(saves)
@@ -710,13 +775,20 @@ function getTeamRating(id) {
 }
 
 function getTeamObj(id) {
-  if (id === state.teamId) return { name: state.team, players: state.players, teamId: state.teamId }
+  if (id === state.teamId) return { name: state.team, players: state.players, teamId: state.teamId, staff: state.staff }
+  const filialId = getFilialId(state.teamId)
+  if (filialId && id === filialId && state.filialSquad) {
+    return { name: getTeamName(id), players: state.filialSquad, teamId: id }
+  }
   let t = state.leagueTeams.find(x => x.teamId === id)
   if (t) return t
   for (const c of COUNTRIES) {
     for (const l of c.leagues) {
       const team = l.teams.find(x => x.id === id)
-      if (team) return { name: team.name, players: [], teamId: team.id, staff: team.staff }
+      if (team) {
+        const squad = REAL_SQUADS[team.id] || []
+        return { name: team.name, players: squad.map(p => ({ ...p })), teamId: team.id, staff: team.staff }
+      }
     }
   }
   return null
@@ -775,20 +847,20 @@ function renderSquad(players) {
   const ordered = [...players].sort((a, b) => POS_ORDER.indexOf(a.position) - POS_ORDER.indexOf(b.position) || a.number - b.number)
   document.getElementById('club-player-count').textContent = `${players.length}/${MAX_SQUAD} jugadores`
   let html = ''
-  const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
   if (state.staff && state.staff.length > 0) {
     html += `<div class="tactics-subsection-label">Staff técnico (${state.staff.length})</div>`
     state.staff.forEach(s => {
       const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
       const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
-      html += `<div class="staff-card"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+      html += `<div class="staff-card"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role" data-role="${s.role}">${roleLabels[s.role] || s.role}</span></div>`
     })
   }
   html += `<div class="tactics-subsection-label" style="margin-top:4px">PLANTILLA (${players.length})</div>`
   container.innerHTML = html + ordered.map(p => {
     const pos = POSITIONS[p.position]
     const initials = getInitials(p.name)
-    const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+    const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
     const val = p.value || calcValue(p.skill)
     return `
       <div class="player-card" data-player-id="${p.id}">
@@ -935,7 +1007,7 @@ function renderClub() {
 function renderBenchCard(player, extraClass) {
   const pos = POSITIONS[player.position]
   const avatarStyle = player.avatar
-    ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}`
+    ? `background-image:url(${player.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}`
     : `background:${pos.color}`
   return `<div class="bench-card ${extraClass}" data-player-id="${player.id}">
     <div class="bc-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
@@ -1064,7 +1136,7 @@ function renderTactics(tactic) {
     if (player) {
       const mult = getPositionMultiplier(player.position, role)
       const penalty = mult < 1 ? '⚠️' : ''
-      const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = player.avatar ? `background-image:url(${player.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       return `<div class="pitch-slot-wrap">
         <div class="pitch-slot filled" data-slot="${i}" style="border-color:${pos.color};background:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
@@ -1100,7 +1172,7 @@ function renderTactics(tactic) {
       if (player) {
         const mult = getPositionMultiplier(player.position, role)
         const penalty = mult < 1 ? '⚠️' : ''
-        const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+        const avatarStyle = player.avatar ? `background-image:url(${player.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
         html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
           <div class="pitch-slot filled" data-slot="${slotIdx}" style="border-color:${pos.color};background:${pos.color}">
             <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
@@ -1127,7 +1199,7 @@ function renderTactics(tactic) {
     const player = pid ? state.players.find(p => p.id === pid) : null
     if (player) {
       const pos = POSITIONS[player.position]
-      const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = player.avatar ? `background-image:url(${player.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       html += `<div class="bench-slot-wrap">
         <div class="bench-slot filled" data-bench="${i}" style="border-color:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
@@ -1152,7 +1224,7 @@ function renderTactics(tactic) {
     const player = pid ? state.players.find(p => p.id === pid) : null
     if (player) {
       const pos = POSITIONS[player.position]
-      const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = player.avatar ? `background-image:url(${player.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       html += `<div class="bench-slot-wrap">
         <div class="bench-slot filled" data-reserve="${i}" style="border-color:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
@@ -1351,7 +1423,11 @@ function handleSlotClick(el, tactic) {
 /* ============ FATIGA & SUSTITUCIONES ============ */
 function getHabilidadEfectiva(player, assignedRole) {
   const mult = assignedRole ? getPositionMultiplier(player.position, assignedRole) : 1
-  const base = player.energy < 50 ? Math.round(player.skill * 0.5) : player.skill
+  let base = player.energy < 50 ? Math.round(player.skill * 0.5) : player.skill
+  if (player.position === 'portero') {
+    const gkCoachCount = state.staff.filter(s => s.role === 'goalkeeperCoach').length
+    base += gkCoachCount * 2
+  }
   return Math.round(base * mult)
 }
 
@@ -1391,10 +1467,12 @@ function gestionarCambios() {
 }
 
 function simularLesion() {
+  const fitCoachCount = state.staff.filter(s => s.role === 'fitnessCoach').length
+  const injuryProb = 0.025 * Math.max(0.4, 1 - fitCoachCount * 0.10)
   for (const p of state.players) {
     if (!p.enPista) continue
     if (p.injury) continue
-    if (Math.random() > 0.025) continue
+    if (Math.random() > injuryProb) continue
     const inj = pickRandom(INJURIES)
     p.injury = { type: inj.type, description: inj.description, duration: inj.duration, remaining: inj.duration, recoveryEnergy: inj.recoveryEnergy }
     p.energy = 0
@@ -1792,7 +1870,7 @@ function renderPlayerRatings() {
   enPista.sort((a, b) => (posOrder[a.position] ?? 99) - (posOrder[b.position] ?? 99))
   container.innerHTML = enPista.map(p => {
     const pos = POSITIONS[p.position]
-    const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+    const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
     let cardBadge = ''
     if (p._redThisMatch) cardBadge = '<span class="card-indicator card-red"></span>'
     else if (p._yellowsInThisMatch) cardBadge = '<span class="card-indicator card-yellow"></span>'
@@ -1877,7 +1955,7 @@ function abrirTacticasModal() {
 
       if (player) {
         const isRed = player._redThisMatch
-        const avatarStyle = player.avatar ? `background-image:url(${player.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+        const avatarStyle = player.avatar ? `background-image:url(${player.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
         html += `<div class="pitch-slot-wrap" style="grid-area:${area}">
           <div class="pitch-slot filled" data-slot="${slotIdx}" style="border-color:${isRed ? '#EF4444' : pos.color};background:${isRed ? '#EF4444' : pos.color}">
             <div class="slot-avatar" style="${avatarStyle}">${player.avatar ? '' : getInitials(player.name)}</div>
@@ -1943,7 +2021,7 @@ function abrirTacticasModal() {
   } else {
     bench.innerHTML = benchPlayers.map(p => {
       const pos = POSITIONS[p.position]
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       return `<div class="bench-slot-wrap">
         <div class="bench-slot filled" data-pid="${p.id}" style="border-color:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
@@ -1966,7 +2044,7 @@ function abrirTacticasModal() {
   } else {
     reserves.innerHTML = reservePlayers.map(p => {
       const pos = POSITIONS[p.position]
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;background-position:center;background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       return `<div class="bench-slot-wrap">
         <div class="bench-slot filled" data-pid="${p.id}" style="border-color:${pos.color}">
           <div class="slot-avatar" style="${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
@@ -2155,7 +2233,34 @@ function getLeagueFromId(leagueId) {
   return null
 }
 
+/* ============ ECONOMÍA SEMANAL ============ */
+function procesarEconomiaSemanal() {
+  /* Salarios de jugadores */
+  const wageTotal = state.players.reduce((s, p) => s + (p.wage || calcWage(p.skill || 70)), 0)
+  const staffTotal = (state.staff ? state.staff.length : 1) * 400
+  const total = wageTotal + staffTotal
+  state.finances.balance -= total
+  state.finances.history.push({ reason: `📋 Salarios semanales (${state.players.length} jugs + staff)`, amount: -total })
+
+  /* Ventas CPU */
+  procesarVentasCPU()
+}
+
+function procesarVentasCPU() {
+  const transferibles = state.players.filter(p => p.transferListed && p.transferPrice > 0)
+  for (const p of transferibles) {
+    if (Math.random() > 0.15) continue
+    /* CPU compra al jugador */
+    state.finances.balance += p.transferPrice
+    state.finances.history.push({ reason: `💰 Venta: ${p.name}`, amount: p.transferPrice })
+    const idx = state.players.indexOf(p)
+    if (idx >= 0) state.players.splice(idx, 1)
+    addNotification('transfer', `💰 Vendido: ${p.name}`, `${formatMoney(p.transferPrice)} · Traspasado a un equipo de la liga`)
+  }
+}
+
 function procesarFinTemporada() {
+  envejecerYProgresar()
   const standings = updateLeagueStandings()
   const pos = standings.findIndex(s => s.teamId === state.teamId) + 1
   const enPrimera = state.leagueId === 'lnfs1'
@@ -2181,7 +2286,7 @@ function procesarFinTemporada() {
     return {
       teamId: t.id, name: t.name,
       players: existing ? existing.players.map(p => ({ ...p, energy: 100, injury: null, goals: 0, matches: 0 }))
-        : (REAL_SQUADS[t.id] || []).map(p => ({ ...p, value: calcValue(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, energy: 100, goals: 0, matches: 0 })),
+        : (REAL_SQUADS[t.id] || []).map(p => ({ ...p, value: calcValue(p.skill), wage: calcWage(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, energy: 100, goals: 0, matches: 0 })),
       staff: t.staff || existing?.staff || [],
     }
   })
@@ -2313,6 +2418,7 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
         return
       }
       state.currentMatchday++
+      procesarEconomiaSemanal()
       for (const p of state.players) {
         if (!p.injury) continue
         p.injury.remaining--
@@ -2321,6 +2427,24 @@ function showMatchdayResults(userScore, rivalScore, rivalName) {
           p.energy = p.injury.recoveryEnergy
           p.injury = null
           addNotification('general', `💪 Recuperado: ${name}`, `Vuelve tras superar su lesión`)
+        }
+      }
+      /* Staff bonus: 2º Entrenador → +5 energía/jornada */
+      const assistCount = state.staff.filter(s => s.role === 'assistantCoach').length
+      if (assistCount > 0) {
+        state.players.forEach(p => { p.energy = Math.min(100, p.energy + assistCount * 5) })
+      }
+      /* AI promotion from filial to first team */
+      const parentIdAI = getParentTeamId(state.teamId)
+      if (parentIdAI && Math.random() < 0.15) {
+        const candidates = state.players.filter(p => p.skill >= 65 && !p.injury)
+        if (candidates.length > 0) {
+          const promoted = pickRandom(candidates)
+          const idx = state.players.indexOf(promoted)
+          if (idx >= 0) {
+            state.players.splice(idx, 1)
+            addNotification('general', `⬆ ${promoted.name} sube al primer equipo`, `El primer equipo recluta a ${promoted.name} desde el filial`)
+          }
         }
       }
       document.getElementById('league-results-wrap').classList.add('hidden')
@@ -2349,8 +2473,8 @@ function renderMarketContent() {
   }
 
   if (state.marketTab === 'buy') {
-    const available = allCpuPlayers.filter(p => !p.transferListed).sort((a, b) => b.value - a.value).slice(0, 20)
-    const filtered = search ? available.filter(p => p.name.toLowerCase().includes(search)) : available
+    const available = allCpuPlayers.filter(p => !p.transferListed).sort((a, b) => b.value - a.value)
+    const filtered = search ? available.filter(p => p.name.toLowerCase().includes(search)) : available.slice(0, 20)
 
     if (filtered.length === 0) {
       container.innerHTML = '<div class="market-empty">No hay jugadores disponibles</div>'
@@ -2360,7 +2484,7 @@ function renderMarketContent() {
     container.innerHTML = filtered.map(p => {
       const pos = POSITIONS[p.position]
       const canBuy = state.players.length < MAX_SQUAD && state.finances.balance >= p.value
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       return `
         <div class="market-card" data-player-id="${p.id}" data-team-id="${p.teamId}">
           <div class="player-avatar" style="width:36px;height:36px;font-size:12px;${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
@@ -2397,7 +2521,7 @@ function renderMarketContent() {
         buyPlayer(player, team)
       })
     })
-  } else {
+  } else if (state.marketTab === 'sell') {
     const listed = state.players.filter(p => p.transferListed)
     if (listed.length === 0) {
       container.innerHTML = '<div class="market-empty">No tienes jugadores en venta.<br>Ve a Club > Plantilla y abre un jugador para listarlo.</div>'
@@ -2410,7 +2534,7 @@ function renderMarketContent() {
     }
     container.innerHTML = filtered.map(p => {
       const pos = POSITIONS[p.position]
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       return `
         <div class="market-card" data-player-id="${p.id}">
           <div class="player-avatar" style="width:36px;height:36px;font-size:12px;${avatarStyle}">${p.avatar ? '' : getInitials(p.name)}</div>
@@ -2440,19 +2564,102 @@ function renderMarketContent() {
         renderMarketContent()
       })
     })
+  } else if (state.marketTab === 'staff') {
+    const allStaff = []
+    for (const t of state.leagueTeams) {
+      for (const s of (t.staff || [])) {
+        allStaff.push({ ...s, teamName: t.name, teamId: t.teamId })
+      }
+    }
+    /* Add unemployed staff available for hire */
+    const roles = ['headCoach', 'assistantCoach', 'delegate', 'goalkeeperCoach', 'fitnessCoach']
+    const countryIds = Object.keys(NATIONALITIES)
+    for (let i = 0; i < 12; i++) {
+      const cid = pickRandom(countryIds)
+      const role = pickRandom(roles)
+      const m = generateStaffMember('— Sin equipo —', cid, role)
+      allStaff.push({ ...m, teamName: '— Sin equipo —', teamId: null })
+    }
+    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+    const visibleStaff = allStaff.filter(s => !(s.role === 'headCoach' && s.teamId !== null))
+    const filtered = search ? visibleStaff.filter(s => s.name.toLowerCase().includes(search)) : visibleStaff
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="market-empty">No hay personal técnico disponible</div>'
+      return
+    }
+    container.innerHTML = filtered.map(s => {
+      const avatarStyle = s.avatar ? `background-image:url(${s.avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)` : `background:var(--bg-surface)`
+      const alreadyHas = state.staff.some(x => x.role === s.role)
+      const canHire = state.finances.balance >= 2000 && !alreadyHas
+      return `
+        <div class="market-card" data-staff-name="${s.name}" data-team-id="${s.teamId}">
+          <div class="staff-card-avatar" style="width:36px;height:36px;${avatarStyle}">${s.avatar ? '' : getInitials(s.name)}</div>
+          <div class="market-card-info">
+            <div class="market-card-name">${s.name}</div>
+            <div class="market-card-detail">${roleLabels[s.role] || s.role} · ${s.teamName}</div>
+          </div>
+          <div class="market-card-right">
+            <div class="market-card-value">2.000 €</div>
+            <button class="market-card-btn ${canHire ? 'hire' : 'disabled'}">${canHire ? 'CONTRATAR' : (alreadyHas ? 'YA TIENES UNO' : 'SIN FONDOS')}</button>
+          </div>
+        </div>
+      `
+    }).join('')
+    container.querySelectorAll('.market-card').forEach(card => {
+      card.onclick = () => {
+        const name = card.dataset.staffName
+        const tid = card.dataset.teamId
+        const team = state.leagueTeams.find(t => t.teamId === tid)
+        if (team) {
+          const staff = team.staff.find(s => s.name === name)
+          if (staff) openStaffModal(staff)
+        }
+      }
+      card.querySelector('.market-card-btn.hire')?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const name = card.dataset.staffName
+        const tid = card.dataset.teamId
+        const team = tid ? state.leagueTeams.find(t => t.teamId === tid) : null
+        const staffMember = team ? team.staff.find(s => s.name === name) : allStaff.find(s => s.name === name && s.teamId === null)
+        if (!staffMember) return
+        hireStaff(staffMember, team)
+      })
+    })
   }
 }
 
 function buyPlayer(player, team) {
   if (state.players.length >= MAX_SQUAD) return
-  if (state.finances.balance < player.value) return
-  state.finances.balance -= player.value
-  state.finances.history.push({ reason: `Compra: ${player.name}`, amount: -player.value })
+  const delegateCount = state.staff.filter(s => s.role === 'delegate').length
+  const discount = Math.max(0, 1 - delegateCount * 0.1)
+  const finalValue = Math.round(player.value * discount)
+  if (state.finances.balance < finalValue) return
+  state.finances.balance -= finalValue
+  state.finances.history.push({ reason: `Compra: ${player.name}${discount < 1 ? ' (-' + Math.round((1 - discount) * 100) + '% dto)' : ''}`, amount: -finalValue })
   const idx = team.players.indexOf(player)
   if (idx >= 0) team.players.splice(idx, 1)
-  const newPlayer = { ...player, id: `user-${Date.now()}`, energy: 100, matches: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [], transferListed: false, transferPrice: 0, loanListed: false, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']) }
+  const newPlayer = { ...player, id: `user-${Date.now()}`, value: calcValue(player.skill), wage: calcWage(player.skill), energy: 100, matches: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [], transferListed: false, transferPrice: 0, loanListed: false, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null, age: randInt(20, 35), foot: pickRandom(['DER', 'IZQ']) }
   state.players.push(newPlayer)
   addNotification('transfer', `Fichaje completado: ${player.name}`, `${formatMoney(player.value)} · ${player.nationality}`)
+  renderMarketContent()
+}
+
+function hireStaff(staffMember, team) {
+  if (state.staff.some(s => s.role === staffMember.role)) return
+  const cost = 2000
+  if (state.finances.balance < cost) return
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+  state.finances.balance -= cost
+  state.finances.history.push({ reason: `Contratación: ${staffMember.name} (${roleLabels[staffMember.role] || staffMember.role})`, amount: -cost })
+  if (team) {
+    const staffTeam = state.leagueTeams.find(t => t.teamId === team.teamId)
+    if (staffTeam) {
+      const idx = staffTeam.staff.indexOf(staffMember)
+      if (idx >= 0) staffTeam.staff.splice(idx, 1)
+    }
+  }
+  state.staff.push({ ...staffMember })
+  addNotification('transfer', `Staff contratado: ${staffMember.name}`, `${roleLabels[staffMember.role] || staffMember.role} · ${formatMoney(cost)}`)
   renderMarketContent()
 }
 
@@ -2461,7 +2668,7 @@ function openPlayerModal(player, mode) {
   const pos = POSITIONS[player.position]
   const avatarEl = document.getElementById('modal-avatar')
   avatarEl.textContent = player.avatar ? '' : getInitials(player.name)
-  avatarEl.style.background = player.avatar ? `url(${player.avatar}) center/cover, ${pos.color}` : pos.color
+  avatarEl.style.background = player.avatar ? `url(${player.avatar}) center/cover, url(${NOPHOTO}) center/cover, ${pos.color}` : pos.color
   /* Avatar glow with position color */
   const wrap = document.getElementById('modal-avatar-wrap')
   wrap.style.setProperty('--glow-color', pos.color)
@@ -2481,6 +2688,7 @@ function openPlayerModal(player, mode) {
   document.getElementById('modal-energy').textContent = player.energy
   document.getElementById('modal-energy-fill').style.width = player.energy + '%'
   document.getElementById('modal-value').textContent = formatMoney(player.value)
+  document.getElementById('modal-wage').textContent = formatMoney(player.wage || calcWage(player.skill))
   document.getElementById('modal-pj').textContent = player.matches || 0
   document.getElementById('modal-g').textContent = player.goals || 0
   document.getElementById('modal-a').textContent = player.assists || 0
@@ -2545,9 +2753,9 @@ function openPlayerModal(player, mode) {
     }
     /* LC button */
     if (player.loanListed) {
-      actions.innerHTML += `<button class="btn-secondary" id="modal-retirar-lc" style="margin-top:6px">RETIRAR DE CEDIBLES</button>`
+      actions.innerHTML += `<button class="btn-secondary" id="modal-retirar-lc">RETIRAR CEDIBLES</button>`
     } else {
-      actions.innerHTML += `<button class="btn-primary" id="modal-listar-lc" style="margin-top:6px;background:var(--accent)">LISTA CEDIBLES</button>`
+      actions.innerHTML += `<button class="btn-primary" id="modal-listar-lc" style="background:var(--accent)">LISTA CEDIBLES</button>`
     }
 
     /* LT events */
@@ -2565,17 +2773,48 @@ function openPlayerModal(player, mode) {
     const listarLC = document.getElementById('modal-listar-lc')
     if (listarLC) listarLC.onclick = () => { player.loanListed = true; closeModal(); renderSquad(state.players) }
 
+    /* Filial buttons */
+    const filialId = getFilialId(state.teamId)
+    if (filialId) {
+      actions.innerHTML += `<button class="btn-secondary" id="modal-bajar-filial" style="margin-top:4px">⬇ BAJAR AL FILIAL</button>`
+    }
+
+    /* Filial events */
+    const btnBajar = document.getElementById('modal-bajar-filial')
+    if (btnBajar) btnBajar.onclick = () => {
+      if (state.filialSquad.length >= MAX_SQUAD) return
+      const idx = state.players.indexOf(player)
+      if (idx < 0) return
+      state.players.splice(idx, 1)
+      state.filialSquad.push({ ...player, id: `filial-down-${Date.now()}`, energy: 100, goals: 0, matches: 0 })
+      const filialName = getTeamName(filialId)
+      addNotification('transfer', `⬇ ${player.name} baja al filial`, `Traspasado a ${filialName}`)
+      closeModal()
+      renderSquad(state.players)
+    }
+
   } else if (mode === 'cpu') {
-    const canBuy = state.players.length < MAX_SQUAD && state.finances.balance >= player.value
-    actions.innerHTML = `
-      <button class="btn-primary ${canBuy ? '' : 'disabled'}" id="modal-comprar" ${!canBuy ? 'disabled' : ''}>
-        ${canBuy ? `COMPRAR · ${formatMoney(player.value)}` : (state.players.length >= MAX_SQUAD ? 'PLANTILLA LLENA' : 'SIN FONDOS')}
-      </button>
-    `
-    if (canBuy) {
-      document.getElementById('modal-comprar').onclick = () => {
-        const team = state.leagueTeams.find(t => t.teamId === player.teamId || t.players?.includes(player))
-        if (team) { buyPlayer(player, team); closeModal() }
+    const playerFilialParent = player._teamId ? getParentTeamId(player._teamId) : null
+    const isFilialPlayer = playerFilialParent === state.teamId
+
+    if (isFilialPlayer && state.players.length < MAX_SQUAD) {
+      actions.innerHTML = `<button class="btn-primary" id="modal-subir-filial-cpu" style="background:#10B981">⬆ SUBIR AL PRIMER EQUIPO</button>`
+      document.getElementById('modal-subir-filial-cpu').onclick = () => {
+      const idx = state.filialSquad.findIndex(p => p.id === player.id)
+      if (idx >= 0) state.filialSquad.splice(idx, 1)
+      state.players.push({ ...player, id: `promo-${Date.now()}`, value: calcValue(player.skill || 70), wage: calcWage(player.skill || 70), energy: 100, matches: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matchHistory: [], transferListed: false, transferPrice: 0, loanListed: false, enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null })
+        addNotification('transfer', `⬆ ${player.name} sube al primer equipo`, `Promocionado desde el filial`)
+        closeModal()
+        renderSquad(state.players)
+      }
+    } else {
+      const canBuy = state.players.length < MAX_SQUAD && state.finances.balance >= player.value
+      actions.innerHTML = `<button class="btn-primary ${canBuy ? '' : 'disabled'}" id="modal-comprar" ${!canBuy ? 'disabled' : ''}>${canBuy ? `COMPRAR · ${formatMoney(player.value)}` : (state.players.length >= MAX_SQUAD ? 'PLANTILLA LLENA' : 'SIN FONDOS')}</button>`
+      if (canBuy) {
+        document.getElementById('modal-comprar').onclick = () => {
+          const team = state.leagueTeams.find(t => t.teamId === player.teamId || t.players?.includes(player))
+          if (team) { buyPlayer(player, team); closeModal() }
+        }
       }
     }
   }
@@ -2585,15 +2824,65 @@ function openPlayerModal(player, mode) {
 
 function closeModal() {
   document.getElementById('player-modal').classList.remove('open')
+
+}
+
+/* ============ AGE & PROGRESSION ============ */
+function envejecerYProgresar() {
+  const retirados = []
+  state.players.forEach(p => {
+    p.age = (p.age || 22) + 1
+    const matches = p.matches || 0
+    const jugoMucho = matches >= 10
+    const jugoPoco = matches < 5
+
+    if (p.age <= 29) {
+      p.skill = Math.min(99, p.skill + (jugoMucho ? 2 : jugoPoco ? 0.5 : 1))
+    } else if (p.age >= 35) {
+      p.skill = Math.max(40, p.skill - (jugoMucho ? 2 : 3))
+      if (jugoPoco && Math.random() < 0.5) retirados.push(p)
+    } else if (p.age >= 33) {
+      p.skill = Math.max(45, p.skill - (jugoMucho ? 1 : 2))
+    } else {
+      p.skill = Math.max(50, p.skill - (jugoMucho ? 0 : 1))
+    }
+  })
+  retirados.forEach(p => {
+    const idx = state.players.indexOf(p)
+    if (idx >= 0) state.players.splice(idx, 1)
+    addNotification('general', `🚑 Retirada: ${p.name}`, `${p.age} años · Se retira tras ${p.matches} partidos esta temporada`)
+  })
 }
 
 function openStaffModal(staff) {
   const avatar = staff.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
-  const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
-  document.getElementById('staff-modal-avatar').src = avatar
+  const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
+  const img = document.getElementById('staff-modal-avatar')
+  img.src = avatar
+  img.onerror = () => { img.src = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1' }
   document.getElementById('staff-modal-name').textContent = staff.name
+  document.getElementById('staff-modal-nationality').textContent = staff.nationality || '🇪🇸 España'
   document.getElementById('staff-modal-role').textContent = roleLabels[staff.role] || staff.role
 
+  /* Staff bonus */
+  const bonusMap = {
+    headCoach: 'Mejora el rendimiento del plan de juego en los partidos',
+    assistantCoach: '+5 energía extra por jornada para todos los jugadores',
+    delegate: '-10% en el precio de compra de jugadores',
+    goalkeeperCoach: '+2 skill efectivo para los porteros durante los partidos',
+    fitnessCoach: '-10% de probabilidad de lesión en los partidos',
+  }
+  const existingBonus = document.getElementById('staff-modal-bonus')
+  if (existingBonus) existingBonus.remove()
+  if (bonusMap[staff.role]) {
+    const bonusEl = document.createElement('div')
+    bonusEl.id = 'staff-modal-bonus'
+    bonusEl.className = 'staff-bonus'
+    bonusEl.textContent = bonusMap[staff.role]
+    document.getElementById('staff-modal-role').after(bonusEl)
+  }
+
+  const isHeadCoach = staff.role === 'headCoach'
   const career = staff.career || [{ team: state.team, from: '—', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }]
   const total = { matches: 0, won: 0, drawn: 0, lost: 0 }
 
@@ -2602,14 +2891,38 @@ function openStaffModal(staff) {
     return `<div class="staff-career-item">
       <span class="staff-career-team">${c.team}</span>
       <span class="staff-career-dates">${c.from} → ${c.to}</span>
-      <span class="staff-career-record">${c.won}V ${c.drawn}E ${c.lost}D</span>
-      <span class="staff-career-matches">${c.matches} part.</span>
+      ${isHeadCoach ? `<span class="staff-career-record"><span class="wins">${c.won}V</span> <span class="draws">${c.drawn}E</span> <span class="losses">${c.lost}D</span></span><span class="staff-career-matches">${c.matches} part.</span>` : ''}
     </div>`
   }).join('')
 
-  document.getElementById('staff-modal-total').innerHTML = career.length > 0
-    ? `<div class="staff-career-total">TOTAL: ${total.matches} part. · ${total.won}V ${total.drawn}E ${total.lost}D</div>`
+  document.getElementById('staff-modal-total').innerHTML = career.length > 0 && isHeadCoach
+    ? `<div class="staff-career-total">TOTAL · ${total.matches} part. · <span class="wins">${total.won}V</span> <span class="draws">${total.drawn}E</span> <span class="losses">${total.lost}D</span> (${total.matches > 0 ? Math.round((total.won / total.matches) * 100) : 0}% victorias)</div>`
     : ''
+
+  /* Fire staff button */
+  const oldFire = document.getElementById('staff-modal-fire')
+  if (oldFire) oldFire.remove()
+  if (!isHeadCoach) {
+    const compensation = 2000
+    const canFire = state.finances.balance >= compensation
+    const fireDiv = document.createElement('div')
+    fireDiv.id = 'staff-modal-fire'
+    fireDiv.style.cssText = 'width:100%;padding:8px 0'
+    fireDiv.innerHTML = `<button class="btn-primary" id="btn-fire-staff" style="background:#EF4444;height:36px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px" ${canFire ? '' : 'disabled'}>${canFire ? `DESPEDIR (${formatMoney(compensation)})` : `SIN FONDOS (${formatMoney(compensation)})`}</button>`
+    document.getElementById('staff-modal-total').after(fireDiv)
+    const fireBtn = document.getElementById('btn-fire-staff')
+    if (fireBtn && canFire) {
+      fireBtn.onclick = () => {
+        const idx = state.staff.indexOf(staff)
+        if (idx >= 0) state.staff.splice(idx, 1)
+        state.finances.balance -= compensation
+        state.finances.history.push({ reason: `Despido: ${staff.name} (${roleLabels[staff.role] || staff.role})`, amount: -compensation })
+        addNotification('general', `Despido: ${staff.name}`, `${roleLabels[staff.role] || staff.role} · Indemnización: ${formatMoney(compensation)}`)
+        document.getElementById('staff-modal').classList.remove('open')
+        renderSquad(state.players)
+      }
+    }
+  }
 
   document.getElementById('staff-modal').classList.add('open')
 }
@@ -2617,13 +2930,25 @@ function openStaffModal(staff) {
 /* ============ FINANCES VIEW ============ */
 function renderFinances() {
   document.getElementById('finance-balance').textContent = formatMoney(state.finances.balance)
+
+  /* Income / expense totals */
+  const ingresos = state.finances.history.filter(i => i.amount > 0).reduce((s, i) => s + i.amount, 0)
+  const gastos = state.finances.history.filter(i => i.amount < 0).reduce((s, i) => s + Math.abs(i.amount), 0)
+  const wageTotal = state.players.reduce((s, p) => s + (p.wage || calcWage(p.skill || 70)), 0)
+  const semanal = -(wageTotal + (state.staff ? state.staff.length : 1) * 400)
+  document.getElementById('finance-ingresos').textContent = formatMoney(ingresos)
+  document.getElementById('finance-gastos').textContent = formatMoney(gastos)
+  document.getElementById('finance-semanal').textContent = formatMoney(semanal)
+
+  /* History */
   const container = document.getElementById('finance-history')
   if (!container) return
   if (state.finances.history.length === 0) {
-    container.innerHTML = '<div class="finance-item" style="justify-content:center;color:var(--text-muted)">Sin movimientos aún</div>'
+    container.innerHTML = '<div class="finance-item" style="justify-content:center;color:var(--text-muted);background:none;border:none">Sin movimientos aún</div>'
     return
   }
-  container.innerHTML = state.finances.history.map(item => {
+  const items = [...state.finances.history].reverse()
+  container.innerHTML = items.map(item => {
     const cls = item.amount >= 0 ? 'positive' : 'negative'
     const sign = item.amount >= 0 ? '+' : ''
     return `<div class="finance-item"><span class="finance-item-reason">${item.reason}</span><span class="finance-item-amount ${cls}">${sign}${formatMoney(item.amount)}</span></div>`
@@ -2708,7 +3033,12 @@ function newGame(coach) {
   state.team = selectedTeam.name
   state.teamId = selectedTeam.id
   state.teamLogo = selectedTeam.logo || ''
-  state.staff = selectedTeam.staff || []
+  const noface = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
+  const countryId = selectedCountry.id
+  state.staff = [
+    { name: coach, nationality: NATIONALITIES[countryId]?.label || '🇪🇸 España', role: 'headCoach', avatar: noface, career: [{ team: selectedTeam.name, from: new Date().toLocaleDateString('es-ES'), to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] },
+    ...generateStaff(selectedTeam.name, countryId).slice(1),
+  ]
   state.countryId = selectedCountry.id
   state.leagueId = selectedLeague.id
   state.gameId = Date.now()
@@ -2726,10 +3056,18 @@ function newGame(coach) {
   /* Assign user squad based on selected team */
   const userSquad = REAL_SQUADS[state.teamId] || FCB_SQUAD
   state.players = userSquad.map(p => ({
-    ...p, value: calcValue(p.skill),
+    ...p, value: calcValue(p.skill), wage: calcWage(p.skill),
     enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null,
   }))
   state.players.forEach(p => { p.energy = 100 })
+
+  /* Initialize filial squad if the team has one */
+  const myFilialId = getFilialId(state.teamId)
+  if (myFilialId) {
+    state.filialSquad = (REAL_SQUADS[myFilialId] || []).map(p => ({ ...p, id: `filial-${p.id}`, value: calcValue(p.skill), wage: calcWage(p.skill), energy: 100, goals: 0, assists: 0, yellowCards: 0, redCards: 0, mvp: 0, matches: 0, matchHistory: [], transferListed: false, transferPrice: 0, loanListed: false }))
+  } else {
+    state.filialSquad = []
+  }
 
   /* Generate CPU teams */
   state.leagueTeams = []
@@ -2738,9 +3076,9 @@ function newGame(coach) {
     if (t.id === state.teamId) continue
     const base = REAL_SQUADS[t.id]
     const squad = base
-      ? base.map(p => ({ ...p, value: calcValue(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }))
+      ? base.map(p => ({ ...p, value: calcValue(p.skill), wage: calcWage(p.skill), enPista: false, minutosEnPista: 0, convocado: false, titular: false, injury: null }))
       : generateCpuSquad(t.id)
-    const defaultStaff = t.staff || [{ name: pickRandom(NAME_POOLS.ala), nationality: '🇪🇸 España', role: 'headCoach', avatar: 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1', career: [{ team: t.name, from: '01/09/2026', to: 'Actualidad', matches: 0, won: 0, drawn: 0, lost: 0 }] }]
+    const defaultStaff = t.staff || generateStaff(t.name, state.countryId)
     state.leagueTeams.push({ teamId: t.id, name: t.name, players: squad, staff: defaultStaff })
     allTeamIds.push(t.id)
   }
@@ -2838,6 +3176,7 @@ function loadGame(id) {
   state.staff = data.staff || []
   state.inbox = data.inbox || []
   state.soundEnabled = data.soundEnabled !== false
+  state.filialSquad = data.filialSquad || []
   startGame()
 }
 
@@ -2940,7 +3279,7 @@ function showTeamPreview(teamId) {
     const noface = 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
     staff.forEach(s => {
       const avatar = s.avatar || noface
-      html += `<div class="staff-card staff-card-team"><div class="staff-card-avatar" style="background:var(--bg-surface)"><img src="${avatar}" onerror="this.src='${noface}'" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality || ''}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+      html += `<div class="staff-card staff-card-team"><div class="staff-card-avatar" style="background:var(--bg-surface)"><img src="${avatar}" onerror="this.src='${noface}'" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality || ''}</div></div><span class="staff-card-role" data-role="${s.role}">${roleLabels[s.role] || s.role}</span></div>`
     })
   }
 
@@ -2950,7 +3289,7 @@ function showTeamPreview(teamId) {
     ordered.forEach(p => {
       const pos = POSITIONS[p.position]
       const initials = getInitials(p.name)
-      const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+      const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
       const val = p.value || calcValue(p.skill)
       html += `<div class="player-card">
         <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
@@ -3212,10 +3551,10 @@ function showTeamInfo(teamId) {
       </div>
     </div>
     ${team.staff && team.staff.length > 0 ? `<div class="tactics-subsection-label">Staff técnico (${team.staff.length})</div>${team.staff.map(s => {
-      const roleLabels = { headCoach: 'Entrenador', assistantCoach: 'Asistente', delegate: 'Delegado', fitnessCoach: 'Preparador físico' }
+    const roleLabels = { headCoach: 'Entrenador', assistantCoach: '2º Entrenador', delegate: 'Delegado', goalkeeperCoach: 'Entr. Porteros', fitnessCoach: 'Preparador físico' }
       const avatar = s.avatar || 'https://cdn.resfu.com/media/img/nofoto_jugador.png?size=120x&lossy=1'
       const avatarStyle = `background-image:url(${avatar});background-size:cover;background-position:center;background-color:var(--bg-surface)`
-      return `<div class="staff-card staff-card-team" data-staff-name="${s.name}"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role">${roleLabels[s.role] || s.role}</span></div>`
+      return `<div class="staff-card staff-card-team" data-staff-name="${s.name}"><div class="staff-card-avatar" style="${avatarStyle}"></div><div class="staff-card-info"><div class="staff-card-name">${s.name}</div><div class="staff-card-meta">${s.nationality}</div></div><span class="staff-card-role" data-role="${s.role}">${roleLabels[s.role] || s.role}</span></div>`
     }).join('')}` : ''}
     <div class="tactics-subsection-label">PLANTILLA (${team.players.length})</div>
     <div class="squad-grid">`
@@ -3223,7 +3562,7 @@ function showTeamInfo(teamId) {
   orderedPlayers.forEach(p => {
     const pos = POSITIONS[p.position]
     const initials = getInitials(p.name)
-    const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-color:${pos.color}` : `background:${pos.color}`
+    const avatarStyle = p.avatar ? `background-image:url(${p.avatar}), url(${NOPHOTO});background-size:cover,cover;background-position:center,center;background-color:${pos.color}` : `background:${pos.color}`
     const val = p.value || calcValue(p.skill)
     html += `<div class="player-card" data-player-id="${p.id}">
       <div class="player-avatar" style="${avatarStyle}">${p.avatar ? '' : initials}</div>
@@ -3257,7 +3596,7 @@ function showTeamInfo(teamId) {
     card.onclick = () => {
       const pid = card.dataset.playerId
       const player = team.players.find(p => p.id === pid)
-      if (player) openPlayerModal(player, 'cpu')
+      if (player) openPlayerModal({ ...player, _teamId: teamId }, 'cpu')
     }
   })
 }
